@@ -34,8 +34,8 @@
     },
     "hr": {
       "total_shortage_actual": 73,
-      "total_shortage_bs": 21,
-      "total_resign_week": 59,
+      "total_shortage_bs": 18,
+      "total_resign_week": 62,
       "total_ob_week": 11,
       "latest_week": 38
     }
@@ -133,9 +133,9 @@
       "backlog": 248,
       "backlog_change": 25,
       "hr": {
-        "shortage_actual": 10,
+        "shortage_actual": 11,
         "shortage_bs": 0,
-        "resign": 10,
+        "resign": 11,
         "ob": 0,
         "target_headcount": 148,
         "hrbp": "DungLK",
@@ -157,9 +157,9 @@
       "backlog": 296,
       "backlog_change": 30,
       "hr": {
-        "shortage_actual": 11,
-        "shortage_bs": 3,
-        "resign": 9,
+        "shortage_actual": 10,
+        "shortage_bs": 0,
+        "resign": 11,
         "ob": 1,
         "target_headcount": 219,
         "hrbp": "NgọcNTM",
@@ -302,9 +302,9 @@
       },
       "status": "Mạnh",
       "hr": {
-        "shortage_actual": 10,
+        "shortage_actual": 11,
         "shortage_bs": 0,
-        "resign": 10,
+        "resign": 11,
         "ob": 0,
         "target_headcount": 148
       }
@@ -324,9 +324,9 @@
       },
       "status": "Mạnh",
       "hr": {
-        "shortage_actual": 4,
-        "shortage_bs": 3,
-        "resign": 1,
+        "shortage_actual": 3,
+        "shortage_bs": 0,
+        "resign": 3,
         "ob": 0,
         "target_headcount": 64
       }
@@ -703,22 +703,22 @@
       "fd_change": 0.021320000000000026,
       "backlog": 6,
       "status": "Cảnh báo",
-      "cause": "Tỷ lệ trả hàng (%FD) cao bất thường (8.27%)",
-      "recommendation": "AM trực tiếp rà soát lý do trả hàng chặng cuối và thái độ phục vụ.",
+      "cause": "Thiếu 2 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.27%)",
+      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. AM trực tiếp rà soát lý do trả hàng chặng cuối và thái độ phục vụ.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 0,
+        "shortage_actual": 2,
         "shortage_bs": 0,
         "target_headcount": 18,
         "tuyen_thieu": "xã tân phú trung :    2nv\nXã tân bình           ;   2nv\nxã phú hựu  2NV",
         "hrbp": "NgọcNTM",
-        "status": "Đủ",
+        "status": "Thiếu",
         "ob_week": 0,
-        "resign_week": 0
+        "resign_week": 2
       }
     },
     {
@@ -898,7 +898,7 @@
     ],
     "lowlights": [
       "Toàn vùng đang **thiếu hụt thực tế 73 shipper (NVPTTT)**, ảnh nghiêm trọng đến tiến độ giao hàng đầu ca.",
-      "Điểm nóng nhân sự tập trung lớn nhất tại **Tiền Giang** (thiếu 26 định biên) và **Đồng Tháp** (thiếu 11 định biên)."
+      "Điểm nóng nhân sự tập trung lớn nhất tại **Tiền Giang** (thiếu 26 định biên) và **Đồng Tháp** (thiếu 10 định biên)."
     ],
     "causes": [
       "Tại **(BTR) An Hội**: Nhân sự: 7/11 (thiếu 4) + 2 nhân viên hỗ trợ; Bưu cục liên tục có nhân viên nghỉ ngang, té xe.; NVXL mới chưa quản lý được nhân sự tại BC, điều tiết giờ giấc xuất hàng.; Nhân viên 9h chưa rời khỏi kho.",
