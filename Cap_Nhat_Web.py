@@ -64,7 +64,7 @@ try:
     print("\n==========================================================")
     print("🎉 CẬP NHẬT TRANG WEB THÀNH CÔNG!")
     print("👉 Chị hãy mở link web bên dưới và bấm F5 (Làm mới) để xem:")
-    print("   https://baotranngocle1410kt-sys.github.io/DashboardDCL/")
+    print("   https://BaoBao993.github.io/DashboardDCL/")
     print("==========================================================")
 except Exception as e:
     print(f"\n[LỖI] Thất bại khi đẩy lên GitHub: {e}")
