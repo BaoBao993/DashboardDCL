@@ -249,10 +249,24 @@
           </div>
           <div class="kpi-card">
             <div class="kpi-value bad" id="kpiBacklog">1,247</div>
-            <div class="kpi-label">Backlog >3 ngày</div>
+            <div class="kpi-label">Backlog >5 ngày</div>
           </div>
         </div>
-        <p style="font-size:11px;color:var(--text-muted)">* Dữ liệu mẫu. Cập nhật qua Operations_Insights.md</p>
+        <div class="kpi-grid" style="margin-top:-4px">
+          <div class="kpi-card">
+            <div class="kpi-value info" id="kpiOverallBacklog" style="color:var(--accent-teal)">--</div>
+            <div class="kpi-label">Tồn Lấy/Giao/Trả</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-value warn" id="kpiTransferBacklog" style="color:var(--accent-amber)">--</div>
+            <div class="kpi-label">Tồn Luân Chuyển</div>
+          </div>
+          <div class="kpi-card" style="grid-column: span 2">
+            <div class="kpi-value bad" id="kpiODRBacklog" style="color:var(--accent-rose)">--</div>
+            <div class="kpi-label">Đơn trễ ODR (Ưu tiên)</div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:var(--text-muted)">* Dữ liệu thực tế. Cập nhật qua Operations_Insights.md & Excel sheets</p>
       </div>
 
       <!-- AM Scorecard -->
@@ -691,7 +705,7 @@
     <!-- Row 1: KPI Cards -->
     <div class="kpi-grid-4">
       <div class="kpi-card-rep">
-        <div class="kpi-card-title">Tồn Luân Chuyển (>24h)</div>
+        <div class="kpi-card-title">Tồn Luân Chuyển</div>
         <div class="kpi-card-value" id="tbKpiTotal">0</div>
         <div class="kpi-card-changes" id="tbKpiTotalChanges">
           <span class="change-tag" id="tbKpiTotalChange">-- vs Lần trước</span>

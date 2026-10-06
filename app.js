@@ -714,6 +714,9 @@ function parseAndRenderInsights(content) {
   const fdMatch = content.match(/-\s*\*\*FD\*\*:\s*([0-9.]+\%)/i);
   const ontimeMatch = content.match(/-\s*\*\*Ontime\*\*:\s*([0-9.]+\%)/i);
   const backlogMatch = content.match(/-\s*\*\*Backlog\*\*:\s*([0-9,]+)/i);
+  const overallBacklogMatch = content.match(/-\s*\*\*Tồn đọng Lấy\/Giao\/Trả\*\*:\s*([0-9,]+)/i);
+  const odrBacklogMatch = content.match(/-\s*\*\*Đơn ưu tiên giao trễ ODR\*\*:\s*([0-9,]+)/i);
+  const transferBacklogMatch = content.match(/-\s*\*\*Tồn Luân Chuyển\*\*:\s*([0-9,]+)/i);
 
   if (gtcMatch) {
     const el = document.getElementById('kpiGTC');
@@ -738,6 +741,18 @@ function parseAndRenderInsights(content) {
     el.textContent = backlogMatch[1];
     const val = parseInt(backlogMatch[1].replace(/,/g, ''));
     el.className = 'kpi-value ' + (val < 500 ? 'good' : val < 1500 ? 'warn' : 'bad');
+  }
+  if (overallBacklogMatch) {
+    const el = document.getElementById('kpiOverallBacklog');
+    if (el) el.textContent = overallBacklogMatch[1];
+  }
+  if (transferBacklogMatch) {
+    const el = document.getElementById('kpiTransferBacklog');
+    if (el) el.textContent = transferBacklogMatch[1];
+  }
+  if (odrBacklogMatch) {
+    const el = document.getElementById('kpiODRBacklog');
+    if (el) el.textContent = odrBacklogMatch[1];
   }
 
   // Parse AM Scorecard Table
@@ -1412,6 +1427,22 @@ function renderChecklistSidePanel() {
         el.className = 'kpi-value ' + (val < 500 ? 'good' : val < 1500 ? 'warn' : 'bad');
       }
     }
+    if (repData.overall_backlog) {
+      const el = document.getElementById('kpiOverallBacklog');
+      if (el) el.textContent = repData.overall_backlog.total.toLocaleString();
+    }
+    if (repData.transfer_backlog && repData.transfer_backlog.kpis) {
+      const el = document.getElementById('kpiTransferBacklog');
+      if (el) el.textContent = repData.transfer_backlog.kpis.total.toLocaleString();
+    }
+    if (repData.odr_backlog) {
+      const el = document.getElementById('kpiODRBacklog');
+      if (el) {
+        const totalVal = repData.odr_backlog.total.toLocaleString();
+        const pctVal = (repData.odr_backlog.percentage * 100).toFixed(1) + '%';
+        el.textContent = `${totalVal} (${pctVal})`;
+      }
+    }
   }
 
   // Update badges to "Thực tế" instead of "Demo"
@@ -1979,7 +2010,7 @@ function renderBcGrid(gridEl) {
       </div>
       <div class="bc-card-buttons">
         <button class="bc-btn" onclick="viewBcHistory('${escapeHtml(bc.name)}')">📉 Xem Lịch Sử</button>
-        <button class="bc-btn bc-btn-primary" onclick="sendTelegramAlert('${escapeHtml(bc.name)}', '${escapeHtml(bc.am)}', '${escapeHtml(bc.am_tele)}', '${(bc.gtc*100).toFixed(2)}%', '${escapeHtml(changeText)}', '${bc.backlog}', '${escapeHtml(bc.cause)}')">💬 Nhắc AM</button>
+        <button class="bc-btn bc-btn-primary" onclick="sendTelegramAlert('${escapeHtml(bc.name)}', '${escapeHtml(bc.am)}', '${escapeHtml(bc.am_tele)}', '${(bc.gtc*100).toFixed(2)}%', '${escapeHtml(changeText)}', '${bc.backlog}', '${escapeHtml(bc.cause)}', '${escapeHtml(bc.recommendation || '')}')">💬 Nhắc AM</button>
       </div>
     `;
     gridEl.appendChild(card);
@@ -1990,7 +2021,7 @@ function viewBcHistory(bcName) {
   showToast(`📉 Đang mở lịch sử của ${bcName}...`);
 }
 
-async function sendTelegramAlert(bcName, amName, amTele, gtcVal, changeText, backlog, cause) {
+async function sendTelegramAlert(bcName, amName, amTele, gtcVal, changeText, backlog, cause, recommendation) {
   if (!telegramConfig || !telegramConfig.BOT_TOKEN || !telegramConfig.CHAT_ID) {
     showToast("⚠️ Vui lòng cấu hình BOT_TOKEN & CHAT_ID trong file telegram_config.json");
     return;
@@ -2001,13 +2032,15 @@ async function sendTelegramAlert(bcName, amName, amTele, gtcVal, changeText, bac
   const chatId = telegramConfig.CHAT_ID;
   const threadId = telegramConfig.THREADS && telegramConfig.THREADS.van_hanh;
   
+  const recText = recommendation ? recommendation : "👉 Đề nghị AM vào kiểm tra và xử lý luồng hàng gấp!";
+  
   const text = `🚨 *[CẢNH BÁO VẬN HÀNH]* 🚨\n\n` +
                `*Bưu cục:* ${escapeMarkdown(bcName)}\n` +
                `*AM Phụ Trách:* ${escapeMarkdown(amName)} (${escapeMarkdown(amTele || '@chua_co_tele')})\n\n` +
                `*Tỷ lệ GTC hiện tại:* ${escapeMarkdown(gtcVal)} (Biến động N-1: ${escapeMarkdown(changeText)})\n` +
                `*Đơn Tồn > 5 ngày:* ${escapeMarkdown(backlog)} đơn\n\n` +
                `*Nguyên nhân:* ${escapeMarkdown(cause)}\n\n` +
-               `👉 Đề nghị AM vào kiểm tra và xử lý luồng hàng gấp!`;
+               `💡 *Đề xuất:* ${escapeMarkdown(recText)}`;
   
   const url = `https://api.telegram.org/bot${token}/sendMessage`;
   
@@ -2316,9 +2349,9 @@ function renderHrDimensionTable() {
 
     const filtered = repData.provinces.filter(p => p.name.toLowerCase().includes(hrTableSearchQuery));
     filtered.forEach(p => {
-      // Find HRBP and Intern for this province dynamically
-      let hrbp = p.hr && p.hr.hrbp ? p.hr.hrbp : 'N/A';
-      let intern = p.hr && p.hr.intern ? p.hr.intern : 'N/A';
+      // Find HRBP and Intern dynamically from data
+      const hrbp = (p.hr && p.hr.hrbp) ? p.hr.hrbp : 'N/A';
+      const intern = (p.hr && p.hr.intern) ? p.hr.intern : 'N/A';
 
       const tr = document.createElement('tr');
       tr.innerHTML = `

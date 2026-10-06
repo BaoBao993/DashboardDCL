@@ -336,7 +336,10 @@ def main():
             p_hr = p_hr_local
             
     if not download_success:
-        if os.path.exists(p_hr_user):
+        if os.path.exists(p_hr_local):
+            print("✓ Using existing recruitment_live.xlsx as fallback.")
+            p_hr = p_hr_local
+        elif os.path.exists(p_hr_user):
             print("✓ Falling back to local recruitment file '[ĐCL] - BÁO CÁO TUYỂN DỤNG DATA.xlsx'. Copying to recruitment_live.xlsx...")
             import shutil
             try:
@@ -344,9 +347,8 @@ def main():
                 p_hr = p_hr_local
             except Exception as e:
                 print(f"⚠ Failed to copy local recruitment file: {e}")
-                p_hr = p_hr_local
+                p_hr = p_hr_user
         else:
-            print("✓ Using existing recruitment_live.xlsx as fallback.")
             p_hr = p_hr_local
         
     # Download Link 1 (GTC/Performance)
@@ -622,8 +624,8 @@ def main():
                 tonghop_sheets.append((w, s))
                 
         if tonghop_sheets:
-            # Sort chronologically: weeks >= 40 are from 2025 (lesser chronological value), weeks < 40 are from 2026.
-            latest_week_num, latest_hr_sheet = max(tonghop_sheets, key=lambda x: x[0] if x[0] < 40 else x[0] - 100)
+            # Sort chronologically: weeks >= 47 are from 2025 (lesser chronological value), weeks < 47 are from 2026.
+            latest_week_num, latest_hr_sheet = max(tonghop_sheets, key=lambda x: x[0] if x[0] < 47 else x[0] - 100)
             print(f"✓ Selected latest available recruitment sheet: {latest_hr_sheet} (Week {latest_week_num})")
         else:
             latest_hr_sheet = 'Tổng hợp (T23)'
