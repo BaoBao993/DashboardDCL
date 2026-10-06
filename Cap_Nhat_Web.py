@@ -35,7 +35,8 @@ files_to_push = [
     r"index.html",
     r"LDN PA/Vitality Compass/index.html",
     r"styles.css",
-    r"LDN PA/Vitality Compass/styles.css"
+    r"LDN PA/Vitality Compass/styles.css",
+    r"operations_data.json"
 ]
 
 try:
