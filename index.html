@@ -317,6 +317,168 @@
           Operations_Insights.md</p>
       </div>
     </div>
+
+    <!-- FULL-WIDTH SECTION: BẢNG PIVOT & PHÂN TÍCH CHUYÊN GIA - ĐƠN LẤY RỚT LUÂN CHUYỂN -->
+    <div class="card dropped-pivot-card" style="grid-column: span 2; margin-top: 10px;" id="droppedPivotContainer">
+      <!-- Header -->
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <div>
+          <div class="card-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+            <span>⚡ BẢNG PIVOT & PHÂN TÍCH CHUYÊN GIA: ĐƠN LẤY RỚT LUÂN CHUYỂN</span>
+            <span class="card-badge" style="background: rgba(244,63,94,0.15); color: var(--accent-rose); font-weight: 700;" id="droppedTotalBadge">712 Đơn</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+            Nguồn: Sheet <strong>Đơn LẤY rớt luân chuyển ALL</strong> (Cột A đến L) • Tự động đối soát & Pivot đa chiều theo AM, Bưu Cục, Tỉnh, Ca & Kênh
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="btn btn-sm" onclick="toggleExpertAnalysis()" id="btnToggleExpert" style="background: rgba(167,139,250,0.15); border-color: var(--accent-purple); color: var(--accent-purple); font-weight: 600;">
+            🧠 Chẩn Đoán Chuyên Gia & SOP
+          </button>
+          <button class="btn btn-sm btn-primary" onclick="exportDroppedPivotToExcel()">
+            📥 Xuất Excel (CSV)
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick KPI Ribbon -->
+      <div class="dropped-kpi-ribbon" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px;">
+        <div class="kpi-mini-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px;">
+          <div style="font-size: 11px; color: var(--text-secondary);">Tổng Đơn Rớt</div>
+          <div style="font-size: 22px; font-weight: 700; color: var(--text-primary); margin-top: 2px;" id="dpKpiTotal">712</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Toàn bộ Vùng ĐCL</div>
+        </div>
+        <div class="kpi-mini-card" style="background: rgba(244,63,94,0.08); border: 1px solid rgba(244,63,94,0.3); border-radius: var(--radius-sm); padding: 10px 14px;">
+          <div style="font-size: 11px; color: var(--accent-rose); font-weight: 600;">🔴 TikTok Shop (TTS)</div>
+          <div style="font-size: 22px; font-weight: 700; color: var(--accent-rose); margin-top: 2px;" id="dpKpiTts">225 <span style="font-size: 13px; font-weight: 500;">(31.6%)</span></div>
+          <div style="font-size: 10px; color: var(--accent-rose); margin-top: 2px;">Cực kỳ rủi ro phạt SLA sàn</div>
+        </div>
+        <div class="kpi-mini-card" style="background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-sm); padding: 10px 14px;">
+          <div style="font-size: 11px; color: var(--accent-amber); font-weight: 600;">🟠 Shopee</div>
+          <div style="font-size: 22px; font-weight: 700; color: var(--accent-amber); margin-top: 2px;" id="dpKpiShopee">51 <span style="font-size: 13px; font-weight: 500;">(7.2%)</span></div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Chậm lịch lấy sàn Shopee</div>
+        </div>
+        <div class="kpi-mini-card" style="background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.3); border-radius: var(--radius-sm); padding: 10px 14px;">
+          <div style="font-size: 11px; color: var(--accent-blue); font-weight: 600;">🔵 Khách Hàng Khác</div>
+          <div style="font-size: 22px; font-weight: 700; color: var(--accent-blue); margin-top: 2px;" id="dpKpiKhac">436 <span style="font-size: 13px; font-weight: 500;">(61.2%)</span></div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Đơn ngoài sàn TMĐT</div>
+        </div>
+        <div class="kpi-mini-card" style="background: rgba(167,139,250,0.08); border: 1px solid rgba(167,139,250,0.3); border-radius: var(--radius-sm); padding: 10px 14px;">
+          <div style="font-size: 11px; color: var(--accent-purple); font-weight: 600;">⏰ Ngoài Giờ Cut-off</div>
+          <div style="font-size: 22px; font-weight: 700; color: var(--accent-purple); margin-top: 2px;" id="dpKpiCutoff">436 <span style="font-size: 13px; font-weight: 500;">(61.2%)</span></div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Lấy muộn sau chuyến xe</div>
+        </div>
+        <div class="kpi-mini-card" style="background: rgba(45,212,191,0.08); border: 1px solid rgba(45,212,191,0.3); border-radius: var(--radius-sm); padding: 10px 14px;">
+          <div style="font-size: 11px; color: var(--accent-teal); font-weight: 600;">🌙 Ca Tối</div>
+          <div style="font-size: 22px; font-weight: 700; color: var(--accent-teal); margin-top: 2px;" id="dpKpiToi">276 <span style="font-size: 13px; font-weight: 500;">(38.8%)</span></div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Tồn chia chọn qua đêm</div>
+        </div>
+      </div>
+
+      <!-- Expert Diagnostic Box -->
+      <div id="expertAnalysisBox" style="background: linear-gradient(145deg, rgba(26,35,50,0.9), rgba(15,23,42,0.95)); border: 1px solid rgba(167,139,250,0.3); border-radius: var(--radius); padding: 18px 20px; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 14px;">
+          <div style="font-size: 14px; font-weight: 700; color: var(--accent-purple); display: flex; align-items: center; gap: 8px;">
+            <span>🧠 BÁO CÁO CHẨN ĐOÁN VẬN HÀNH & KẾ HOẠCH HÀNH ĐỘNG (SOP)</span>
+          </div>
+          <span style="font-size: 11px; color: var(--accent-teal); font-weight: 600;">Khuyến nghị từ Giám đốc Vận hành</span>
+        </div>
+        
+        <!-- 4 Key Insights -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; margin-bottom: 16px;" id="expertDiagnosisCards">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- SOP Action Matrix -->
+        <div style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--accent-teal); margin-bottom: 8px; text-transform: uppercase;">
+            📋 Ma Trận Hành Động Khẩn Cấp (SOP Action Matrix)
+          </div>
+          <div class="scrollable" style="overflow-x: auto;">
+            <table class="rep-table" style="width: 100%; font-size: 11.5px;">
+              <thead>
+                <tr>
+                  <th style="width: 5%; text-align: center;">STT</th>
+                  <th style="width: 25%;">Đầu Mối Chịu Trách Nhiệm</th>
+                  <th style="width: 15%; text-align: center;">Mức Độ Ưu Tiên</th>
+                  <th style="width: 35%;">Hành Động Khắc Phục Cụ Thể</th>
+                  <th style="width: 20%;">Mục Tiêu & Thời Hạn</th>
+                </tr>
+              </thead>
+              <tbody id="sopActionMatrixBody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pivot View Selector & Filter Controls -->
+      <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 18px; margin-bottom: 14px;">
+        <!-- View selector buttons -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Chế độ xem:</span>
+            <div class="dim-toggles">
+              <button class="dim-btn active" id="btnDropViewBc" onclick="switchDroppedView('bc')">🏢 Bưu Cục & AM</button>
+              <button class="dim-btn" id="btnDropViewProv" onclick="switchDroppedView('province')">🗺️ Theo Tỉnh</button>
+              <button class="dim-btn" id="btnDropViewAm" onclick="switchDroppedView('am')">👤 Theo AM</button>
+              <button class="dim-btn" id="btnDropViewShop" onclick="switchDroppedView('shop')">🏪 Top Shop / Khách Hàng</button>
+              <button class="dim-btn" id="btnDropViewRaw" onclick="switchDroppedView('raw')">📋 Chi Tiết Đơn (12 Cột A-L)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter bar -->
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label style="font-size: 11px; color: var(--text-muted);">Tỉnh:</label>
+            <select id="dropFilterProvince" onchange="applyDroppedFilters()" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+              <option value="all">Tất cả Tỉnh</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label style="font-size: 11px; color: var(--text-muted);">AM:</label>
+            <select id="dropFilterAm" onchange="applyDroppedFilters()" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+              <option value="all">Tất cả AM</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label style="font-size: 11px; color: var(--text-muted);">Kênh:</label>
+            <select id="dropFilterChannel" onchange="applyDroppedFilters()" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+              <option value="all">Tất cả Kênh</option>
+              <option value="TTS">TikTok Shop (TTS)</option>
+              <option value="Shopee">Shopee</option>
+              <option value="Khac">Khách Hàng Khác</option>
+            </select>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label style="font-size: 11px; color: var(--text-muted);">Ca:</label>
+            <select id="dropFilterShift" onchange="applyDroppedFilters()" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 11px;">
+              <option value="all">Tất cả Ca</option>
+              <option value="Ngoài giờ cutoff">Ngoài giờ cutoff</option>
+              <option value="Tối">Ca Tối</option>
+            </select>
+          </div>
+          <div style="flex: 1; min-width: 200px;">
+            <input type="text" id="dropSearchInput" oninput="applyDroppedFilters()" placeholder="🔍 Tìm kiếm Bưu cục, AM, Tên Shop, Mã đơn..." style="width: 100%; background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; font-size: 11px;">
+          </div>
+          <button class="btn btn-sm" onclick="resetDroppedFilters()" style="font-size: 11px; padding: 4px 10px;">✕ Xóa lọc</button>
+        </div>
+      </div>
+
+      <!-- Pivot Table Wrapper -->
+      <div class="scrollable" style="max-height: 520px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow-y: auto;">
+        <table class="excel-table" style="width: 100%;" id="droppedPivotMainTable">
+          <thead id="droppedPivotThead">
+            <!-- Rendered dynamically -->
+          </thead>
+          <tbody id="droppedPivotTbody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </main>
 
   <!-- Reporting Dashboard -->
@@ -622,14 +784,14 @@
         <div style="display: flex; align-items: center; gap: 12px;">
           <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary);">Chọn chỉ số theo dõi:</span>
           <div class="dim-toggles">
-            <button class="dim-btn active" id="btnFdMetricTotal" onclick="switchFdMetric('total')">%FD Tổng</button>
+            <button class="dim-btn" id="btnFdMetricTotal" onclick="switchFdMetric('total')">%FD Tổng</button>
             <button class="dim-btn" id="btnFdMetricSme" onclick="switchFdMetric('sme')">%FD SME COD</button>
-            <button class="dim-btn" id="btnFdMetricTts" onclick="switchFdMetric('tts')">%FD TikTok Shop</button>
+            <button class="dim-btn active" id="btnFdMetricTts" onclick="switchFdMetric('tts')">%FD TikTok Shop (Sheet %FD TTS, Cột J-U)</button>
             <button class="dim-btn" id="btnFdMetricGtb" onclick="switchFdMetric('gtb')">%GTB-TT (Thất Bại Thu Tiền)</button>
           </div>
         </div>
         <span style="font-size: 11px; color: var(--accent-teal); background: rgba(45,212,191,0.1); padding: 4px 10px; border-radius: 20px;" id="fdMetricDesc">
-          Hiển thị tỷ lệ chuyển trả tổng của Bưu cục (tất cả các nguồn đơn).
+          Hiển thị tỷ lệ chuyển trả của các đơn hàng TikTok Shop (TTS) - Nguồn dữ liệu: Sheet %FD TTS, Cột J đến U.
         </span>
       </div>
     </div>

@@ -692,6 +692,7 @@ async function refreshData() {
     renderWorstBcs();
     renderChecklistSidePanel();
     renderDroppedBcs();
+    renderDroppedPivotSection();
     renderReturnRateView();
     renderTransferBacklogView();
     try {
@@ -1093,7 +1094,7 @@ let tableSearchQuery = '';
 let telegramConfig = null;
 
 // ===== RETURN RATE (%FD) STATE =====
-let activeFdMetric = 'total';
+let activeFdMetric = 'tts';
 let activeFdTrendMetric = 'weekly';
 let activeFdViewMode = 'weekly';
 let activeFdDimension = 'bc';
@@ -1105,8 +1106,15 @@ let activeHrDim = 'province';
 let hrTableSearchQuery = '';
 let hrChartObj = null;
 
-// ===== DROPPED TRANSFER SORT STATE =====
+// ===== DROPPED TRANSFER PIVOT STATE =====
 let activeDroppedSort = 'tts';
+let activeDroppedPivotView = 'bc'; // 'bc', 'province', 'am', 'shop', 'raw'
+let droppedFilterProvince = 'all';
+let droppedFilterAm = 'all';
+let droppedFilterChannel = 'all';
+let droppedFilterShift = 'all';
+let droppedSearchQuery = '';
+let isExpertAnalysisExpanded = true;
 
 async function loadTelegramConfig() {
   const confStr = await readFile('telegram_config.json');
@@ -1656,6 +1664,593 @@ async function sendDroppedAlert(bcName, amName, amTele, khac, shopee, tts, total
   } catch (e) {
     showToast(`❌ Gửi Telegram thất bại: ${e.message}`);
   }
+}
+
+// ===== DROPPED TRANSFER ORDERS: PIVOT & EXPERT ANALYSIS =====
+function toggleExpertAnalysis() {
+  isExpertAnalysisExpanded = !isExpertAnalysisExpanded;
+  const box = document.getElementById('expertAnalysisBox');
+  const btn = document.getElementById('btnToggleExpert');
+  if (box) {
+    box.style.display = isExpertAnalysisExpanded ? 'block' : 'none';
+  }
+  if (btn) {
+    btn.textContent = isExpertAnalysisExpanded ? '🧠 Thu Gọn Chẩn Đoán' : '🧠 Mở Chẩn Đoán Chuyên Gia & SOP';
+  }
+}
+
+function switchDroppedView(view) {
+  activeDroppedPivotView = view;
+  const btnMap = {
+    bc: 'btnDropViewBc',
+    province: 'btnDropViewProv',
+    am: 'btnDropViewAm',
+    shop: 'btnDropViewShop',
+    raw: 'btnDropViewRaw'
+  };
+  for (const v in btnMap) {
+    const el = document.getElementById(btnMap[v]);
+    if (el) {
+      if (v === view) el.classList.add('active');
+      else el.classList.remove('active');
+    }
+  }
+  renderDroppedPivotTable();
+}
+
+function populateDroppedFilterOptions() {
+  if (!repData || !repData.dropped_bcs) return;
+  
+  const selProv = document.getElementById('dropFilterProvince');
+  const selAm = document.getElementById('dropFilterAm');
+  
+  if (selProv && selProv.options.length <= 1) {
+    const provinces = [...new Set(repData.dropped_bcs.map(b => b.tinh).filter(Boolean))].sort();
+    provinces.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      selProv.appendChild(opt);
+    });
+  }
+  
+  if (selAm && selAm.options.length <= 1) {
+    const ams = [...new Set(repData.dropped_bcs.map(b => b.am).filter(Boolean))].sort();
+    ams.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      selAm.appendChild(opt);
+    });
+  }
+}
+
+function applyDroppedFilters() {
+  const selProv = document.getElementById('dropFilterProvince');
+  const selAm = document.getElementById('dropFilterAm');
+  const selChannel = document.getElementById('dropFilterChannel');
+  const selShift = document.getElementById('dropFilterShift');
+  const searchInp = document.getElementById('dropSearchInput');
+
+  if (selProv) droppedFilterProvince = selProv.value;
+  if (selAm) droppedFilterAm = selAm.value;
+  if (selChannel) droppedFilterChannel = selChannel.value;
+  if (selShift) droppedFilterShift = selShift.value;
+  if (searchInp) droppedSearchQuery = searchInp.value.toLowerCase().trim();
+
+  renderDroppedPivotTable();
+}
+
+function resetDroppedFilters() {
+  droppedFilterProvince = 'all';
+  droppedFilterAm = 'all';
+  droppedFilterChannel = 'all';
+  droppedFilterShift = 'all';
+  droppedSearchQuery = '';
+
+  const selProv = document.getElementById('dropFilterProvince');
+  const selAm = document.getElementById('dropFilterAm');
+  const selChannel = document.getElementById('dropFilterChannel');
+  const selShift = document.getElementById('dropFilterShift');
+  const searchInp = document.getElementById('dropSearchInput');
+
+  if (selProv) selProv.value = 'all';
+  if (selAm) selAm.value = 'all';
+  if (selChannel) selChannel.value = 'all';
+  if (selShift) selShift.value = 'all';
+  if (searchInp) searchInp.value = '';
+
+  renderDroppedPivotTable();
+}
+
+function renderDroppedPivotSection() {
+  if (!repData) return;
+  populateDroppedFilterOptions();
+
+  // 1. Render KPI Ribbon
+  const pivot = repData.dropped_pivot || {};
+  const total = pivot.total_orders || (repData.dropped_bcs ? repData.dropped_bcs.reduce((acc, x) => acc + (x.total || 0), 0) : 0);
+  const ch = pivot.by_channel || {};
+  const sh = pivot.by_shift || {};
+
+  const totalBadge = document.getElementById('droppedTotalBadge');
+  if (totalBadge) totalBadge.textContent = `${total} Đơn`;
+
+  const kpiTotal = document.getElementById('dpKpiTotal');
+  if (kpiTotal) kpiTotal.textContent = total;
+
+  const kpiTts = document.getElementById('dpKpiTts');
+  if (kpiTts) {
+    const ttsVal = ch.tts || 0;
+    const ttsPct = ch.tts_pct || (total > 0 ? (ttsVal / total * 100).toFixed(1) : 0);
+    kpiTts.innerHTML = `${ttsVal} <span style="font-size: 13px; font-weight: 500;">(${ttsPct}%)</span>`;
+  }
+
+  const kpiShopee = document.getElementById('dpKpiShopee');
+  if (kpiShopee) {
+    const shopeeVal = ch.shopee || 0;
+    const shopeePct = ch.shopee_pct || (total > 0 ? (shopeeVal / total * 100).toFixed(1) : 0);
+    kpiShopee.innerHTML = `${shopeeVal} <span style="font-size: 13px; font-weight: 500;">(${shopeePct}%)</span>`;
+  }
+
+  const kpiKhac = document.getElementById('dpKpiKhac');
+  if (kpiKhac) {
+    const khacVal = ch.khac || 0;
+    const khacPct = ch.khac_pct || (total > 0 ? (khacVal / total * 100).toFixed(1) : 0);
+    kpiKhac.innerHTML = `${khacVal} <span style="font-size: 13px; font-weight: 500;">(${khacPct}%)</span>`;
+  }
+
+  const kpiCutoff = document.getElementById('dpKpiCutoff');
+  if (kpiCutoff) {
+    const cutoffVal = sh.cutoff || 0;
+    const cutoffPct = sh.cutoff_pct || (total > 0 ? (cutoffVal / total * 100).toFixed(1) : 0);
+    kpiCutoff.innerHTML = `${cutoffVal} <span style="font-size: 13px; font-weight: 500;">(${cutoffPct}%)</span>`;
+  }
+
+  const kpiToi = document.getElementById('dpKpiToi');
+  if (kpiToi) {
+    const toiVal = sh.toi || 0;
+    const toiPct = sh.toi_pct || (total > 0 ? (toiVal / total * 100).toFixed(1) : 0);
+    kpiToi.innerHTML = `${toiVal} <span style="font-size: 13px; font-weight: 500;">(${toiPct}%)</span>`;
+  }
+
+  // 2. Render Expert Diagnosis Cards
+  const diagContainer = document.getElementById('expertDiagnosisCards');
+  const sopContainer = document.getElementById('sopActionMatrixBody');
+  const exp = repData.dropped_expert_analysis;
+
+  if (diagContainer && exp && exp.expert_diagnosis) {
+    diagContainer.innerHTML = '';
+    exp.expert_diagnosis.forEach((d, idx) => {
+      const card = document.createElement('div');
+      card.style.background = 'rgba(255,255,255,0.03)';
+      card.style.border = '1px solid rgba(255,255,255,0.08)';
+      card.style.borderRadius = 'var(--radius-sm)';
+      card.style.padding = '12px 14px';
+      
+      const badgeColors = {
+        0: 'background: rgba(244,63,94,0.15); color: var(--accent-rose);',
+        1: 'background: rgba(245,158,11,0.15); color: var(--accent-amber);',
+        2: 'background: rgba(167,139,250,0.15); color: var(--accent-purple);',
+        3: 'background: rgba(45,212,191,0.15); color: var(--accent-teal);'
+      };
+      const bColor = badgeColors[idx % 4];
+
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px;">
+          <h5 style="font-size: 12.5px; font-weight: 700; color: #fff; line-height: 1.3;">${escapeHtml(d.title)}</h5>
+          <span style="font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; white-space: nowrap; ${bColor}">
+            ${escapeHtml(d.badge || 'Cảnh báo')}
+          </span>
+        </div>
+        <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 0;">${escapeHtml(d.desc)}</p>
+      `;
+      diagContainer.appendChild(card);
+    });
+  }
+
+  // 3. Render SOP Matrix
+  if (sopContainer && exp && exp.sop_action_matrix) {
+    sopContainer.innerHTML = '';
+    exp.sop_action_matrix.forEach(row => {
+      const tr = document.createElement('tr');
+      const isP1 = row.priority && row.priority.includes('P1');
+      const prioBadge = isP1 
+        ? `<span style="background: rgba(244,63,94,0.15); color: var(--accent-rose); padding: 2px 6px; border-radius: 4px; font-weight: 600;">${escapeHtml(row.priority)}</span>`
+        : `<span style="background: rgba(245,158,11,0.15); color: var(--accent-amber); padding: 2px 6px; border-radius: 4px; font-weight: 600;">${escapeHtml(row.priority)}</span>`;
+
+      tr.innerHTML = `
+        <td style="text-align: center; font-weight: 600;">${row.stt}</td>
+        <td><strong style="color: var(--text-primary);">${escapeHtml(row.role)}</strong></td>
+        <td style="text-align: center;">${prioBadge}</td>
+        <td style="color: var(--text-secondary); line-height: 1.4;">${escapeHtml(row.action)}</td>
+        <td style="color: var(--accent-teal); font-weight: 500;">${escapeHtml(row.target)}</td>
+      `;
+      sopContainer.appendChild(tr);
+    });
+  }
+
+  // 4. Render Table
+  renderDroppedPivotTable();
+}
+
+function renderDroppedPivotTable() {
+  const thead = document.getElementById('droppedPivotThead');
+  const tbody = document.getElementById('droppedPivotTbody');
+  if (!thead || !tbody || !repData) return;
+
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+
+  const totalAll = repData.dropped_pivot?.total_orders || 712;
+
+  // View: BƯU CỤC & AM
+  if (activeDroppedPivotView === 'bc') {
+    thead.innerHTML = `
+      <tr>
+        <th style="width: 5%; text-align: center;">STT</th>
+        <th style="width: 25%;">Bưu Cục Lấy</th>
+        <th style="width: 15%;">AM Quản Lý</th>
+        <th style="width: 10%;">Tỉnh</th>
+        <th class="blue-header" style="width: 7%; text-align: right;">Khác</th>
+        <th class="blue-header" style="width: 7%; text-align: right;">Shopee</th>
+        <th class="blue-header" style="width: 8%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
+        <th style="width: 8%; text-align: right;">Ngoài Cut-off</th>
+        <th style="width: 7%; text-align: right;">Ca Tối</th>
+        <th class="dark-blue-header" style="width: 8%; text-align: right;">Tổng Đơn</th>
+        <th style="width: 6%; text-align: right;">% Vùng</th>
+        <th style="width: 6%; text-align: center;">Thao Tác</th>
+      </tr>
+    `;
+
+    let list = (repData.dropped_bcs || []).filter(item => {
+      if (droppedFilterProvince !== 'all' && item.tinh !== droppedFilterProvince) return false;
+      if (droppedFilterAm !== 'all' && item.am !== droppedFilterAm) return false;
+      if (droppedFilterChannel === 'TTS' && (!item.tts || item.tts <= 0)) return false;
+      if (droppedFilterChannel === 'Shopee' && (!item.shopee || item.shopee <= 0)) return false;
+      if (droppedFilterChannel === 'Khac' && (!item.khac || item.khac <= 0)) return false;
+      if (droppedFilterShift === 'Ngoài giờ cutoff' && (!item.cutoff || item.cutoff <= 0)) return false;
+      if (droppedFilterShift === 'Tối' && (!item.toi || item.toi <= 0)) return false;
+      if (droppedSearchQuery) {
+        const q = droppedSearchQuery;
+        const bcMatch = item.bc_name && item.bc_name.toLowerCase().includes(q);
+        const amMatch = item.am && item.am.toLowerCase().includes(q);
+        const tinhMatch = item.tinh && item.tinh.toLowerCase().includes(q);
+        if (!bcMatch && !amMatch && !tinhMatch) return false;
+      }
+      return true;
+    });
+
+    list.sort((a, b) => (b.total || 0) - (a.total || 0));
+
+    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
+
+    list.forEach((item, idx) => {
+      sumKhac += item.khac || 0;
+      sumShopee += item.shopee || 0;
+      sumTts += item.tts || 0;
+      sumCutoff += item.cutoff || 0;
+      sumToi += item.toi || 0;
+      sumTotal += item.total || 0;
+
+      const tr = document.createElement('tr');
+      const amTele = findAmTele(item.am);
+      const teleDisplay = amTele ? `<div style="font-size: 9px; color: #5a6a80;">${escapeHtml(amTele)}</div>` : '';
+
+      const ttsHighlight = item.tts > 0 ? `background-color: #ffe4e6; color: #be123c; font-weight: 700;` : '';
+      const totalHighlight = item.total >= 50 ? `background-color: #fee2e2; font-weight: 700; color: #991b1b;` : (item.total >= 20 ? `background-color: #ffedd5; font-weight: 600; color: #9a3412;` : '');
+
+      const pctVal = totalAll > 0 ? (item.total / totalAll * 100).toFixed(1) : 0;
+
+      tr.innerHTML = `
+        <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
+        <td><strong style="color: #111827;">${escapeHtml(item.bc_name)}</strong></td>
+        <td>
+          <div style="font-weight: 500;">👤 ${escapeHtml(item.am)}</div>
+          ${teleDisplay}
+        </td>
+        <td style="color: #374151;">${escapeHtml(item.tinh || '')}</td>
+        <td style="text-align: right;">${item.khac || 0}</td>
+        <td style="text-align: right;">${item.shopee || 0}</td>
+        <td style="text-align: right; ${ttsHighlight}">${item.tts || 0}</td>
+        <td style="text-align: right; color: #6b21a8; font-weight: 500;">${item.cutoff || 0}</td>
+        <td style="text-align: right; color: #047857;">${item.toi || 0}</td>
+        <td style="text-align: right; ${totalHighlight}">${item.total || 0}</td>
+        <td style="text-align: right; font-weight: 600; color: #475569;">${pctVal}%</td>
+        <td style="text-align: center;">
+          <button class="btn-nhac-am" onclick="sendDroppedAlert('${escapeHtml(item.bc_name)}', '${escapeHtml(item.am)}', '${escapeHtml(amTele)}', ${item.khac || 0}, ${item.shopee || 0}, ${item.tts || 0}, ${item.total || 0})">Nhắc AM</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Grand total row
+    const trGrand = document.createElement('tr');
+    trGrand.className = 'grand-total-row';
+    const sumPct = totalAll > 0 ? (sumTotal / totalAll * 100).toFixed(1) : 0;
+    trGrand.innerHTML = `
+      <td colspan="4" style="text-align: center; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">TỔNG CỘNG (${list.length} Bưu cục)</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">${sumKhac}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">${sumShopee}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #ffe4e6; color: #be123c;">${sumTts}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #6b21a8;">${sumCutoff}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #047857;">${sumToi}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #cbd5e1; color: #0f172a;">${sumTotal}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">${sumPct}%</td>
+      <td style="background-color: #e2e8f0;"></td>
+    `;
+    tbody.appendChild(trGrand);
+  }
+
+  // View: THEO TỈNH
+  else if (activeDroppedPivotView === 'province') {
+    thead.innerHTML = `
+      <tr>
+        <th style="width: 8%; text-align: center;">STT</th>
+        <th style="width: 25%;">Tỉnh / Thành</th>
+        <th class="blue-header" style="width: 10%; text-align: right;">Khác</th>
+        <th class="blue-header" style="width: 10%; text-align: right;">Shopee</th>
+        <th class="blue-header" style="width: 12%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TikTok Shop (TTS) 🔴</th>
+        <th style="width: 11%; text-align: right;">Ngoài Cut-off</th>
+        <th style="width: 10%; text-align: right;">Ca Tối</th>
+        <th class="dark-blue-header" style="width: 12%; text-align: right;">Tổng Đơn Rớt</th>
+        <th style="width: 12%; text-align: right;">Tỷ Trọng (% Vùng)</th>
+      </tr>
+    `;
+
+    const provList = repData.dropped_pivot?.by_province || [];
+    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
+
+    provList.forEach((r, idx) => {
+      sumKhac += r.khac || 0;
+      sumShopee += r.shopee || 0;
+      sumTts += r.tts || 0;
+      sumCutoff += r.cutoff || 0;
+      sumToi += r.toi || 0;
+      sumTotal += r.total || 0;
+
+      const tr = document.createElement('tr');
+      const isEpicenter = r.tinh === 'Đồng Tháp';
+      const rowStyle = isEpicenter ? 'background-color: #fff1f2;' : '';
+      const tagText = isEpicenter ? '<span style="background: rgba(244,63,94,0.15); color: #be123c; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">TÂM CHẤN VÙNG</span>' : '';
+
+      tr.innerHTML = `
+        <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
+        <td style="${rowStyle} font-size: 13px;"><strong>${escapeHtml(r.tinh)}</strong> ${tagText}</td>
+        <td style="text-align: right;">${r.khac || 0}</td>
+        <td style="text-align: right;">${r.shopee || 0}</td>
+        <td style="text-align: right; font-weight: 700; color: #be123c; background-color: #ffe4e6;">${r.tts || 0}</td>
+        <td style="text-align: right; color: #6b21a8; font-weight: 600;">${r.cutoff || 0}</td>
+        <td style="text-align: right; color: #047857;">${r.toi || 0}</td>
+        <td style="text-align: right; font-weight: 700; font-size: 13px; color: #0f172a; background-color: #f1f5f9;">${r.total || 0}</td>
+        <td style="text-align: right; font-weight: 700; color: #0369a1;">${r.pct || 0}%</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Grand total row
+    const trGrand = document.createElement('tr');
+    trGrand.className = 'grand-total-row';
+    const sumPct = totalAll > 0 ? (sumTotal / totalAll * 100).toFixed(1) : 0;
+    trGrand.innerHTML = `
+      <td colspan="2" style="text-align: center; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">TỔNG VÙNG ĐCL</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0;">${sumKhac}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0;">${sumShopee}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #ffe4e6; color: #be123c;">${sumTts}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #6b21a8;">${sumCutoff}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #047857;">${sumToi}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #cbd5e1; color: #0f172a;">${sumTotal}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #0369a1;">${sumPct}%</td>
+    `;
+    tbody.appendChild(trGrand);
+  }
+
+  // View: THEO AM
+  else if (activeDroppedPivotView === 'am') {
+    thead.innerHTML = `
+      <tr>
+        <th style="width: 6%; text-align: center;">STT</th>
+        <th style="width: 22%;">Area Manager (AM)</th>
+        <th style="width: 24%;">Bưu Cục Trọng Điểm Rớt</th>
+        <th class="blue-header" style="width: 8%; text-align: right;">Khác</th>
+        <th class="blue-header" style="width: 8%; text-align: right;">Shopee</th>
+        <th class="blue-header" style="width: 9%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
+        <th style="width: 8%; text-align: right;">Ngoài Cut-off</th>
+        <th style="width: 7%; text-align: right;">Ca Tối</th>
+        <th class="dark-blue-header" style="width: 9%; text-align: right;">Tổng Đơn</th>
+        <th style="width: 9%; text-align: right;">% Vùng</th>
+      </tr>
+    `;
+
+    const amList = repData.dropped_pivot?.by_am || [];
+    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
+
+    amList.forEach((r, idx) => {
+      sumKhac += r.khac || 0;
+      sumShopee += r.shopee || 0;
+      sumTts += r.tts || 0;
+      sumCutoff += r.cutoff || 0;
+      sumToi += r.toi || 0;
+      sumTotal += r.total || 0;
+
+      const tr = document.createElement('tr');
+      const isTopAm = idx === 0;
+      const tagText = isTopAm ? '<span style="background: rgba(244,63,94,0.15); color: #be123c; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">CẤP BÁCH</span>' : '';
+
+      tr.innerHTML = `
+        <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
+        <td><strong>👤 ${escapeHtml(r.am)}</strong> ${tagText}</td>
+        <td style="color: #475569; font-size: 11px;">${escapeHtml(r.top_bcs || '')}</td>
+        <td style="text-align: right;">${r.khac || 0}</td>
+        <td style="text-align: right;">${r.shopee || 0}</td>
+        <td style="text-align: right; font-weight: 700; color: #be123c; background-color: #ffe4e6;">${r.tts || 0}</td>
+        <td style="text-align: right; color: #6b21a8; font-weight: 500;">${r.cutoff || 0}</td>
+        <td style="text-align: right; color: #047857;">${r.toi || 0}</td>
+        <td style="text-align: right; font-weight: 700; background-color: #f1f5f9;">${r.total || 0}</td>
+        <td style="text-align: right; font-weight: 700; color: #0369a1;">${r.pct || 0}%</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Grand total row
+    const trGrand = document.createElement('tr');
+    trGrand.className = 'grand-total-row';
+    const sumPct = totalAll > 0 ? (sumTotal / totalAll * 100).toFixed(1) : 0;
+    trGrand.innerHTML = `
+      <td colspan="3" style="text-align: center; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">TỔNG CỘNG (${amList.length} AM)</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0;">${sumKhac}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0;">${sumShopee}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #ffe4e6; color: #be123c;">${sumTts}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #6b21a8;">${sumCutoff}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #047857;">${sumToi}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #cbd5e1; color: #0f172a;">${sumTotal}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #0369a1;">${sumPct}%</td>
+    `;
+    tbody.appendChild(trGrand);
+  }
+
+  // View: TOP SHOP / KHÁCH HÀNG
+  else if (activeDroppedPivotView === 'shop') {
+    thead.innerHTML = `
+      <tr>
+        <th style="width: 6%; text-align: center;">STT</th>
+        <th style="width: 34%;">Tên Shop / Người Gửi (From Name)</th>
+        <th style="width: 22%;">Bưu Cục Lấy Hàng</th>
+        <th style="width: 16%;">AM Quản Lý</th>
+        <th class="blue-header" style="width: 7%; text-align: right;">Khác</th>
+        <th class="blue-header" style="width: 7%; text-align: right;">Shopee</th>
+        <th class="blue-header" style="width: 8%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
+        <th class="dark-blue-header" style="width: 10%; text-align: right;">Tổng Đơn</th>
+      </tr>
+    `;
+
+    const shopList = (repData.dropped_pivot?.top_shops || []).filter(item => {
+      if (droppedSearchQuery) {
+        const q = droppedSearchQuery;
+        const sMatch = item.shop_name && item.shop_name.toLowerCase().includes(q);
+        const bcMatch = item.bc_lay && item.bc_lay.toLowerCase().includes(q);
+        const amMatch = item.am && item.am.toLowerCase().includes(q);
+        if (!sMatch && !bcMatch && !amMatch) return false;
+      }
+      return true;
+    });
+
+    shopList.forEach((r, idx) => {
+      const tr = document.createElement('tr');
+      const isTop1 = idx === 0 && r.total >= 50;
+      const highlightBg = isTop1 ? 'background-color: #fff1f2;' : '';
+      const tagText = isTop1 ? '<span style="background: #f43f5e; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">SHOP LỚN NGUY CƠ CAO</span>' : '';
+
+      tr.innerHTML = `
+        <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
+        <td style="${highlightBg}"><strong style="color: #0f172a;">${escapeHtml(r.shop_name)}</strong> ${tagText}</td>
+        <td style="color: #334155;">${escapeHtml(r.bc_lay)}</td>
+        <td style="color: #334155;">👤 ${escapeHtml(r.am)}</td>
+        <td style="text-align: right;">${r.khac || 0}</td>
+        <td style="text-align: right;">${r.shopee || 0}</td>
+        <td style="text-align: right; font-weight: 700; color: #be123c; background-color: #ffe4e6;">${r.tts || 0}</td>
+        <td style="text-align: right; font-weight: 700; font-size: 12.5px; background-color: #f1f5f9; color: #0f172a;">${r.total || 0}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // View: CHI TIẾT TỪNG ĐƠN (12 CỘT A-L)
+  else if (activeDroppedPivotView === 'raw') {
+    thead.innerHTML = `
+      <tr>
+        <th style="width: 5%; text-align: center;">STT</th>
+        <th style="width: 14%;">Mã Đơn Hàng</th>
+        <th style="width: 18%;">Bưu Cục Lấy</th>
+        <th style="width: 10%;">Tỉnh</th>
+        <th style="width: 12%;">AM</th>
+        <th style="width: 20%;">Khách Hàng / Shop</th>
+        <th style="width: 7%; text-align: center;">Kênh</th>
+        <th style="width: 10%; text-align: center;">Ca Lấy</th>
+        <th style="width: 8%; text-align: center;">Loại Hàng</th>
+      </tr>
+    `;
+
+    const rawList = (repData.dropped_raw_orders || []).filter(item => {
+      if (droppedFilterProvince !== 'all' && item.tinhlay !== droppedFilterProvince) return false;
+      if (droppedFilterAm !== 'all' && item.am !== droppedFilterAm) return false;
+      if (droppedFilterChannel !== 'all' && item.channel !== droppedFilterChannel) return false;
+      if (droppedFilterShift !== 'all' && item.shift !== droppedFilterShift) return false;
+      if (droppedSearchQuery) {
+        const q = droppedSearchQuery;
+        const codeMatch = item.order_code && item.order_code.toLowerCase().includes(q);
+        const shopMatch = item.from_name && item.from_name.toLowerCase().includes(q);
+        const bcMatch = item.bc_lay && item.bc_lay.toLowerCase().includes(q);
+        if (!codeMatch && !shopMatch && !bcMatch) return false;
+      }
+      return true;
+    });
+
+    rawList.forEach((r, idx) => {
+      const tr = document.createElement('tr');
+      const isTts = r.channel === 'TTS';
+      const chBadge = isTts
+        ? `<span style="background: rgba(244,63,94,0.15); color: #be123c; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px;">TTS</span>`
+        : (r.channel === 'Shopee' 
+            ? `<span style="background: rgba(245,158,11,0.15); color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 10px;">Shopee</span>`
+            : `<span style="background: rgba(59,130,246,0.15); color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 500; font-size: 10px;">Khác</span>`);
+
+      const shiftBadge = r.shift && r.shift.includes('cutoff')
+        ? `<span style="background: rgba(167,139,250,0.15); color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Ngoài cutoff</span>`
+        : `<span style="background: rgba(45,212,191,0.15); color: #047857; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Ca tối</span>`;
+
+      tr.innerHTML = `
+        <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
+        <td><strong style="color: #0369a1; font-family: monospace;">${escapeHtml(r.order_code)}</strong></td>
+        <td>${escapeHtml(r.bc_lay)}</td>
+        <td style="color: #475569;">${escapeHtml(r.tinhlay)}</td>
+        <td>👤 ${escapeHtml(r.am)}</td>
+        <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.from_name)}">${escapeHtml(r.from_name)}</td>
+        <td style="text-align: center;">${chBadge}</td>
+        <td style="text-align: center;">${shiftBadge}</td>
+        <td style="text-align: center; font-size: 11px; color: #64748b;">${escapeHtml(r.loai_hang || 'Normal')}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+}
+
+function exportDroppedPivotToExcel() {
+  const table = document.getElementById('droppedPivotMainTable');
+  if (!table) {
+    showToast('⚠️ Không tìm thấy bảng dữ liệu để xuất.');
+    return;
+  }
+
+  let csvContent = '\uFEFF'; // UTF-8 BOM for Microsoft Excel compatibility
+  const rows = table.querySelectorAll('tr');
+
+  rows.forEach(row => {
+    const cols = row.querySelectorAll('th, td');
+    const rowData = [];
+    cols.forEach(col => {
+      // Don't export the action button column
+      if (col.querySelector('button')) return;
+      let text = col.innerText.replace(/"/g, '""').trim();
+      rowData.push(`"${text}"`);
+    });
+    if (rowData.length > 0) {
+      csvContent += rowData.join(',') + '\r\n';
+    }
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+  a.download = `DCL_Pivot_Don_Lay_Rot_Luan_Chuyen_${activeDroppedPivotView}_${dateStr}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('📥 Đã tải xuống file CSV pivot thành công!');
 }
 
 function renderReportingView() {
@@ -2460,6 +3055,7 @@ function renderHrDimensionTable() {
 // ===== RETURN RATE (%FD) DASHBOARD RENDERING =====
 function renderReturnRateView() {
   if (!repData || !repData.fd_report) return;
+  switchFdMetric(activeFdMetric);
   renderFdKPIs();
   try {
     renderFdChart();
