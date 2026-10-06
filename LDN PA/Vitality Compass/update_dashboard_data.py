@@ -498,30 +498,54 @@ def main():
     try:
         if "--skip-downloads" in sys.argv:
             print("Skipping dropped transfer orders download as requested.")
+            df_gsheet = pd.DataFrame()
         else:
-            gsheet_url = "https://docs.google.com/spreadsheets/d/1kYBjz-xrD8IsEo-PVC3a1Qi8etVGN9j-xWdZyrPo36M/export?format=csv&gid=1657944306"
+            gsheet_url = "https://docs.google.com/spreadsheets/d/1kYBjz-xrD8IsEo-PVC3a1Qi8etVGN9j-xWdZyrPo36M/export?format=csv&gid=698882533"
             temp_csv_path = "temp_dropped_bcs.csv"
             download_success = download_with_cookies(gsheet_url, cookies_path, temp_csv_path)
-            if download_success:
-                df_gsheet = pd.read_csv(temp_csv_path)
-                if os.path.exists(temp_csv_path):
-                    try:
-                        os.remove(temp_csv_path)
-                    except:
-                        pass
+            if download_success and os.path.exists(temp_csv_path) and os.path.getsize(temp_csv_path) > 100:
+                try:
+                    df_gsheet = pd.read_csv(temp_csv_path, header=None)
+                except Exception:
+                    df_gsheet = pd.DataFrame()
             else:
                 df_gsheet = pd.DataFrame()
-            
-            # Find where the pivot table starts in the sheet
-            row0 = df_gsheet.iloc[0].tolist() if not df_gsheet.empty else []
+
+        # Fallback to local files in Mentor or workspace if download failed
+        if df_gsheet.empty:
+            local_dropped_candidates = [
+                r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn LẤY rớt luân chuyển.xlsx",
+                r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn LẤY rớt luân chuyển.csv",
+                r"C:\Users\Administrator\Desktop\AI 2026\Mentor\dropped_live.xlsx",
+                r"C:\Users\Administrator\Desktop\AI 2026\temp_dropped_bcs.csv"
+            ]
+            for cand in local_dropped_candidates:
+                if os.path.exists(cand) and os.path.getsize(cand) > 100:
+                    try:
+                        if cand.endswith('.xlsx'):
+                            df_gsheet = pd.read_excel(cand, header=None)
+                        else:
+                            df_gsheet = pd.read_csv(cand, header=None)
+                        print(f"✓ Loaded dropped transfer orders from local fallback: {os.path.basename(cand)}")
+                        break
+                    except Exception as le:
+                        print(f"⚠ Failed reading local fallback {cand}: {le}")
+
+        if not df_gsheet.empty:
+            # Find where the table starts dynamically across any row and column
+            header_row_idx = -1
             pivot_start_col = -1
-            # Scan from index 13 to end to find the pivot table header 'AM'
-            for i in range(13, len(row0)):
-                if str(row0[i]).strip() == 'AM':
-                    pivot_start_col = i
+            for r_idx in range(min(20, len(df_gsheet))):
+                row_vals = [str(x).strip().lower() for x in df_gsheet.iloc[r_idx].tolist()]
+                for c_idx, val in enumerate(row_vals):
+                    if val == 'am' and any(('bưu cục' in v or 'bc' in v) for v in row_vals[c_idx:]):
+                        header_row_idx = r_idx
+                        pivot_start_col = c_idx
+                        break
+                if header_row_idx != -1:
                     break
-                    
-            if pivot_start_col != -1:
+
+            if header_row_idx != -1 and pivot_start_col != -1:
                 header_map = {
                     'am': 'am',
                     'bưu cục': 'bc_name',
@@ -533,18 +557,19 @@ def main():
                     'tổng cộng': 'total',
                     'tổng': 'total'
                 }
-                
-                pivot_cols = df_gsheet.iloc[:, pivot_start_col:].copy()
-                pivot_headers = [str(x).strip().lower() for x in row0[pivot_start_col:]]
-                
+
+                header_cells = df_gsheet.iloc[header_row_idx, pivot_start_col:].tolist()
+                pivot_headers = [str(x).strip().lower() for x in header_cells]
+                pivot_cols = df_gsheet.iloc[header_row_idx + 1:, pivot_start_col:].copy()
+
                 populated_cols = {}
                 for idx, h in enumerate(pivot_headers):
                     if h in header_map:
                         target_col = header_map[h]
-                        col_data = pivot_cols.iloc[1:, idx].reset_index(drop=True)
+                        col_data = pivot_cols.iloc[:, idx].reset_index(drop=True)
                         populated_cols[target_col] = col_data
-                        
-                df_pivot = pd.DataFrame(index=range(len(pivot_cols) - 1))
+
+                df_pivot = pd.DataFrame(index=range(len(pivot_cols)))
                 for key, default_val in [('am', ""), ('bc_name', "")]:
                     if key in populated_cols:
                         df_pivot[key] = populated_cols[key].astype(str).str.strip()
@@ -555,12 +580,13 @@ def main():
                         df_pivot[key] = pd.to_numeric(populated_cols[key], errors='coerce').fillna(0).astype(int)
                     else:
                         df_pivot[key] = 0
-                
+
                 # Clean rows
-                df_pivot = df_pivot[df_pivot['bc_name'].notna() & (df_pivot['bc_name'].astype(str).str.strip() != '')]
+                df_pivot = df_pivot[df_pivot['bc_name'].notna() & (df_pivot['bc_name'].astype(str).str.strip() != '') & (df_pivot['bc_name'].astype(str).str.lower() != 'nan')]
                 df_pivot = df_pivot[df_pivot['am'].str.lower() != 'grand total']
                 df_pivot = df_pivot[df_pivot['bc_name'].str.lower() != 'grand total']
-                
+                df_pivot = df_pivot[df_pivot['am'].str.lower() != 'am']
+
                 for _, row in df_pivot.iterrows():
                     dropped_bcs.append({
                         'am': str(row['am']).strip(),
@@ -572,7 +598,9 @@ def main():
                     })
                 print(f"✓ Parsed {len(dropped_bcs)} dropped transfer post offices successfully.")
             else:
-                print("⚠ Could not find 'AM' header for pivot table starting from column 13.")
+                print("⚠ Could not find 'AM' and 'Bưu cục' headers in dropped transfer data.")
+        else:
+            print("⚠ Dropped transfer dataframe is empty (sheet unavailable or unauthorized).")
     except Exception as e:
         print(f"⚠ Failed to fetch/parse dropped transfer orders: {e}")
 
