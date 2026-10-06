@@ -419,12 +419,26 @@ def main():
     if "--skip-downloads" in sys.argv:
         print("Skipping Link 2 download.")
     else:
-        gsheet_link2_url = "https://docs.google.com/spreadsheets/d/1czdUAW8M9hJZ_OBk5fUgwJupOmahM6QW5AlufN36jaU/export?format=xlsx"
+        gsheet_link2_url = "https://docs.google.com/spreadsheets/d/1czdUAW8M9hJZ_OBk5fUgwJupOmahM6QW5AlufN36jaU/export?format=xlsx&gid=392250472"
         link2_success = download_with_cookies(gsheet_link2_url, cookies_path, p_link2_local)
         if link2_success:
             print("✓ Downloaded Link 2 successfully.")
         else:
             print("⚠ Failed to download Link 2. Falling back to local file.")
+
+    if not link2_success:
+        local_bl_candidates = [
+            r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging >15 ngày.xlsx",
+            r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging _15 ngày.xlsx",
+            r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging >5 ngày.xlsx",
+            r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging _5 ngày.xlsx",
+            p_link2_local
+        ]
+        for bl_cand in local_bl_candidates:
+            if os.path.exists(bl_cand) and os.path.getsize(bl_cand) > 1000:
+                p_backlog = bl_cand
+                print(f"✓ Using local backlog fallback: {os.path.basename(bl_cand)}")
+                break
         
     # Download FD Report (Link 4)
     print("Downloading live FD report sheet from Google Sheets...")
@@ -620,9 +634,17 @@ def main():
     bl_by_bc = {}
     df_bl_ams = pd.DataFrame()
     
-    if "aging>5" in xl_bl.sheet_names:
-        print("✓ Detected new backlog format ('aging>5' sheet)")
-        df_raw_bl = pd.read_excel(xl_bl, sheet_name="aging>5")
+    aging_sheet = None
+    for s in xl_bl.sheet_names:
+        if "aging" in s.lower():
+            aging_sheet = s
+            break
+    if not aging_sheet and "PIVOT" not in xl_bl.sheet_names and len(xl_bl.sheet_names) > 0:
+        aging_sheet = xl_bl.sheet_names[0]
+
+    if aging_sheet:
+        print(f"✓ Detected backlog sheet: '{aging_sheet}'")
+        df_raw_bl = pd.read_excel(xl_bl, sheet_name=aging_sheet)
         if 'vung' in df_raw_bl.columns:
             df_dcl = df_raw_bl[df_raw_bl['vung'].astype(str).str.strip().str.upper() == 'ĐCL'].copy()
         else:
@@ -634,7 +656,7 @@ def main():
                 bl_by_bc[clean_bc_name(bc_name_raw)] = len(grp)
         
         am_col = 'am_name' if 'am_name' in df_dcl.columns else ('AM' if 'AM' in df_dcl.columns else 'am')
-        days_col = 'BL số ngày' if 'BL số ngày' in df_dcl.columns else ('bl_so_ngay' if 'bl_so_ngay' in df_dcl.columns else 'BL số ngày')
+        days_col = 'BL số ngày' if 'BL số ngày' in df_dcl.columns else ('bl_so_ngay' if 'bl_so_ngay' in df_dcl.columns else ('Aging' if 'Aging' in df_dcl.columns else 'BL số ngày'))
         
         def get_bucket(days):
             try:
