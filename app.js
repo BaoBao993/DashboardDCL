@@ -2132,6 +2132,10 @@ function renderHrKPIs() {
   document.getElementById('hrBs').textContent = hr.total_shortage_bs;
   document.getElementById('hrOb').textContent = hr.total_ob_week;
   document.getElementById('hrResign').textContent = hr.total_resign_week;
+  const hrWeekBadge = document.getElementById('hrWeekBadge');
+  if (hrWeekBadge && hr.latest_week) {
+    hrWeekBadge.textContent = `Tuần ${hr.latest_week} (Mới nhất)`;
+  }
 }
 
 function renderHrChart() {
