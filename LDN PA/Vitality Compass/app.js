@@ -1095,8 +1095,8 @@ let telegramConfig = null;
 
 // ===== RETURN RATE (%FD) STATE =====
 let activeFdMetric = 'tts';
-let activeFdTrendMetric = 'weekly';
-let activeFdViewMode = 'weekly';
+let activeFdTrendMetric = 'daily';
+let activeFdViewMode = 'daily';
 let activeFdDimension = 'bc';
 let fdTableSearchQuery = '';
 let fdTrendChartObj = null;
@@ -1108,13 +1108,15 @@ let hrChartObj = null;
 
 // ===== DROPPED TRANSFER PIVOT STATE =====
 let activeDroppedSort = 'tts';
-let activeDroppedPivotView = 'bc'; // 'bc', 'province', 'am', 'shop', 'raw'
+let activeDroppedPivotView = 'bc'; // 'bc', 'province', 'am', 'matrix', 'shop', 'raw'
 let droppedFilterProvince = 'all';
 let droppedFilterAm = 'all';
 let droppedFilterChannel = 'all';
 let droppedFilterShift = 'all';
 let droppedSearchQuery = '';
 let isExpertAnalysisExpanded = true;
+let droppedRawCurrentPage = 1;
+const DROPPED_RAW_PAGE_SIZE = 50;
 
 async function loadTelegramConfig() {
   const confStr = await readFile('telegram_config.json');
@@ -1685,6 +1687,7 @@ function switchDroppedView(view) {
     bc: 'btnDropViewBc',
     province: 'btnDropViewProv',
     am: 'btnDropViewAm',
+    matrix: 'btnDropViewMatrix',
     shop: 'btnDropViewShop',
     raw: 'btnDropViewRaw'
   };
@@ -1695,6 +1698,7 @@ function switchDroppedView(view) {
       else el.classList.remove('active');
     }
   }
+  droppedRawCurrentPage = 1;
   renderDroppedPivotTable();
 }
 
@@ -1725,6 +1729,37 @@ function populateDroppedFilterOptions() {
   }
 }
 
+function getFilteredDroppedRawList() {
+  if (!repData || !repData.dropped_raw_orders) return [];
+  return repData.dropped_raw_orders.filter(item => {
+    if (droppedFilterProvince !== 'all' && item.tinhlay !== droppedFilterProvince) return false;
+    if (droppedFilterAm !== 'all' && item.am !== droppedFilterAm) return false;
+    if (droppedFilterChannel !== 'all' && item.channel !== droppedFilterChannel) return false;
+    if (droppedFilterShift !== 'all' && item.shift !== droppedFilterShift) return false;
+    if (droppedSearchQuery) {
+      const q = droppedSearchQuery;
+      const codeMatch = item.order_code && item.order_code.toLowerCase().includes(q);
+      const shopMatch = item.from_name && item.from_name.toLowerCase().includes(q);
+      const bcMatch = item.bc_lay && item.bc_lay.toLowerCase().includes(q);
+      const amMatch = item.am && item.am.toLowerCase().includes(q);
+      const tinhMatch = item.tinhlay && item.tinhlay.toLowerCase().includes(q);
+      if (!codeMatch && !shopMatch && !bcMatch && !amMatch && !tinhMatch) return false;
+    }
+    return true;
+  });
+}
+
+function changeDroppedRawPage(delta) {
+  const rawList = getFilteredDroppedRawList();
+  const totalPages = Math.ceil(rawList.length / DROPPED_RAW_PAGE_SIZE) || 1;
+  const newPage = droppedRawCurrentPage + delta;
+  if (newPage >= 1 && newPage <= totalPages) {
+    droppedRawCurrentPage = newPage;
+    renderDroppedPivotTable();
+  }
+}
+window.changeDroppedRawPage = changeDroppedRawPage;
+
 function applyDroppedFilters() {
   const selProv = document.getElementById('dropFilterProvince');
   const selAm = document.getElementById('dropFilterAm');
@@ -1738,6 +1773,7 @@ function applyDroppedFilters() {
   if (selShift) droppedFilterShift = selShift.value;
   if (searchInp) droppedSearchQuery = searchInp.value.toLowerCase().trim();
 
+  droppedRawCurrentPage = 1;
   renderDroppedPivotTable();
 }
 
@@ -1760,6 +1796,7 @@ function resetDroppedFilters() {
   if (selShift) selShift.value = 'all';
   if (searchInp) searchInp.value = '';
 
+  droppedRawCurrentPage = 1;
   renderDroppedPivotTable();
 }
 
@@ -1884,21 +1921,30 @@ function renderDroppedPivotTable() {
 
   const totalAll = repData.dropped_pivot?.total_orders || 712;
 
-  // View: BƯU CỤC & AM
+  // Manage pagination visibility
+  const paginationEl = document.getElementById('droppedRawPagination');
+  if (activeDroppedPivotView === 'raw') {
+    if (paginationEl) paginationEl.style.display = 'flex';
+  } else {
+    if (paginationEl) paginationEl.style.display = 'none';
+  }
+
+  // View 1: BƯU CỤC & AM (CÓ CỘT CỒNG KỀNH BULKY)
   if (activeDroppedPivotView === 'bc') {
     thead.innerHTML = `
       <tr>
-        <th style="width: 5%; text-align: center;">STT</th>
-        <th style="width: 25%;">Bưu Cục Lấy</th>
-        <th style="width: 15%;">AM Quản Lý</th>
-        <th style="width: 10%;">Tỉnh</th>
-        <th class="blue-header" style="width: 7%; text-align: right;">Khác</th>
-        <th class="blue-header" style="width: 7%; text-align: right;">Shopee</th>
-        <th class="blue-header" style="width: 8%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
+        <th style="width: 4%; text-align: center;">STT</th>
+        <th style="width: 21%;">Bưu Cục Lấy</th>
+        <th style="width: 14%;">AM Quản Lý</th>
+        <th style="width: 9%;">Tỉnh</th>
+        <th class="blue-header" style="width: 6%; text-align: right;">Khác</th>
+        <th class="blue-header" style="width: 6%; text-align: right;">Shopee</th>
+        <th class="blue-header" style="width: 7%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
+        <th style="width: 6%; text-align: right; color: #b91c1c;">Cồng Kềnh</th>
         <th style="width: 8%; text-align: right;">Ngoài Cut-off</th>
-        <th style="width: 7%; text-align: right;">Ca Tối</th>
-        <th class="dark-blue-header" style="width: 8%; text-align: right;">Tổng Đơn</th>
-        <th style="width: 6%; text-align: right;">% Vùng</th>
+        <th style="width: 6%; text-align: right;">Ca Tối</th>
+        <th class="dark-blue-header" style="width: 7%; text-align: right;">Tổng Đơn</th>
+        <th style="width: 5%; text-align: right;">% Vùng</th>
         <th style="width: 6%; text-align: center;">Thao Tác</th>
       </tr>
     `;
@@ -1923,12 +1969,13 @@ function renderDroppedPivotTable() {
 
     list.sort((a, b) => (b.total || 0) - (a.total || 0));
 
-    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
+    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumBulky = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
 
     list.forEach((item, idx) => {
       sumKhac += item.khac || 0;
       sumShopee += item.shopee || 0;
       sumTts += item.tts || 0;
+      sumBulky += item.bulky || 0;
       sumCutoff += item.cutoff || 0;
       sumToi += item.toi || 0;
       sumTotal += item.total || 0;
@@ -1938,6 +1985,7 @@ function renderDroppedPivotTable() {
       const teleDisplay = amTele ? `<div style="font-size: 9px; color: #5a6a80;">${escapeHtml(amTele)}</div>` : '';
 
       const ttsHighlight = item.tts > 0 ? `background-color: #ffe4e6; color: #be123c; font-weight: 700;` : '';
+      const bulkyHighlight = item.bulky > 0 ? `color: #b91c1c; font-weight: 700; background-color: #fef2f2;` : `color: #94a3b8;`;
       const totalHighlight = item.total >= 50 ? `background-color: #fee2e2; font-weight: 700; color: #991b1b;` : (item.total >= 20 ? `background-color: #ffedd5; font-weight: 600; color: #9a3412;` : '');
 
       const pctVal = totalAll > 0 ? (item.total / totalAll * 100).toFixed(1) : 0;
@@ -1953,6 +2001,7 @@ function renderDroppedPivotTable() {
         <td style="text-align: right;">${item.khac || 0}</td>
         <td style="text-align: right;">${item.shopee || 0}</td>
         <td style="text-align: right; ${ttsHighlight}">${item.tts || 0}</td>
+        <td style="text-align: right; ${bulkyHighlight}">${item.bulky || 0}</td>
         <td style="text-align: right; color: #6b21a8; font-weight: 500;">${item.cutoff || 0}</td>
         <td style="text-align: right; color: #047857;">${item.toi || 0}</td>
         <td style="text-align: right; ${totalHighlight}">${item.total || 0}</td>
@@ -1973,6 +2022,7 @@ function renderDroppedPivotTable() {
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">${sumKhac}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">${sumShopee}</td>
       <td style="text-align: right; font-weight: 700; background-color: #ffe4e6; color: #be123c;">${sumTts}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #fef2f2; color: #b91c1c;">${sumBulky}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #6b21a8;">${sumCutoff}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #047857;">${sumToi}</td>
       <td style="text-align: right; font-weight: 700; background-color: #cbd5e1; color: #0f172a;">${sumTotal}</td>
@@ -1982,29 +2032,31 @@ function renderDroppedPivotTable() {
     tbody.appendChild(trGrand);
   }
 
-  // View: THEO TỈNH
+  // View 2: THEO TỈNH (CÓ CỘT CỒNG KỀNH)
   else if (activeDroppedPivotView === 'province') {
     thead.innerHTML = `
       <tr>
-        <th style="width: 8%; text-align: center;">STT</th>
-        <th style="width: 25%;">Tỉnh / Thành</th>
-        <th class="blue-header" style="width: 10%; text-align: right;">Khác</th>
-        <th class="blue-header" style="width: 10%; text-align: right;">Shopee</th>
-        <th class="blue-header" style="width: 12%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TikTok Shop (TTS) 🔴</th>
-        <th style="width: 11%; text-align: right;">Ngoài Cut-off</th>
-        <th style="width: 10%; text-align: right;">Ca Tối</th>
-        <th class="dark-blue-header" style="width: 12%; text-align: right;">Tổng Đơn Rớt</th>
-        <th style="width: 12%; text-align: right;">Tỷ Trọng (% Vùng)</th>
+        <th style="width: 5%; text-align: center;">STT</th>
+        <th style="width: 22%;">Tỉnh / Thành</th>
+        <th class="blue-header" style="width: 8%; text-align: right;">Khác</th>
+        <th class="blue-header" style="width: 8%; text-align: right;">Shopee</th>
+        <th class="blue-header" style="width: 10%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TikTok Shop (TTS) 🔴</th>
+        <th style="width: 9%; text-align: right; color: #b91c1c;">Cồng Kềnh</th>
+        <th style="width: 10%; text-align: right;">Ngoài Cut-off</th>
+        <th style="width: 8%; text-align: right;">Ca Tối</th>
+        <th class="dark-blue-header" style="width: 10%; text-align: right;">Tổng Đơn Rớt</th>
+        <th style="width: 10%; text-align: right;">Tỷ Trọng (% Vùng)</th>
       </tr>
     `;
 
     const provList = repData.dropped_pivot?.by_province || [];
-    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
+    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumBulky = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
 
     provList.forEach((r, idx) => {
       sumKhac += r.khac || 0;
       sumShopee += r.shopee || 0;
       sumTts += r.tts || 0;
+      sumBulky += r.bulky || 0;
       sumCutoff += r.cutoff || 0;
       sumToi += r.toi || 0;
       sumTotal += r.total || 0;
@@ -2013,6 +2065,7 @@ function renderDroppedPivotTable() {
       const isEpicenter = r.tinh === 'Đồng Tháp';
       const rowStyle = isEpicenter ? 'background-color: #fff1f2;' : '';
       const tagText = isEpicenter ? '<span style="background: rgba(244,63,94,0.15); color: #be123c; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">TÂM CHẤN VÙNG</span>' : '';
+      const bulkyHighlight = r.bulky > 0 ? `color: #b91c1c; font-weight: 700; background-color: #fef2f2;` : `color: #94a3b8;`;
 
       tr.innerHTML = `
         <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
@@ -2020,6 +2073,7 @@ function renderDroppedPivotTable() {
         <td style="text-align: right;">${r.khac || 0}</td>
         <td style="text-align: right;">${r.shopee || 0}</td>
         <td style="text-align: right; font-weight: 700; color: #be123c; background-color: #ffe4e6;">${r.tts || 0}</td>
+        <td style="text-align: right; ${bulkyHighlight}">${r.bulky || 0}</td>
         <td style="text-align: right; color: #6b21a8; font-weight: 600;">${r.cutoff || 0}</td>
         <td style="text-align: right; color: #047857;">${r.toi || 0}</td>
         <td style="text-align: right; font-weight: 700; font-size: 13px; color: #0f172a; background-color: #f1f5f9;">${r.total || 0}</td>
@@ -2037,6 +2091,7 @@ function renderDroppedPivotTable() {
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0;">${sumKhac}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0;">${sumShopee}</td>
       <td style="text-align: right; font-weight: 700; background-color: #ffe4e6; color: #be123c;">${sumTts}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #fef2f2; color: #b91c1c;">${sumBulky}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #6b21a8;">${sumCutoff}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #047857;">${sumToi}</td>
       <td style="text-align: right; font-weight: 700; background-color: #cbd5e1; color: #0f172a;">${sumTotal}</td>
@@ -2045,30 +2100,32 @@ function renderDroppedPivotTable() {
     tbody.appendChild(trGrand);
   }
 
-  // View: THEO AM
+  // View 3: THEO AM (CÓ CỘT CỒNG KỀNH)
   else if (activeDroppedPivotView === 'am') {
     thead.innerHTML = `
       <tr>
-        <th style="width: 6%; text-align: center;">STT</th>
-        <th style="width: 22%;">Area Manager (AM)</th>
-        <th style="width: 24%;">Bưu Cục Trọng Điểm Rớt</th>
-        <th class="blue-header" style="width: 8%; text-align: right;">Khác</th>
-        <th class="blue-header" style="width: 8%; text-align: right;">Shopee</th>
-        <th class="blue-header" style="width: 9%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
+        <th style="width: 5%; text-align: center;">STT</th>
+        <th style="width: 20%;">Area Manager (AM)</th>
+        <th style="width: 22%;">Bưu Cục Trọng Điểm Rớt</th>
+        <th class="blue-header" style="width: 7%; text-align: right;">Khác</th>
+        <th class="blue-header" style="width: 7%; text-align: right;">Shopee</th>
+        <th class="blue-header" style="width: 8%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
+        <th style="width: 7%; text-align: right; color: #b91c1c;">Cồng Kềnh</th>
         <th style="width: 8%; text-align: right;">Ngoài Cut-off</th>
-        <th style="width: 7%; text-align: right;">Ca Tối</th>
-        <th class="dark-blue-header" style="width: 9%; text-align: right;">Tổng Đơn</th>
-        <th style="width: 9%; text-align: right;">% Vùng</th>
+        <th style="width: 6%; text-align: right;">Ca Tối</th>
+        <th class="dark-blue-header" style="width: 8%; text-align: right;">Tổng Đơn</th>
+        <th style="width: 7%; text-align: right;">% Vùng</th>
       </tr>
     `;
 
     const amList = repData.dropped_pivot?.by_am || [];
-    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
+    let sumKhac = 0, sumShopee = 0, sumTts = 0, sumBulky = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
 
     amList.forEach((r, idx) => {
       sumKhac += r.khac || 0;
       sumShopee += r.shopee || 0;
       sumTts += r.tts || 0;
+      sumBulky += r.bulky || 0;
       sumCutoff += r.cutoff || 0;
       sumToi += r.toi || 0;
       sumTotal += r.total || 0;
@@ -2076,6 +2133,7 @@ function renderDroppedPivotTable() {
       const tr = document.createElement('tr');
       const isTopAm = idx === 0;
       const tagText = isTopAm ? '<span style="background: rgba(244,63,94,0.15); color: #be123c; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">CẤP BÁCH</span>' : '';
+      const bulkyHighlight = r.bulky > 0 ? `color: #b91c1c; font-weight: 700; background-color: #fef2f2;` : `color: #94a3b8;`;
 
       tr.innerHTML = `
         <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
@@ -2084,6 +2142,7 @@ function renderDroppedPivotTable() {
         <td style="text-align: right;">${r.khac || 0}</td>
         <td style="text-align: right;">${r.shopee || 0}</td>
         <td style="text-align: right; font-weight: 700; color: #be123c; background-color: #ffe4e6;">${r.tts || 0}</td>
+        <td style="text-align: right; ${bulkyHighlight}">${r.bulky || 0}</td>
         <td style="text-align: right; color: #6b21a8; font-weight: 500;">${r.cutoff || 0}</td>
         <td style="text-align: right; color: #047857;">${r.toi || 0}</td>
         <td style="text-align: right; font-weight: 700; background-color: #f1f5f9;">${r.total || 0}</td>
@@ -2101,6 +2160,7 @@ function renderDroppedPivotTable() {
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0;">${sumKhac}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0;">${sumShopee}</td>
       <td style="text-align: right; font-weight: 700; background-color: #ffe4e6; color: #be123c;">${sumTts}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #fef2f2; color: #b91c1c;">${sumBulky}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #6b21a8;">${sumCutoff}</td>
       <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #047857;">${sumToi}</td>
       <td style="text-align: right; font-weight: 700; background-color: #cbd5e1; color: #0f172a;">${sumTotal}</td>
@@ -2109,18 +2169,91 @@ function renderDroppedPivotTable() {
     tbody.appendChild(trGrand);
   }
 
-  // View: TOP SHOP / KHÁCH HÀNG
+  // View 4: MA TRẬN KÊNH x CA (2D MATRIX CHUẨN CHUYÊN GIA)
+  else if (activeDroppedPivotView === 'matrix') {
+    thead.innerHTML = `
+      <tr>
+        <th style="width: 5%; text-align: center;">STT</th>
+        <th style="width: 25%;">Kênh Bán Hàng / Nguồn Đơn</th>
+        <th style="width: 15%; text-align: right; background-color: #f5f3ff; color: #6b21a8;">Ngoài Giờ Cut-off</th>
+        <th style="width: 15%; text-align: right; background-color: #ecfdf5; color: #047857;">Ca Tối</th>
+        <th class="dark-blue-header" style="width: 15%; text-align: right;">Tổng Đơn Rớt</th>
+        <th style="width: 10%; text-align: right;">% Vùng</th>
+        <th style="width: 25%;">Đánh Giá Rủi Ro Chuyên Gia Vận Hành</th>
+      </tr>
+    `;
+
+    const matrixData = repData.dropped_pivot?.matrix_channel_shift || [
+      { channel: 'TTS', cutoff: 155, toi: 70, total: 225, pct: 31.6 },
+      { channel: 'Shopee', cutoff: 12, toi: 39, total: 51, pct: 7.16 },
+      { channel: 'Khac', cutoff: 269, toi: 167, total: 436, pct: 61.24 }
+    ];
+
+    let sumCutoff = 0, sumToi = 0, sumTotal = 0;
+
+    matrixData.forEach((r, idx) => {
+      sumCutoff += r.cutoff || 0;
+      sumToi += r.toi || 0;
+      sumTotal += r.total || 0;
+
+      const tr = document.createElement('tr');
+      let chLabel = r.channel;
+      let badge = '';
+      let riskAssessment = '';
+      if (r.channel === 'TTS') {
+        chLabel = 'TikTok Shop (TTS)';
+        badge = '<span style="background: rgba(244,63,94,0.15); color: #be123c; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 10px; margin-left: 6px;">ƯU TIÊN 1 🔴</span>';
+        riskAssessment = '<span style="color: #be123c; font-weight: 600;">Cực kỳ cấp bách: 155 đơn ngoài cutoff + 70 đơn ca tối. Dễ vỡ SLA 24h & bị sàn phạt hủy. Cần xe sweep vét gấp.</span>';
+      } else if (r.channel === 'Shopee') {
+        chLabel = 'Shopee';
+        badge = '<span style="background: rgba(245,158,11,0.15); color: #b45309; padding: 2px 6px; border-radius: 4px; font-weight: 600; font-size: 10px; margin-left: 6px;">ƯU TIÊN 2 🟠</span>';
+        riskAssessment = '<span style="color: #b45309; font-weight: 500;">Rủi ro trung bình: Chiếm 51 đơn, chủ yếu ở Ca tối (39 đơn). Chốt chia chọn đêm để xuất đi chuyến 05h sáng.</span>';
+      } else {
+        chLabel = 'Khách Hàng Khác / Ngoài Sàn';
+        badge = '<span style="background: rgba(59,130,246,0.15); color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-weight: 500; font-size: 10px; margin-left: 6px;">SỐ LƯỢNG LỚN 🔵</span>';
+        riskAssessment = '<span style="color: #2563eb; font-weight: 500;">Chiếm 61.2% tổng đơn (436 đơn). Ngoài cutoff 269 đơn do shop đóng hàng muộn. Đàm phán đẩy cutoff shop lên sớm 1h.</span>';
+      }
+
+      tr.innerHTML = `
+        <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
+        <td><strong>${chLabel}</strong> ${badge}</td>
+        <td style="text-align: right; font-weight: 600; color: #6b21a8; background-color: #faf5ff;">${r.cutoff}</td>
+        <td style="text-align: right; font-weight: 600; color: #047857; background-color: #f0fdf4;">${r.toi}</td>
+        <td style="text-align: right; font-weight: 700; font-size: 13px; background-color: #f1f5f9; color: #0f172a;">${r.total}</td>
+        <td style="text-align: right; font-weight: 700; color: #0369a1;">${r.pct}%</td>
+        <td style="font-size: 11.5px; line-height: 1.4;">${riskAssessment}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    // Grand total row
+    const trGrand = document.createElement('tr');
+    trGrand.className = 'grand-total-row';
+    const sumPct = totalAll > 0 ? (sumTotal / totalAll * 100).toFixed(1) : 0;
+    trGrand.innerHTML = `
+      <td colspan="2" style="text-align: center; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">TỔNG TOÀN VÙNG ĐCL</td>
+      <td style="text-align: right; font-weight: 700; background-color: #f3e8ff; color: #6b21a8;">${sumCutoff}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #dcfce7; color: #047857;">${sumToi}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #cbd5e1; color: #0f172a; font-size: 13px;">${sumTotal}</td>
+      <td style="text-align: right; font-weight: 700; background-color: #e2e8f0; color: #0369a1;">${sumPct}%</td>
+      <td style="background-color: #e2e8f0; font-size: 11px; font-weight: 600; color: #334155;">Đối soát 100% từ Cột A đến L của Sheet gốc</td>
+    `;
+    tbody.appendChild(trGrand);
+  }
+
+  // View 5: TOP SHOP / KHÁCH HÀNG (CÓ CỘT CỒNG KỀNH)
   else if (activeDroppedPivotView === 'shop') {
     thead.innerHTML = `
       <tr>
-        <th style="width: 6%; text-align: center;">STT</th>
-        <th style="width: 34%;">Tên Shop / Người Gửi (From Name)</th>
-        <th style="width: 22%;">Bưu Cục Lấy Hàng</th>
-        <th style="width: 16%;">AM Quản Lý</th>
-        <th class="blue-header" style="width: 7%; text-align: right;">Khác</th>
-        <th class="blue-header" style="width: 7%; text-align: right;">Shopee</th>
-        <th class="blue-header" style="width: 8%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
-        <th class="dark-blue-header" style="width: 10%; text-align: right;">Tổng Đơn</th>
+        <th style="width: 5%; text-align: center;">STT</th>
+        <th style="width: 30%;">Tên Shop / Người Gửi (From Name)</th>
+        <th style="width: 20%;">Bưu Cục Lấy Hàng</th>
+        <th style="width: 15%;">AM Quản Lý</th>
+        <th class="blue-header" style="width: 6%; text-align: right;">Khác</th>
+        <th class="blue-header" style="width: 6%; text-align: right;">Shopee</th>
+        <th class="blue-header" style="width: 7%; text-align: right; background-color: #ffe4e6; color: #e11d48;">TTS 🔴</th>
+        <th style="width: 6%; text-align: right; color: #b91c1c;">Cồng Kềnh</th>
+        <th class="dark-blue-header" style="width: 8%; text-align: right;">Tổng Đơn</th>
       </tr>
     `;
 
@@ -2139,7 +2272,8 @@ function renderDroppedPivotTable() {
       const tr = document.createElement('tr');
       const isTop1 = idx === 0 && r.total >= 50;
       const highlightBg = isTop1 ? 'background-color: #fff1f2;' : '';
-      const tagText = isTop1 ? '<span style="background: #f43f5e; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">SHOP LỚN NGUY CƠ CAO</span>' : '';
+      const tagText = isTop1 ? '<span style="background: #f43f5e; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">SHOP TÂM ĐIỂM (133 ĐƠN)</span>' : '';
+      const bulkyHighlight = r.bulky > 0 ? `color: #b91c1c; font-weight: 700; background-color: #fef2f2;` : `color: #94a3b8;`;
 
       tr.innerHTML = `
         <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
@@ -2149,44 +2283,55 @@ function renderDroppedPivotTable() {
         <td style="text-align: right;">${r.khac || 0}</td>
         <td style="text-align: right;">${r.shopee || 0}</td>
         <td style="text-align: right; font-weight: 700; color: #be123c; background-color: #ffe4e6;">${r.tts || 0}</td>
+        <td style="text-align: right; ${bulkyHighlight}">${r.bulky || 0}</td>
         <td style="text-align: right; font-weight: 700; font-size: 12.5px; background-color: #f1f5f9; color: #0f172a;">${r.total || 0}</td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  // View: CHI TIẾT TỪNG ĐƠN (12 CỘT A-L)
+  // View 6: CHI TIẾT TỪNG ĐƠN (12 CỘT A-L CHUẨN SHEET, PHÂN TRANG 50 ĐƠN/TRANG)
   else if (activeDroppedPivotView === 'raw') {
     thead.innerHTML = `
       <tr>
-        <th style="width: 5%; text-align: center;">STT</th>
-        <th style="width: 14%;">Mã Đơn Hàng</th>
-        <th style="width: 18%;">Bưu Cục Lấy</th>
-        <th style="width: 10%;">Tỉnh</th>
-        <th style="width: 12%;">AM</th>
-        <th style="width: 20%;">Khách Hàng / Shop</th>
-        <th style="width: 7%; text-align: center;">Kênh</th>
-        <th style="width: 10%; text-align: center;">Ca Lấy</th>
-        <th style="width: 8%; text-align: center;">Loại Hàng</th>
+        <th style="width: 3%; text-align: center;">STT</th>
+        <th style="width: 5%; text-align: center;">Vùng</th>
+        <th style="width: 7%;">Tỉnh Lấy</th>
+        <th style="width: 10%;">Bưu Cục Lấy</th>
+        <th style="width: 8%; text-align: center;">Ca Lấy</th>
+        <th style="width: 6%; text-align: center;">Kênh</th>
+        <th style="width: 6%; text-align: center;">Loại Hàng</th>
+        <th style="width: 11%;">Mã Đơn Hàng</th>
+        <th style="width: 15%;">Shop / Người Gửi</th>
+        <th style="width: 10%;">Bưu Cục Xuất</th>
+        <th style="width: 8%; font-family: monospace; font-size: 11px;">Giờ Lấy TC</th>
+        <th style="width: 5%; font-family: monospace; font-size: 11px; text-align: center;">Giờ DK</th>
+        <th style="width: 8%;">AM Quản Lý</th>
       </tr>
     `;
 
-    const rawList = (repData.dropped_raw_orders || []).filter(item => {
-      if (droppedFilterProvince !== 'all' && item.tinhlay !== droppedFilterProvince) return false;
-      if (droppedFilterAm !== 'all' && item.am !== droppedFilterAm) return false;
-      if (droppedFilterChannel !== 'all' && item.channel !== droppedFilterChannel) return false;
-      if (droppedFilterShift !== 'all' && item.shift !== droppedFilterShift) return false;
-      if (droppedSearchQuery) {
-        const q = droppedSearchQuery;
-        const codeMatch = item.order_code && item.order_code.toLowerCase().includes(q);
-        const shopMatch = item.from_name && item.from_name.toLowerCase().includes(q);
-        const bcMatch = item.bc_lay && item.bc_lay.toLowerCase().includes(q);
-        if (!codeMatch && !shopMatch && !bcMatch) return false;
-      }
-      return true;
-    });
+    const rawList = getFilteredDroppedRawList();
+    const totalPages = Math.ceil(rawList.length / DROPPED_RAW_PAGE_SIZE) || 1;
+    if (droppedRawCurrentPage > totalPages) droppedRawCurrentPage = totalPages;
+    if (droppedRawCurrentPage < 1) droppedRawCurrentPage = 1;
 
-    rawList.forEach((r, idx) => {
+    const startIdx = rawList.length === 0 ? 0 : (droppedRawCurrentPage - 1) * DROPPED_RAW_PAGE_SIZE + 1;
+    const endIdx = Math.min(droppedRawCurrentPage * DROPPED_RAW_PAGE_SIZE, rawList.length);
+
+    const pageInfoEl = document.getElementById('droppedRawPageInfo');
+    const badgeEl = document.getElementById('droppedCurrentPageBadge');
+    const btnPrev = document.getElementById('btnDroppedPrevPage');
+    const btnNext = document.getElementById('btnDroppedNextPage');
+
+    if (pageInfoEl) pageInfoEl.textContent = `Đang hiển thị ${startIdx}-${endIdx} / ${rawList.length} đơn (Toàn bộ 12 cột A-L)`;
+    if (badgeEl) badgeEl.textContent = `${droppedRawCurrentPage} / ${totalPages}`;
+    if (btnPrev) btnPrev.disabled = droppedRawCurrentPage <= 1;
+    if (btnNext) btnNext.disabled = droppedRawCurrentPage >= totalPages;
+
+    const pageData = rawList.slice((droppedRawCurrentPage - 1) * DROPPED_RAW_PAGE_SIZE, droppedRawCurrentPage * DROPPED_RAW_PAGE_SIZE);
+
+    pageData.forEach((r, idx) => {
+      const globalIdx = (droppedRawCurrentPage - 1) * DROPPED_RAW_PAGE_SIZE + idx + 1;
       const tr = document.createElement('tr');
       const isTts = r.channel === 'TTS';
       const chBadge = isTts
@@ -2199,16 +2344,24 @@ function renderDroppedPivotTable() {
         ? `<span style="background: rgba(167,139,250,0.15); color: #6b21a8; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Ngoài cutoff</span>`
         : `<span style="background: rgba(45,212,191,0.15); color: #047857; padding: 2px 6px; border-radius: 4px; font-size: 10px;">Ca tối</span>`;
 
+      const loaiHangBadge = r.loai_hang === 'Bulky'
+        ? `<span style="background: rgba(239,68,68,0.15); color: #b91c1c; padding: 2px 5px; border-radius: 4px; font-weight: 700; font-size: 9.5px;">Bulky</span>`
+        : `<span style="color: #64748b; font-size: 10.5px;">Normal</span>`;
+
       tr.innerHTML = `
-        <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${idx + 1}</td>
-        <td><strong style="color: #0369a1; font-family: monospace;">${escapeHtml(r.order_code)}</strong></td>
-        <td>${escapeHtml(r.bc_lay)}</td>
-        <td style="color: #475569;">${escapeHtml(r.tinhlay)}</td>
-        <td>👤 ${escapeHtml(r.am)}</td>
-        <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.from_name)}">${escapeHtml(r.from_name)}</td>
-        <td style="text-align: center;">${chBadge}</td>
+        <td style="text-align: center; color: var(--text-muted); font-size: 11px;">${globalIdx}</td>
+        <td style="color: #64748b; font-size: 11px; text-align: center;">${escapeHtml(r.vunglay || 'ĐCL')}</td>
+        <td style="color: #334155; font-size: 11.5px;">${escapeHtml(r.tinhlay || '')}</td>
+        <td><strong>${escapeHtml(r.bc_lay || '')}</strong></td>
         <td style="text-align: center;">${shiftBadge}</td>
-        <td style="text-align: center; font-size: 11px; color: #64748b;">${escapeHtml(r.loai_hang || 'Normal')}</td>
+        <td style="text-align: center;">${chBadge}</td>
+        <td style="text-align: center;">${loaiHangBadge}</td>
+        <td><strong style="color: #0369a1; font-family: monospace; font-size: 11.5px;">${escapeHtml(r.order_code || '')}</strong></td>
+        <td style="max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.from_name || '')}">${escapeHtml(r.from_name || '')}</td>
+        <td style="color: #475569; font-size: 11.5px;">${escapeHtml(r.tenbcxuat || '')}</td>
+        <td style="font-family: monospace; font-size: 10.5px; color: #475569;">${escapeHtml(r.gio_ltc || '')}</td>
+        <td style="font-family: monospace; font-size: 10.5px; color: #64748b; text-align: center;">${escapeHtml(r.gio_dk || '--')}</td>
+        <td style="font-size: 11.5px;">👤 ${escapeHtml(r.am || '')}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -2223,13 +2376,67 @@ function exportDroppedPivotToExcel() {
   }
 
   let csvContent = '\uFEFF'; // UTF-8 BOM for Microsoft Excel compatibility
-  const rows = table.querySelectorAll('tr');
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
 
+  // If viewing raw data: export the entire filtered raw dataset (all 12 columns A-L)
+  if (activeDroppedPivotView === 'raw') {
+    const rawList = getFilteredDroppedRawList();
+    const headers = [
+      "STT",
+      "Vùng Lấy (A)",
+      "Tỉnh Lấy (B)",
+      "Bưu Cục Lấy (C)",
+      "Ca Lấy (D)",
+      "Kênh / Nguồn (E)",
+      "Loại Hàng (F)",
+      "Mã Đơn Hàng (G)",
+      "Shop / Người Gửi (H)",
+      "Bưu Cục Xuất (I)",
+      "Giờ Lấy TC (J)",
+      "Giờ Dự Kiến (K)",
+      "AM Quản Lý (L)"
+    ];
+    csvContent += headers.map(h => `"${h}"`).join(',') + '\r\n';
+
+    rawList.forEach((r, idx) => {
+      const row = [
+        idx + 1,
+        r.vunglay || 'ĐCL',
+        r.tinhlay || '',
+        r.bc_lay || '',
+        r.shift || '',
+        r.channel || '',
+        r.loai_hang || 'Normal',
+        r.order_code || '',
+        r.from_name || '',
+        r.tenbcxuat || '',
+        r.gio_ltc || '',
+        r.gio_dk || '',
+        r.am || ''
+      ];
+      csvContent += row.map(v => `"${String(v).replace(/"/g, '""').trim()}"`).join(',') + '\r\n';
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `DCL_Don_Lay_Rot_Luan_Chuyen_Raw_12Cot_${dateStr}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`📥 Đã xuất thành công toàn bộ ${rawList.length} đơn hàng (đủ 12 cột)!`);
+    return;
+  }
+
+  // Otherwise: export visible pivot table
+  const rows = table.querySelectorAll('tr');
   rows.forEach(row => {
     const cols = row.querySelectorAll('th, td');
     const rowData = [];
     cols.forEach(col => {
-      // Don't export the action button column
       if (col.querySelector('button')) return;
       let text = col.innerText.replace(/"/g, '""').trim();
       rowData.push(`"${text}"`);
@@ -2243,8 +2450,6 @@ function exportDroppedPivotToExcel() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  const now = new Date();
-  const dateStr = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
   a.download = `DCL_Pivot_Don_Lay_Rot_Luan_Chuyen_${activeDroppedPivotView}_${dateStr}.csv`;
   document.body.appendChild(a);
   a.click();
@@ -3716,7 +3921,8 @@ function renderFdTable() {
       <th style="text-align: center">${d23_lbl}</th>
       <th style="text-align: center">${d24_lbl}</th>
       <th style="text-align: center; font-weight: bold">${d25_lbl}</th>
-      <th style="text-align: center">Biến động (DoD)</th>
+      <th style="text-align: center">Biến động (D/D-1)</th>
+      <th style="text-align: center">Biến động (D/D-7)</th>
       <th style="text-align: center">Thao tác</th>
     `;
     
@@ -3776,14 +3982,43 @@ function renderFdTable() {
         <td style="text-align: center" class="${getFdCellClass(row.d24)}">${formatValue(row.d24)}</td>
         <td style="text-align: center; font-weight: bold" class="${getFdCellClass(row.d25)}">${formatValue(row.d25)}</td>
         <td style="text-align: center">
-          <span class="change-tag ${changeCls}">${arrow} ${sign}${(changeVal * 100).toFixed(2)}%</span>
+          ${renderChangeTagHtml(row.change_d1)}
         </td>
         <td style="text-align: center">
-          <button class="btn-nhac-am" onclick="sendTelegramFdAlert('${escapeHtml(row.bc_name)}', '${escapeHtml(amNameForAlert)}', '${escapeHtml(amTele)}', '${formatValue(row.d25)}', '${formatChangeText(changeVal)}', 'Kiểm tra tỷ lệ trả trong ngày và đôn đốc thực hiện GTB-TT')">${btnLabel}</button>
+          ${renderChangeTagHtml(row.change_d7)}
+        </td>
+        <td style="text-align: center">
+          <button class="btn-nhac-am" onclick="sendTelegramFdAlert('${escapeHtml(row.bc_name)}', '${escapeHtml(amNameForAlert)}', '${escapeHtml(amTele)}', '${formatValue(row.d25)}', '${formatChangeText(row.change_d1)}', 'Kiểm tra tỷ lệ trả trong ngày và đôn đốc thực hiện GTB-TT')">${btnLabel}</button>
         </td>
       `;
       body.appendChild(tr);
     });
+
+    // Grand total row for Daily view
+    if (filteredDaily.length > 0) {
+      const calcAvg = (key) => {
+        const valid = filteredDaily.map(r => r[key]).filter(v => v !== null && v !== undefined && !isNaN(v));
+        return valid.length ? valid.reduce((a, b) => a + b, 0) / valid.length : null;
+      };
+      const trGrand = document.createElement('tr');
+      trGrand.className = 'grand-total-row';
+      const avgColSpan = secondHeader ? 2 : 1;
+      trGrand.innerHTML = `
+        <td colspan="${avgColSpan}" style="text-align: center; font-weight: 700; background-color: #e2e8f0; color: #0f172a;">TỔNG VÙNG ĐCL (Trung Bình)</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${formatValue(calcAvg('d18'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${formatValue(calcAvg('d19'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${formatValue(calcAvg('d20'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${formatValue(calcAvg('d21'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${formatValue(calcAvg('d22'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${formatValue(calcAvg('d23'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${formatValue(calcAvg('d24'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #cbd5e1; color: #0f172a;">${formatValue(calcAvg('d25'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${renderChangeTagHtml(calcAvg('change_d1'))}</td>
+        <td style="text-align: center; font-weight: 700; background-color: #e2e8f0;">${renderChangeTagHtml(calcAvg('change_d7'))}</td>
+        <td style="background-color: #e2e8f0;"></td>
+      `;
+      body.appendChild(trGrand);
+    }
   }
 }
 

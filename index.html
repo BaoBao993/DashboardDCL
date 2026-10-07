@@ -423,6 +423,7 @@
               <button class="dim-btn active" id="btnDropViewBc" onclick="switchDroppedView('bc')">🏢 Bưu Cục & AM</button>
               <button class="dim-btn" id="btnDropViewProv" onclick="switchDroppedView('province')">🗺️ Theo Tỉnh</button>
               <button class="dim-btn" id="btnDropViewAm" onclick="switchDroppedView('am')">👤 Theo AM</button>
+              <button class="dim-btn" id="btnDropViewMatrix" onclick="switchDroppedView('matrix')">📐 Ma Trận Kênh x Ca</button>
               <button class="dim-btn" id="btnDropViewShop" onclick="switchDroppedView('shop')">🏪 Top Shop / Khách Hàng</button>
               <button class="dim-btn" id="btnDropViewRaw" onclick="switchDroppedView('raw')">📋 Chi Tiết Đơn (12 Cột A-L)</button>
             </div>
@@ -477,6 +478,16 @@
             <!-- Rendered dynamically -->
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination controls for Raw view -->
+      <div id="droppedRawPagination" style="display: none; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-top: none; border-radius: 0 0 var(--radius-sm) var(--radius-sm); font-size: 11.5px;">
+        <span id="droppedRawPageInfo" style="color: var(--text-muted);">Đang hiển thị 1-50 / 712 đơn</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="btn btn-sm" id="btnDroppedPrevPage" onclick="changeDroppedRawPage(-1)">◀ Trang trước</button>
+          <span id="droppedCurrentPageBadge" style="padding: 4px 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; font-weight: 600;">1 / 15</span>
+          <button class="btn btn-sm" id="btnDroppedNextPage" onclick="changeDroppedRawPage(1)">Trang sau ▶</button>
+        </div>
       </div>
     </div>
   </main>
@@ -842,8 +853,8 @@
         <div class="card-title-group">
           <div class="card-title" id="fdTableTitle">📋 Bảng Chi Tiết Tỷ Lệ Trả Tổng (%)</div>
           <div class="dim-toggles">
-            <button class="dim-btn active" id="btnFdViewWeekly" onclick="switchFdViewMode('weekly')">Xem Theo Tuần</button>
-            <button class="dim-btn" id="btnFdViewDaily" onclick="switchFdViewMode('daily')">Xem Theo Ngày</button>
+            <button class="dim-btn" id="btnFdViewWeekly" onclick="switchFdViewMode('weekly')">Xem Theo Tuần</button>
+            <button class="dim-btn active" id="btnFdViewDaily" onclick="switchFdViewMode('daily')">Xem Theo Ngày (Cột J-U)</button>
           </div>
           <div class="dim-toggles" style="margin-left: 15px; border-left: 1px solid var(--border); padding-left: 15px;">
             <button class="dim-btn active" id="btnFdDimBc" onclick="switchFdDimension('bc')">Bưu cục</button>

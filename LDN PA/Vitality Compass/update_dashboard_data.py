@@ -580,6 +580,7 @@ def main():
                 khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
                 cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
                 toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
+                bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
             ).reset_index().sort_values(by='total', ascending=False)
 
             for _, row in piv_bc.iterrows():
@@ -593,55 +594,63 @@ def main():
                     'total': int(row['total']),
                     'cutoff': int(row['cutoff']),
                     'toi': int(row['toi']),
+                    'bulky': int(row['bulky']),
                     'pct': round(float(row['total']) / total_orders * 100, 2) if total_orders > 0 else 0
                 })
 
             # 2. Pivot by Province
             piv_prov = df_dropped.groupby('tinhlay').agg(
+                bcs=('bc_lay', 'nunique'),
                 total=('order_code', 'count'),
                 tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
                 shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
                 khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
                 cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
                 toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
+                bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
             ).reset_index().sort_values(by='total', ascending=False)
 
             piv_prov_list = []
             for _, r in piv_prov.iterrows():
                 piv_prov_list.append({
                     'tinh': str(r['tinhlay']).strip(),
+                    'bcs': int(r['bcs']),
                     'total': int(r['total']),
                     'tts': int(r['tts']),
                     'shopee': int(r['shopee']),
                     'khac': int(r['khac']),
                     'cutoff': int(r['cutoff']),
                     'toi': int(r['toi']),
+                    'bulky': int(r['bulky']),
                     'pct': round(float(r['total']) / total_orders * 100, 2) if total_orders > 0 else 0
                 })
 
             # 3. Pivot by AM
             piv_am = df_dropped.groupby('AM').agg(
+                bcs=('bc_lay', 'nunique'),
                 total=('order_code', 'count'),
                 tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
                 shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
                 khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
                 cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
                 toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
+                bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
             ).reset_index().sort_values(by='total', ascending=False)
 
             piv_am_list = []
             for _, r in piv_am.iterrows():
-                # find top BC of this AM
                 top_bcs_am = df_dropped[df_dropped['AM'] == r['AM']]['bc_lay'].value_counts().head(2).to_dict()
                 top_bcs_str = ", ".join([f"{k} ({v})" for k, v in top_bcs_am.items()])
                 piv_am_list.append({
                     'am': str(r['AM']).strip(),
+                    'bcs': int(r['bcs']),
                     'total': int(r['total']),
                     'tts': int(r['tts']),
                     'shopee': int(r['shopee']),
                     'khac': int(r['khac']),
                     'cutoff': int(r['cutoff']),
                     'toi': int(r['toi']),
+                    'bulky': int(r['bulky']),
                     'top_bcs': top_bcs_str,
                     'pct': round(float(r['total']) / total_orders * 100, 2) if total_orders > 0 else 0
                 })
@@ -652,7 +661,10 @@ def main():
                 tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
                 shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
                 khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
-            ).reset_index().sort_values(by='total', ascending=False).head(20)
+                cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
+                toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
+                bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
+            ).reset_index().sort_values(by='total', ascending=False).head(30)
 
             top_shops_list = []
             for _, r in piv_shops.iterrows():
@@ -664,16 +676,37 @@ def main():
                     'tts': int(r['tts']),
                     'shopee': int(r['shopee']),
                     'khac': int(r['khac']),
+                    'cutoff': int(r['cutoff']),
+                    'toi': int(r['toi']),
+                    'bulky': int(r['bulky'])
                 })
 
-            # Channel counts
+            # 5. 2D Matrix: Channel x Shift
+            matrix_channel_shift = []
+            for ch in ['TTS', 'Shopee', 'Khac']:
+                sub_df = df_dropped[df_dropped['loai_khach_hang'] == ch]
+                c_cutoff = int((sub_df['shift'] == 'Ngoài giờ cutoff').sum())
+                c_toi = int((sub_df['shift'] == 'Tối').sum())
+                c_total = len(sub_df)
+                c_pct = round(c_total / total_orders * 100, 2) if total_orders > 0 else 0
+                matrix_channel_shift.append({
+                    'channel': ch,
+                    'cutoff': c_cutoff,
+                    'toi': c_toi,
+                    'total': c_total,
+                    'pct': c_pct
+                })
+
+            # Channel & Shift counts
             ch_counts = df_dropped['loai_khach_hang'].astype(str).str.strip().value_counts().to_dict()
             shift_counts = df_dropped['shift'].astype(str).str.strip().value_counts().to_dict()
+            bulky_count = int((df_dropped['loai_hang'] == 'Bulky').sum())
 
             dropped_pivot = {
                 'total_orders': total_orders,
                 'total_bcs': int(df_dropped['bc_lay'].nunique()),
                 'total_shops': int(df_dropped['from_name'].nunique()),
+                'total_bulky': bulky_count,
                 'by_channel': {
                     'tts': int(ch_counts.get('TTS', 0)),
                     'shopee': int(ch_counts.get('Shopee', 0)),
@@ -688,24 +721,32 @@ def main():
                     'cutoff_pct': round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
                     'toi_pct': round(float(shift_counts.get('Tối', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
                 },
+                'matrix_channel_shift': matrix_channel_shift,
                 'by_province': piv_prov_list,
                 'by_am': piv_am_list,
                 'top_shops': top_shops_list
             }
 
-            # Expert operational analysis object
+            # Top province and top AM for dynamic expert diagnostic
+            top_prov_row = piv_prov_list[0] if piv_prov_list else {'tinh': 'N/A', 'total': 0, 'pct': 0}
+            top_am_row = piv_am_list[0] if piv_am_list else {'am': 'N/A', 'total': 0, 'pct': 0, 'top_bcs': 'N/A'}
+            top_shop_1 = top_shops_list[0] if top_shops_list else {'shop_name': 'N/A', 'total': 0, 'bc_lay': 'N/A'}
+            top_shop_2 = top_shops_list[1] if len(top_shops_list) > 1 else {'shop_name': 'N/A', 'total': 0, 'bc_lay': 'N/A'}
+
             dropped_expert_analysis = {
                 'summary': {
                     'total_orders': total_orders,
-                    'primary_province': 'Đồng Tháp',
-                    'primary_province_pct': '67.0%',
-                    'primary_am': 'Lý Quài Nhân',
-                    'primary_am_orders': 409,
-                    'primary_am_pct': '57.4%',
+                    'primary_province': top_prov_row['tinh'],
+                    'primary_province_orders': top_prov_row['total'],
+                    'primary_province_pct': f"{top_prov_row['pct']}%",
+                    'primary_am': top_am_row['am'],
+                    'primary_am_orders': top_am_row['total'],
+                    'primary_am_pct': f"{top_am_row['pct']}%",
                     'tts_risk_orders': int(ch_counts.get('TTS', 0)),
                     'tts_risk_pct': f"{round(float(ch_counts.get('TTS', 0)) / total_orders * 100, 1)}%",
                     'cutoff_orders': int(shift_counts.get('Ngoài giờ cutoff', 0)),
-                    'cutoff_pct': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1)}%"
+                    'cutoff_pct': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1)}%",
+                    'bulky_orders': bulky_count
                 },
                 'expert_diagnosis': [
                     {
@@ -714,68 +755,71 @@ def main():
                         'desc': f"Ghi nhận {int(ch_counts.get('TTS', 0))} đơn TikTok Shop ({round(float(ch_counts.get('TTS', 0)) / total_orders * 100, 1)}% tổng đơn rớt toàn vùng). Đây là rủi ro nghiêm trọng nhất đối với chỉ số SLA vận hành, trực tiếp kéo tăng tỷ lệ Late Dispatch Rate (LDR), có nguy cơ bị sàn TikTok Shop phạt điểm sao cửa hàng và hủy đơn tự động."
                     },
                     {
-                        'title': '📍 TÂM CHẤN VÙNG: CỤM ĐỒNG THÁP - AM LÝ QUÀI NHÂN',
-                        'badge': 'Chiếm 67.0% Vùng',
-                        'desc': 'Đồng Tháp chiếm tới 67.0% (477 đơn rớt). Điểm nóng tập trung ở 2 bưu cục do AM Lý Quài Nhân phụ trách: (DTH) Sa Đéc (229 đơn) và (DTH) Lai Vung (150 đơn, đặc biệt 149/150 đơn là TikTok Shop!). Hai bưu cục này chiếm hơn 53% toàn bộ đơn rớt luân chuyển của cả Vùng ĐCL.'
+                        'title': f"📍 TÂM CHẤN VÙNG: CỤM {top_prov_row['tinh'].upper()} - AM {top_am_row['am'].upper()}",
+                        'badge': f"Chiếm {top_am_row['pct']}% Vùng",
+                        'desc': f"{top_prov_row['tinh']} chiếm {top_prov_row['pct']}% ({top_prov_row['total']} đơn rớt). Điểm nóng tập trung cao độ ở cụm bưu cục do AM {top_am_row['am']} phụ trách: {top_am_row['top_bcs']}, chiếm tới {top_am_row['pct']}% toàn bộ lượng đơn rớt luân chuyển của cả Vùng ĐCL."
                     },
                     {
                         'title': '⏰ NGUYÊN NHÂN CỐT LÕI: NGHẼN GIỜ CUT-OFF XE TẢI',
-                        'badge': '61.2% Ngoài Giờ Cut-off',
-                        'desc': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1)}% đơn rớt ({int(shift_counts.get('Ngoài giờ cutoff', 0))} đơn) rơi vào khung Ngoài giờ Cut-off do bưu cục tiếp nhận hàng hoặc quét nhập hệ thống sau khi chuyến xe tải trung chuyển chiều/tối xuất bến. Đồng thời ca Tối cũng rớt {int(shift_counts.get('Tối', 0))} đơn."
+                        'badge': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1)}% Ngoài Cut-off",
+                        'desc': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1)}% đơn rớt ({int(shift_counts.get('Ngoài giờ cutoff', 0))} đơn) rơi vào khung Ngoài giờ Cut-off do bưu cục tiếp nhận hàng hoặc quét nhập hệ thống sau khi chuyến xe tải trung chuyển chiều xuất bến. Đồng thời ca Tối rớt {int(shift_counts.get('Tối', 0))} đơn."
                     },
                     {
                         'title': '🏪 KHÁCH HÀNG TRỌNG ĐIỂM BỊ ẢNH HƯỞNG NẶNG',
                         'badge': 'Rủi ro Hủy Đơn',
-                        'desc': 'Top 1 Shop Phụ Kiện Giá Sỉ 8383 (tại Sa Đéc) rớt tới 133 đơn (100% ngoài giờ cutoff). Kế tiếp là Kho mặc định (59 đơn), UnaFarm (44 đơn), Shop Vườn Bên Bạn (30 đơn). Cần có giải pháp riêng biệt cho nhóm khách hàng lớn này.'
+                        'desc': f"Top 1 Shop {top_shop_1['shop_name']} (tại {top_shop_1['bc_lay']}) rớt tới {top_shop_1['total']} đơn. Kế tiếp là Shop {top_shop_2['shop_name']} ({top_shop_2['total']} đơn). Đã phát hiện {bulky_count} đơn hàng cồng kềnh (Bulky) vượt tải xe trung chuyển cần điều phối xe tải riêng."
                     }
                 ],
                 'sop_action_matrix': [
                     {
                         'stt': 1,
-                        'role': 'AM Lý Quài Nhân & QL Bưu Cục Sa Đéc - Lai Vung',
+                        'role': f"AM {top_am_row['am']} & QL Bưu Cục Trọng Điểm",
                         'priority': 'CẤP BÁCH (P1)',
-                        'action': 'Khẩn cấp bố trí 01 xe tải trung chuyển tăng cường ca vét (19h30 - 20h30) gom sạch toàn bộ 149 đơn TikTok Shop tại Lai Vung và đơn gom tại Sa Đéc về kho Hub trung tâm ngay trong đêm.',
-                        'target': 'Giải tỏa 100% tồn rớt tại cụm Sa Đéc - Lai Vung trước 22h00.'
+                        'action': f"Khẩn cấp bố trí 01 xe tải trung chuyển tăng cường ca vét (19h30 - 20h30) gom sạch toàn bộ đơn rớt tại cụm {top_am_row['top_bcs']} về kho Hub trung tâm ngay trong đêm.",
+                        'target': f"Giải tỏa 100% tồn rớt tại cụm của AM {top_am_row['am']} trước 22h00."
                     },
                     {
                         'stt': 2,
                         'role': 'Bộ phận Quản lý Vận Tải (Linehaul / Transport)',
                         'priority': 'CẤP BÁCH (P1)',
-                        'action': 'Tăng tải trọng hoặc bổ sung tần suất xe trung chuyển tuyến Sa Đéc - Cần Thơ / TP.HCM ca chiều muộn (17h30 - 18h30) để không bỏ sót các chuyến lấy hàng về muộn.',
-                        'target': 'Đảm bảo xe kết nối đủ tải trọng cho toàn bộ cụm công nghiệp Sa Đéc.'
+                        'action': f"Tăng tải trọng hoặc bổ sung tần suất xe trung chuyển tuyến {top_prov_row['tinh']} ca chiều muộn (17h30 - 18h30) để không bỏ sót các chuyến lấy hàng về muộn.",
+                        'target': f"Đảm bảo xe kết nối đủ tải trọng cho toàn bộ bưu cục {top_prov_row['tinh']}."
                     },
                     {
                         'stt': 3,
                         'role': 'Bộ phận CSKH & Quản lý Tài Khoản (Sales/KAM)',
                         'priority': 'ƯU TIÊN CAO (P2)',
-                        'action': 'Làm việc trực tiếp với chủ shop Shop Phụ Kiện Giá Sỉ 8383 và UnaFarm: đàm phán đẩy giờ đóng bao xong trước 16h30 để shipper lấy trước 17h30, tránh dồn hàng sau 18h.',
+                        'action': f"Làm việc trực tiếp với chủ shop {top_shop_1['shop_name']}: đàm phán đẩy giờ đóng bao xong trước 16h30 để shipper lấy trước 17h30, tránh dồn hàng sau 18h.",
                         'target': '100% đơn của Shop lớn được gom trước giờ cut-off chính thức.'
                     },
                     {
                         'stt': 4,
-                        'role': 'AM Nguyễn Thành Huy & Bưu cục Tiểu Cần - Trà Vinh',
+                        'role': 'AM Phụ Trách & Bưu Cục Nhóm 2',
                         'priority': 'ƯU TIÊN CAO (P2)',
-                        'action': 'Rà soát quy trình đóng bao chia chọn ca chiều tại Bưu cục Tiểu Cần (33 đơn ngoài cutoff) và Bưu cục Trà Vinh (28 đơn); tăng cường 1 nhân sự xử lý để kịp giờ xe xuất bến.',
-                        'target': 'Không để phát sinh đơn rớt luân chuyển ca chiều tại Trà Vinh.'
+                        'action': 'Rà soát quy trình đóng bao chia chọn ca chiều; tăng cường nhân sự xử lý để kịp giờ xe xuất bến.',
+                        'target': 'Không để phát sinh đơn rớt luân chuyển ca chiều.'
                     }
                 ]
             }
 
-            # Top 150 raw orders sample for detail modal / view
-            for _, r in df_dropped.head(150).iterrows():
+            # FULL Raw orders export with all 12 columns (A to L)
+            for _, r in df_dropped.iterrows():
                 dropped_raw_orders.append({
-                    'order_code': str(r['order_code']).strip(),
-                    'bc_lay': str(r['bc_lay']).strip(),
+                    'vunglay': str(r['vunglay']).strip(),
                     'tinhlay': str(r['tinhlay']).strip(),
-                    'am': str(r['AM']).strip(),
-                    'from_name': str(r['from_name']).strip(),
-                    'channel': str(r['loai_khach_hang']).strip(),
+                    'bc_lay': str(r['bc_lay']).strip(),
                     'shift': str(r['shift']).strip(),
+                    'channel': str(r['loai_khach_hang']).strip(),
                     'loai_hang': str(r['loai_hang']).strip(),
-                    'gio_ltc': str(r['gio_ltc']).strip() if pd.notna(r['gio_ltc']) else '--'
+                    'order_code': str(r['order_code']).strip(),
+                    'from_name': str(r['from_name']).strip(),
+                    'tenbcxuat': str(r['tenbcxuat']).strip() if pd.notna(r['tenbcxuat']) else '--',
+                    'gio_ltc': str(r['gio_ltc']).strip() if pd.notna(r['gio_ltc']) else '--',
+                    'gio_dk': str(r['gio_dk']).strip() if pd.notna(r['gio_dk']) else '--',
+                    'am': str(r['AM']).strip()
                 })
 
-            print(f"✓ Generated Dropped Transfer Pivot: {len(dropped_bcs)} BCs, {len(piv_prov_list)} provinces, {len(piv_am_list)} AMs, {len(top_shops_list)} top shops.")
+            print(f"✓ Generated Dropped Transfer Pivot: {len(dropped_bcs)} BCs, {len(piv_prov_list)} provinces, {len(piv_am_list)} AMs, {len(top_shops_list)} top shops, {len(dropped_raw_orders)} full raw orders (Cols A-L).")
         else:
             print("⚠ Dropped transfer dataframe is empty (sheet unavailable or unauthorized).")
     except Exception as e:
