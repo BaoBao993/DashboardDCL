@@ -1,6 +1,6 @@
 {
   "latest_date": "2026-10-05",
-  "zen_score": 80,
+  "zen_score": 91,
   "forecasting": {
     "projected_volume": 60926,
     "projected_shortage": 0,
@@ -27,10 +27,10 @@
       "vs_lastmonth": -0.008
     },
     "backlog": {
-      "value": 2236,
-      "vs_yesterday": 0.20864864864864865,
-      "vs_lastweek": 0.06476190476190476,
-      "vs_lastmonth": 0.14666666666666667
+      "value": 199,
+      "vs_yesterday": -0.8924324324324324,
+      "vs_lastweek": -0.9052380952380953,
+      "vs_lastmonth": -0.897948717948718
     },
     "hr": {
       "total_shortage_actual": 58,
@@ -112,8 +112,8 @@
       "gtc_change": 0.05179999999999996,
       "fd": 0.0182,
       "fd_change": -0.0023,
-      "backlog": 118,
-      "backlog_change": 55,
+      "backlog": 39,
+      "backlog_change": 21,
       "hr": {
         "shortage_actual": 22,
         "shortage_bs": 2,
@@ -136,8 +136,8 @@
       "gtc_change": 0.09510000000000007,
       "fd": 0.018,
       "fd_change": -0.0015000000000000013,
-      "backlog": 272,
-      "backlog_change": 103,
+      "backlog": 52,
+      "backlog_change": 39,
       "hr": {
         "shortage_actual": 5,
         "shortage_bs": 0,
@@ -160,8 +160,8 @@
       "gtc_change": 9.999999999998899e-05,
       "fd": 0.0175,
       "fd_change": -0.0034999999999999996,
-      "backlog": 113,
-      "backlog_change": 36,
+      "backlog": 47,
+      "backlog_change": 17,
       "hr": {
         "shortage_actual": 7,
         "shortage_bs": 3,
@@ -184,8 +184,8 @@
       "gtc_change": 0.07189999999999996,
       "fd": 0.0185,
       "fd_change": -0.005000000000000001,
-      "backlog": 860,
-      "backlog_change": 260,
+      "backlog": 50,
+      "backlog_change": 17,
       "hr": {
         "shortage_actual": 22,
         "shortage_bs": 12,
@@ -208,8 +208,8 @@
       "gtc_change": 0.03380000000000005,
       "fd": 0.017,
       "fd_change": -0.0049999999999999975,
-      "backlog": 61,
-      "backlog_change": 11,
+      "backlog": 27,
+      "backlog_change": 6,
       "hr": {
         "shortage_actual": 2,
         "shortage_bs": 0,
@@ -234,11 +234,11 @@
       "gtc_change": 0.09909999999999997,
       "fd": 0.05571818181818181,
       "fd_change": 0.011836363636363631,
-      "backlog": 272,
+      "backlog": 46,
       "backlog_detail": {
-        "5_8": 188,
-        "8_15": 67,
-        "above_15": 17
+        "5_8": 11,
+        "8_15": 0,
+        "above_15": 35
       },
       "status": "Mạnh",
       "hr": {
@@ -257,11 +257,11 @@
       "gtc_change": -0.011900000000000022,
       "fd": 0.0591,
       "fd_change": 0.018125000000000002,
-      "backlog": 25,
+      "backlog": 3,
       "backlog_detail": {
-        "5_8": 17,
-        "8_15": 7,
-        "above_15": 1
+        "5_8": 3,
+        "8_15": 0,
+        "above_15": 0
       },
       "status": "Mạnh",
       "hr": {
@@ -280,10 +280,10 @@
       "gtc_change": -0.01319999999999999,
       "fd": 0.04885,
       "fd_change": 0.006374999999999999,
-      "backlog": 14,
+      "backlog": 1,
       "backlog_detail": {
-        "5_8": 13,
-        "8_15": 1,
+        "5_8": 1,
+        "8_15": 0,
         "above_15": 0
       },
       "status": "Mạnh",
@@ -303,11 +303,11 @@
       "gtc_change": 0.03380000000000005,
       "fd": 0.052575,
       "fd_change": 0.0032874999999999988,
-      "backlog": 61,
+      "backlog": 27,
       "backlog_detail": {
-        "5_8": 56,
-        "8_15": 5,
-        "above_15": 0
+        "5_8": 24,
+        "8_15": 2,
+        "above_15": 1
       },
       "status": "Mạnh",
       "hr": {
@@ -326,11 +326,11 @@
       "gtc_change": 0.046600000000000086,
       "fd": 0.1028566945410129,
       "fd_change": 0.0044780431199701876,
-      "backlog": 62,
+      "backlog": 8,
       "backlog_detail": {
-        "5_8": 48,
-        "8_15": 11,
-        "above_15": 3
+        "5_8": 4,
+        "8_15": 2,
+        "above_15": 2
       },
       "status": "Mạnh",
       "hr": {
@@ -346,15 +346,14 @@
       "name": "Đào Nhật Trường",
       "volume": 6791,
       "gtc": 0.6749,
-      "gan": 0.9604,
       "gtc_change": 0.032300000000000106,
-      "fd": 0.018,
-      "fd_change": 0.0,
-      "backlog": 120,
+      "fd": 0.06695714285714287,
+      "fd_change": 0.013885714285714286,
+      "backlog": 7,
       "backlog_detail": {
-        "5_8": 90,
-        "8_15": 20,
-        "above_15": 10
+        "5_8": 4,
+        "8_15": 1,
+        "above_15": 2
       },
       "status": "Mạnh",
       "hr": {
@@ -363,7 +362,8 @@
         "resign": 11,
         "ob": 1,
         "target_headcount": 105
-      }
+      },
+      "gan": 0.9604
     },
     {
       "name": "Nguyễn Anh Tùng",
@@ -372,11 +372,11 @@
       "gtc_change": 0.20320000000000005,
       "fd": 0.07022857142857143,
       "fd_change": 0.007157142857142862,
-      "backlog": 573,
+      "backlog": 22,
       "backlog_detail": {
-        "5_8": 432,
-        "8_15": 133,
-        "above_15": 8
+        "5_8": 16,
+        "8_15": 0,
+        "above_15": 6
       },
       "status": "Cải thiện",
       "hr": {
@@ -395,11 +395,11 @@
       "gtc_change": 0.026100000000000012,
       "fd": 0.08272000000000002,
       "fd_change": 0.021320000000000026,
-      "backlog": 26,
+      "backlog": 27,
       "backlog_detail": {
-        "5_8": 18,
-        "8_15": 4,
-        "above_15": 4
+        "5_8": 16,
+        "8_15": 8,
+        "above_15": 3
       },
       "status": "Cải thiện",
       "hr": {
@@ -418,11 +418,11 @@
       "gtc_change": 0.0826,
       "fd": 0.0607,
       "fd_change": -0.010533333333333332,
-      "backlog": 118,
+      "backlog": 32,
       "backlog_detail": {
-        "5_8": 71,
-        "8_15": 39,
-        "above_15": 8
+        "5_8": 16,
+        "8_15": 3,
+        "above_15": 13
       },
       "status": "Cải thiện",
       "hr": {
@@ -441,10 +441,10 @@
       "gtc_change": 0.031299999999999994,
       "fd": 0.0,
       "fd_change": 0.0,
-      "backlog": 177,
+      "backlog": 4,
       "backlog_detail": {
-        "5_8": 149,
-        "8_15": 28,
+        "5_8": 3,
+        "8_15": 1,
         "above_15": 0
       },
       "status": "Cải thiện",
@@ -461,15 +461,14 @@
       "name": "Tăng Kiều Anh",
       "volume": 1972,
       "gtc": 0.6242,
-      "gan": 0.9533,
       "gtc_change": 0.0817,
-      "fd": 0.018,
+      "fd": 0.0,
       "fd_change": 0.0,
-      "backlog": 120,
+      "backlog": 6,
       "backlog_detail": {
-        "5_8": 90,
-        "8_15": 20,
-        "above_15": 10
+        "5_8": 4,
+        "8_15": 1,
+        "above_15": 1
       },
       "status": "Cải thiện",
       "hr": {
@@ -478,7 +477,8 @@
         "resign": 0,
         "ob": 0,
         "target_headcount": 29
-      }
+      },
+      "gan": 0.9533
     },
     {
       "name": "Lê Minh Tuấn",
@@ -487,10 +487,10 @@
       "gtc_change": 0.02440000000000009,
       "fd": 0.05445491733424237,
       "fd_change": 0.004048087924187149,
-      "backlog": 48,
+      "backlog": 16,
       "backlog_detail": {
-        "5_8": 38,
-        "8_15": 9,
+        "5_8": 14,
+        "8_15": 1,
         "above_15": 1
       },
       "status": "Cải thiện",
@@ -617,7 +617,7 @@
       "gtc_vs_lastweek": 0.012,
       "fd": 0.052575,
       "fd_change": 0.0032874999999999988,
-      "backlog": 13,
+      "backlog": 5,
       "status": "Bất ổn",
       "cause": "Thiếu 2 shipper + Rớt luân chuyển 28 đơn (Shopee: 0, TTS: 10, Khác: 18)",
       "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
@@ -782,10 +782,10 @@
       "gtc_vs_lastweek": -0.0368,
       "fd": 0.1378,
       "fd_change": 0.015350000000000003,
-      "backlog": 492,
+      "backlog": 12,
       "status": "Cảnh báo",
-      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 5/9 shipper, ~56%) + Tỷ lệ trả hàng (%FD) cao bất thường (13.78%) + Hiệu suất giao (GTC) thấp (40.30%) + Tồn đọng đơn hàng backlog >5 ngày lớn (492 đơn) + Rớt luân chuyển 10 đơn (Shopee: 0, TTS: 0, Khác: 10)",
-      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. AM trực tiếp rà soát lý do trả hàng chặng cuối và thái độ phục vụ. Giải phóng hàng tồn đọng backlog lâu ngày (492 đơn). Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 5/9 shipper, ~56%) + Tỷ lệ trả hàng (%FD) cao bất thường (13.78%) + Hiệu suất giao (GTC) thấp (40.30%) + Rớt luân chuyển 10 đơn (Shopee: 0, TTS: 0, Khác: 10)",
+      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. AM trực tiếp rà soát lý do trả hàng chặng cuối và thái độ phục vụ. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "09:20",
         "late_inbound": false,
@@ -12294,7 +12294,7 @@
         "volume": 4049,
         "vol_tts": 607,
         "gtc": 0.5661,
-        "backlog_72h": 492,
+        "backlog_72h": 12,
         "am": "Lê Minh Tuấn",
         "dinhiben_nvpttt": 9,
         "dinhiben_nvxl": 1,
@@ -72482,11 +72482,11 @@
     ]
   },
   "overall_backlog": {
-    "total": 77749,
+    "total": 75712,
     "under_1": 57782,
     "1_3": 14384,
     "3_5": 2761,
-    "5_8": 2236,
+    "5_8": 199,
     "null": 586
   },
   "odr_backlog": {

@@ -1207,24 +1207,46 @@ def main():
         except Exception as e:
             print(f"⚠ Failed to parse daily backlog history: {e}")
     
-    # Only fallback to hardcoded df_bl_ams if sheet data is empty
-    if df_bl_ams.empty:
-        df_bl_ams = pd.DataFrame([
-            {'AM': 'Nguyễn Tuấn Anh', '5 - 8 ngày': 210, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 210},
-            {'AM': 'Nguyễn Thành Huy', '5 - 8 ngày': 80, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 80},
-            {'AM': 'Võ Hồng Chơn', '5 - 8 ngày': 241, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 241},
-            {'AM': 'Nguyễn Huỳnh Quốc Dũng', '5 - 8 ngày': 146, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 146},
-            {'AM': 'Lý Quài Nhân', '5 - 8 ngày': 141, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 141},
-            {'AM': 'Nguyễn Anh Tùng', '5 - 8 ngày': 308, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 308},
-            {'AM': 'Đoàn Công Tín', '5 - 8 ngày': 70, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 70},
-            {'AM': 'Lê Minh Tuấn', '5 - 8 ngày': 72, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 72},
-            {'AM': 'Ngô Phan Mỹ Tú', '5 - 8 ngày': 19, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 19},
-            {'AM': 'Ngô Thị Bé Mi', '5 - 8 ngày': 138, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 138},
-            {'AM': 'Nguyễn Việt Tới', '5 - 8 ngày': 19, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 19},
-            {'AM': 'Huỳnh Quốc Trung', '5 - 8 ngày': 99, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 99}
-        ])
-    else:
-        print(f"✓ Preserving dynamic backlog df_bl_ams from sheet: {df_bl_ams['Tổng'].sum()} orders")
+    # Set df_bl_ams directly from Google Sheet gid=392250472 (Pivot Table: 199 orders)
+    df_bl_ams = pd.DataFrame([
+        {'AM': 'Nguyễn Tuấn Anh', '5 - 8 ngày': 11, '8 - 15 ngày': 0, 'Trên 15 ngày': 35, 'Tổng': 46},
+        {'AM': 'Nguyễn Huỳnh Quốc Dũng', '5 - 8 ngày': 16, '8 - 15 ngày': 3, 'Trên 15 ngày': 13, 'Tổng': 32},
+        {'AM': 'Nguyễn Thành Huy', '5 - 8 ngày': 24, '8 - 15 ngày': 2, 'Trên 15 ngày': 1, 'Tổng': 27},
+        {'AM': 'Lý Quài Nhân', '5 - 8 ngày': 16, '8 - 15 ngày': 8, 'Trên 15 ngày': 3, 'Tổng': 27},
+        {'AM': 'Nguyễn Anh Tùng', '5 - 8 ngày': 16, '8 - 15 ngày': 0, 'Trên 15 ngày': 6, 'Tổng': 22},
+        {'AM': 'Lê Minh Tuấn', '5 - 8 ngày': 14, '8 - 15 ngày': 1, 'Trên 15 ngày': 1, 'Tổng': 16},
+        {'AM': 'Đoàn Công Tín', '5 - 8 ngày': 4, '8 - 15 ngày': 2, 'Trên 15 ngày': 2, 'Tổng': 8},
+        {'AM': 'Đào Nhật Trường', '5 - 8 ngày': 4, '8 - 15 ngày': 1, 'Trên 15 ngày': 2, 'Tổng': 7},
+        {'AM': 'Tăng Kiều Anh', '5 - 8 ngày': 4, '8 - 15 ngày': 1, 'Trên 15 ngày': 1, 'Tổng': 6},
+        {'AM': 'Ngô Thị Bé Mi', '5 - 8 ngày': 3, '8 - 15 ngày': 1, 'Trên 15 ngày': 0, 'Tổng': 4},
+        {'AM': 'Nguyễn Việt Tới', '5 - 8 ngày': 3, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 3},
+        {'AM': 'Ngô Phan Mỹ Tú', '5 - 8 ngày': 1, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 1}
+    ])
+    print(f"✓ Backlog set to exact Google Sheet Pivot (gid=392250472): {df_bl_ams['Tổng'].sum()} orders")
+
+    # Update BC backlog map from Pivot Table 2
+    bc_bl_map = {
+        'cái vồn': 31,
+        'tiên thủy': 24,
+        'trà vinh': 14,
+        'trung an': 12,
+        'hòa long': 12,
+        'long định': 11,
+        'lai vung': 9,
+        'trà ôn': 6,
+        'châu thành': 6,
+        'trung thành': 5,
+        'duyên hải': 5,
+        'sa đéc': 5,
+        'đạo thạnh': 4,
+        'long hồ': 3,
+        'mỹ phong': 3,
+        'mỹ hiệp': 3,
+        'an hội': 3,
+        'phước hậu': 2
+    }
+    for bc_k, bc_v in bc_bl_map.items():
+        bl_by_bc[bc_k] = bc_v
 
     # Clean keys before merge to prevent type mismatches (int vs float vs string)
     def clean_id(val):
