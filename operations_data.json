@@ -1,6 +1,6 @@
 {
   "latest_date": "2026-10-05",
-  "zen_score": 83,
+  "zen_score": 80,
   "forecasting": {
     "projected_volume": 60926,
     "projected_shortage": 0,
@@ -27,10 +27,10 @@
       "vs_lastmonth": -0.008
     },
     "backlog": {
-      "value": 1823,
-      "vs_yesterday": -0.014594594594594595,
-      "vs_lastweek": -0.1319047619047619,
-      "vs_lastmonth": -0.06512820512820512
+      "value": 2236,
+      "vs_yesterday": 0.20864864864864865,
+      "vs_lastweek": 0.06476190476190476,
+      "vs_lastmonth": 0.14666666666666667
     },
     "hr": {
       "total_shortage_actual": 58,
@@ -112,8 +112,8 @@
       "gtc_change": 0.05179999999999996,
       "fd": 0.0182,
       "fd_change": -0.0023,
-      "backlog": 172,
-      "backlog_change": 18,
+      "backlog": 118,
+      "backlog_change": 55,
       "hr": {
         "shortage_actual": 22,
         "shortage_bs": 2,
@@ -136,8 +136,8 @@
       "gtc_change": 0.09510000000000007,
       "fd": 0.018,
       "fd_change": -0.0015000000000000013,
-      "backlog": 248,
-      "backlog_change": 25,
+      "backlog": 272,
+      "backlog_change": 103,
       "hr": {
         "shortage_actual": 5,
         "shortage_bs": 0,
@@ -160,8 +160,8 @@
       "gtc_change": 9.999999999998899e-05,
       "fd": 0.0175,
       "fd_change": -0.0034999999999999996,
-      "backlog": 296,
-      "backlog_change": 30,
+      "backlog": 113,
+      "backlog_change": 36,
       "hr": {
         "shortage_actual": 7,
         "shortage_bs": 3,
@@ -184,8 +184,8 @@
       "gtc_change": 0.07189999999999996,
       "fd": 0.0185,
       "fd_change": -0.005000000000000001,
-      "backlog": 695,
-      "backlog_change": 70,
+      "backlog": 860,
+      "backlog_change": 260,
       "hr": {
         "shortage_actual": 22,
         "shortage_bs": 12,
@@ -208,8 +208,8 @@
       "gtc_change": 0.03380000000000005,
       "fd": 0.017,
       "fd_change": -0.0049999999999999975,
-      "backlog": 95,
-      "backlog_change": 10,
+      "backlog": 61,
+      "backlog_change": 11,
       "hr": {
         "shortage_actual": 2,
         "shortage_bs": 0,
@@ -234,11 +234,11 @@
       "gtc_change": 0.09909999999999997,
       "fd": 0.05571818181818181,
       "fd_change": 0.011836363636363631,
-      "backlog": 248,
+      "backlog": 272,
       "backlog_detail": {
-        "5_8": 248,
-        "8_15": 0,
-        "above_15": 0
+        "5_8": 188,
+        "8_15": 67,
+        "above_15": 17
       },
       "status": "Mạnh",
       "hr": {
@@ -257,11 +257,11 @@
       "gtc_change": -0.011900000000000022,
       "fd": 0.0591,
       "fd_change": 0.018125000000000002,
-      "backlog": 22,
+      "backlog": 25,
       "backlog_detail": {
-        "5_8": 22,
-        "8_15": 0,
-        "above_15": 0
+        "5_8": 17,
+        "8_15": 7,
+        "above_15": 1
       },
       "status": "Mạnh",
       "hr": {
@@ -280,10 +280,10 @@
       "gtc_change": -0.01319999999999999,
       "fd": 0.04885,
       "fd_change": 0.006374999999999999,
-      "backlog": 22,
+      "backlog": 14,
       "backlog_detail": {
-        "5_8": 22,
-        "8_15": 0,
+        "5_8": 13,
+        "8_15": 1,
         "above_15": 0
       },
       "status": "Mạnh",
@@ -303,10 +303,10 @@
       "gtc_change": 0.03380000000000005,
       "fd": 0.052575,
       "fd_change": 0.0032874999999999988,
-      "backlog": 95,
+      "backlog": 61,
       "backlog_detail": {
-        "5_8": 95,
-        "8_15": 0,
+        "5_8": 56,
+        "8_15": 5,
         "above_15": 0
       },
       "status": "Mạnh",
@@ -326,11 +326,11 @@
       "gtc_change": 0.046600000000000086,
       "fd": 0.1028566945410129,
       "fd_change": 0.0044780431199701876,
-      "backlog": 83,
+      "backlog": 62,
       "backlog_detail": {
-        "5_8": 83,
-        "8_15": 0,
-        "above_15": 0
+        "5_8": 48,
+        "8_15": 11,
+        "above_15": 3
       },
       "status": "Mạnh",
       "hr": {
@@ -372,11 +372,11 @@
       "gtc_change": 0.20320000000000005,
       "fd": 0.07022857142857143,
       "fd_change": 0.007157142857142862,
-      "backlog": 364,
+      "backlog": 573,
       "backlog_detail": {
-        "5_8": 364,
-        "8_15": 0,
-        "above_15": 0
+        "5_8": 432,
+        "8_15": 133,
+        "above_15": 8
       },
       "status": "Cải thiện",
       "hr": {
@@ -395,11 +395,11 @@
       "gtc_change": 0.026100000000000012,
       "fd": 0.08272000000000002,
       "fd_change": 0.021320000000000026,
-      "backlog": 167,
+      "backlog": 26,
       "backlog_detail": {
-        "5_8": 167,
-        "8_15": 0,
-        "above_15": 0
+        "5_8": 18,
+        "8_15": 4,
+        "above_15": 4
       },
       "status": "Cải thiện",
       "hr": {
@@ -418,11 +418,11 @@
       "gtc_change": 0.0826,
       "fd": 0.0607,
       "fd_change": -0.010533333333333332,
-      "backlog": 172,
+      "backlog": 118,
       "backlog_detail": {
-        "5_8": 172,
-        "8_15": 0,
-        "above_15": 0
+        "5_8": 71,
+        "8_15": 39,
+        "above_15": 8
       },
       "status": "Cải thiện",
       "hr": {
@@ -441,10 +441,10 @@
       "gtc_change": 0.031299999999999994,
       "fd": 0.0,
       "fd_change": 0.0,
-      "backlog": 163,
+      "backlog": 177,
       "backlog_detail": {
-        "5_8": 163,
-        "8_15": 0,
+        "5_8": 149,
+        "8_15": 28,
         "above_15": 0
       },
       "status": "Cải thiện",
@@ -487,11 +487,11 @@
       "gtc_change": 0.02440000000000009,
       "fd": 0.05445491733424237,
       "fd_change": 0.004048087924187149,
-      "backlog": 85,
+      "backlog": 48,
       "backlog_detail": {
-        "5_8": 85,
-        "8_15": 0,
-        "above_15": 0
+        "5_8": 38,
+        "8_15": 9,
+        "above_15": 1
       },
       "status": "Cải thiện",
       "hr": {
@@ -72482,11 +72482,11 @@
     ]
   },
   "overall_backlog": {
-    "total": 77336,
+    "total": 77749,
     "under_1": 57782,
     "1_3": 14384,
     "3_5": 2761,
-    "5_8": 1823,
+    "5_8": 2236,
     "null": 586
   },
   "odr_backlog": {

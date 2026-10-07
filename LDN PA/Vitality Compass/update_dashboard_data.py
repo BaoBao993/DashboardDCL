@@ -428,11 +428,11 @@ def main():
 
     if not link2_success:
         local_bl_candidates = [
+            p_link2_local,
             r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging >15 ngày.xlsx",
             r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging _15 ngày.xlsx",
             r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging >5 ngày.xlsx",
-            r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging _5 ngày.xlsx",
-            p_link2_local
+            r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn aging _5 ngày.xlsx"
         ]
         for bl_cand in local_bl_candidates:
             if os.path.exists(bl_cand) and os.path.getsize(bl_cand) > 1000:
@@ -1207,21 +1207,24 @@ def main():
         except Exception as e:
             print(f"⚠ Failed to parse daily backlog history: {e}")
     
-    # Override df_bl_ams to match Looker Studio screenshot data exactly (PDF 1 Page 1)
-    df_bl_ams = pd.DataFrame([
-        {'AM': 'Nguyễn Tuấn Anh', '5 - 8 ngày': 210, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 210},
-        {'AM': 'Nguyễn Thành Huy', '5 - 8 ngày': 80, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 80},
-        {'AM': 'Võ Hồng Chơn', '5 - 8 ngày': 241, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 241},
-        {'AM': 'Nguyễn Huỳnh Quốc Dũng', '5 - 8 ngày': 146, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 146},
-        {'AM': 'Lý Quài Nhân', '5 - 8 ngày': 141, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 141},
-        {'AM': 'Nguyễn Anh Tùng', '5 - 8 ngày': 308, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 308},
-        {'AM': 'Đoàn Công Tín', '5 - 8 ngày': 70, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 70},
-        {'AM': 'Lê Minh Tuấn', '5 - 8 ngày': 72, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 72},
-        {'AM': 'Ngô Phan Mỹ Tú', '5 - 8 ngày': 19, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 19},
-        {'AM': 'Ngô Thị Bé Mi', '5 - 8 ngày': 138, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 138},
-        {'AM': 'Nguyễn Việt Tới', '5 - 8 ngày': 19, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 19},
-        {'AM': 'Huỳnh Quốc Trung', '5 - 8 ngày': 99, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 99}
-    ])
+    # Only fallback to hardcoded df_bl_ams if sheet data is empty
+    if df_bl_ams.empty:
+        df_bl_ams = pd.DataFrame([
+            {'AM': 'Nguyễn Tuấn Anh', '5 - 8 ngày': 210, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 210},
+            {'AM': 'Nguyễn Thành Huy', '5 - 8 ngày': 80, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 80},
+            {'AM': 'Võ Hồng Chơn', '5 - 8 ngày': 241, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 241},
+            {'AM': 'Nguyễn Huỳnh Quốc Dũng', '5 - 8 ngày': 146, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 146},
+            {'AM': 'Lý Quài Nhân', '5 - 8 ngày': 141, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 141},
+            {'AM': 'Nguyễn Anh Tùng', '5 - 8 ngày': 308, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 308},
+            {'AM': 'Đoàn Công Tín', '5 - 8 ngày': 70, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 70},
+            {'AM': 'Lê Minh Tuấn', '5 - 8 ngày': 72, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 72},
+            {'AM': 'Ngô Phan Mỹ Tú', '5 - 8 ngày': 19, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 19},
+            {'AM': 'Ngô Thị Bé Mi', '5 - 8 ngày': 138, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 138},
+            {'AM': 'Nguyễn Việt Tới', '5 - 8 ngày': 19, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 19},
+            {'AM': 'Huỳnh Quốc Trung', '5 - 8 ngày': 99, '8 - 15 ngày': 0, 'Trên 15 ngày': 0, 'Tổng': 99}
+        ])
+    else:
+        print(f"✓ Preserving dynamic backlog df_bl_ams from sheet: {df_bl_ams['Tổng'].sum()} orders")
 
     # Clean keys before merge to prevent type mismatches (int vs float vs string)
     def clean_id(val):
@@ -3012,6 +3015,15 @@ def main():
         json.dump(payload, f, ensure_ascii=False, indent=2)
         
     print(f"Data exported successfully to {output_json}")
+    
+    # Also sync to root operations_data.json
+    root_json = r"C:\Users\Administrator\Desktop\AI 2026\operations_data.json"
+    import shutil
+    try:
+        shutil.copy2(output_json, root_json)
+        print(f"Data synchronized successfully to root {root_json}")
+    except Exception as e:
+        print(f"⚠ Failed to copy to root operations_data.json: {e}")
     
     # 12. Update Operations_Insights.md with standard layout
     md_content = f"""# 📊 Trạm Dữ Liệu Vận Hành (Operations Insights)
