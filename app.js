@@ -3260,7 +3260,7 @@ function renderHrDimensionTable() {
 // ===== RETURN RATE (%FD) DASHBOARD RENDERING =====
 function renderReturnRateView() {
   if (!repData || !repData.fd_report) return;
-  switchFdMetric(activeFdMetric);
+  updateFdMetricUI(activeFdMetric);
   renderFdKPIs();
   try {
     renderFdChart();
@@ -4046,7 +4046,7 @@ function switchFdDimension(dim) {
   renderFdTable();
 }
 
-function switchFdMetric(metric) {
+function updateFdMetricUI(metric) {
   activeFdMetric = metric;
   
   const btnIds = {
@@ -4099,7 +4099,10 @@ function switchFdMetric(metric) {
     };
     tableTitleEl.textContent = tableTitles[metric];
   }
-  
+}
+
+function switchFdMetric(metric) {
+  updateFdMetricUI(metric);
   renderReturnRateView();
 }
 
