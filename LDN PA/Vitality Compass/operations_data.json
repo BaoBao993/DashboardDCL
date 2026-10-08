@@ -2,17 +2,17 @@
   "latest_date": "2026-10-07",
   "zen_score": 91,
   "forecasting": {
-    "projected_volume": -794,
+    "projected_volume": 60654,
     "projected_shortage": 0,
-    "vol_trend": "Giảm",
-    "recommendation": "Dự báo sản lượng tuần tới đạt -794 đơn (Giảm). Cần bổ sung thêm 0 shipper dự phòng để giữ lưới chặng cuối luôn ổn định."
+    "vol_trend": "Tăng",
+    "recommendation": "Dự báo sản lượng tuần tới đạt 60,654 đơn (Tăng). Cần bổ sung thêm 0 shipper dự phòng để giữ lưới chặng cuối luôn ổn định."
   },
   "kpis": {
     "volume": {
-      "value": 4396,
-      "vs_yesterday": -0.9281699346405229,
-      "vs_lastweek": -0.9210913660025131,
-      "vs_lastmonth": -0.9242068965517242
+      "value": 59700,
+      "vs_yesterday": -0.024509803921568627,
+      "vs_lastweek": 0.07162089391491654,
+      "vs_lastmonth": 0.029310344827586206
     },
     "gtc": {
       "value": 0.6877,
@@ -112,7 +112,7 @@
     },
     {
       "date": "2026-10-07",
-      "volume": 4396,
+      "volume": 59700,
       "gtc": 0.6877,
       "fd": 0.0175,
       "backlog": 199

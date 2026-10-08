@@ -1360,7 +1360,7 @@ def main():
     if looker_gtc is not None:
         print(f"Overriding cur_gtc: {cur_gtc:.2%} -> {looker_gtc:.2%}")
         cur_gtc = looker_gtc
-    if looker_vol is not None:
+    if looker_vol is not None and looker_vol > 20000:
         print(f"Overriding cur_vol: {cur_vol:,} -> {looker_vol:,}")
         cur_vol = looker_vol
 
@@ -1830,7 +1830,7 @@ def main():
         latest_gtc_date = pd.Timestamp('2026-10-07')
     
     # Target values for latest date (from Looker Studio / Overrides)
-    target_vol = 59700 if looker_vol is None else looker_vol
+    target_vol = 59700 if (looker_vol is None or looker_vol < 20000) else looker_vol
     target_gtc = 0.6877 if looker_gtc is None else looker_gtc
     target_gan = 0.9444
     target_fd = 0.0180

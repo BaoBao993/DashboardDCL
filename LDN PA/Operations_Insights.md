@@ -26,13 +26,13 @@
 ## 📈 Highlight / Lowlight
 ### Highlights:
 - Tỷ lệ GTC toàn vùng (68.77%) cải thiện **+4.57%** so với cùng kỳ tuần trước (58.57%).
+- Sản lượng đơn toàn vùng đạt 59,700 đơn, tăng trưởng **+7.16%** so với tuần trước.
 - Đơn tồn backlog (>5 ngày) kiểm soát tốt, giảm **-90.52%** so với tuần trước (từ 1,850 xuống 199 đơn).
 - **Ngô Phan Mỹ Tú** là AM có tỷ lệ GTC cao nhất toàn vùng (71.61%), đồng thời duy trì lượng đơn tồn đọng cực thấp.
 - Tỷ lệ chuyển trả (FD) toàn vùng duy trì ở mức an toàn là **1.80%** (↘ -0.55% vs Tuần trước).
 - Trong tuần qua, HRBP đã tuyển thành công **2 nhân viên mới** (OB) hỗ trợ lấp đầy các tuyến nóng.
 
 ### Lowlights:
-- Sản lượng đơn toàn vùng đạt 4,396 đơn, suy giảm nhẹ **-92.11%** so với tuần trước.
 - Toàn vùng đang **thiếu hụt thực tế 58 shipper (NVPTTT)**, ảnh nghiêm trọng đến tiến độ giao hàng đầu ca.
 - Điểm nóng nhân sự tập trung lớn nhất tại **Tiền Giang** (thiếu 22 định biên) và **Đồng Tháp** (thiếu 7 định biên).
 
