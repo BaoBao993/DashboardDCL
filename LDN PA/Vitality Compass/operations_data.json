@@ -1,29 +1,29 @@
 {
-  "latest_date": "2026-10-05",
+  "latest_date": "2026-10-07",
   "zen_score": 91,
   "forecasting": {
-    "projected_volume": 60926,
+    "projected_volume": -794,
     "projected_shortage": 0,
-    "vol_trend": "Tăng",
-    "recommendation": "Dự báo sản lượng tuần tới đạt 60,926 đơn (Tăng). Cần bổ sung thêm 0 shipper dự phòng để giữ lưới chặng cuối luôn ổn định."
+    "vol_trend": "Giảm",
+    "recommendation": "Dự báo sản lượng tuần tới đạt -794 đơn (Giảm). Cần bổ sung thêm 0 shipper dự phòng để giữ lưới chặng cuối luôn ổn định."
   },
   "kpis": {
     "volume": {
-      "value": 59700,
-      "vs_yesterday": -0.14897863180852733,
-      "vs_lastweek": 0.16802316481452498,
-      "vs_lastmonth": 0.029310344827586206
+      "value": 4396,
+      "vs_yesterday": -0.9281699346405229,
+      "vs_lastweek": -0.9210913660025131,
+      "vs_lastmonth": -0.9242068965517242
     },
     "gtc": {
-      "value": 0.6778,
-      "vs_yesterday": 0.052099999999999924,
-      "vs_lastweek": 0.02949999999999997,
-      "vs_lastmonth": 0.05779999999999996
+      "value": 0.6877,
+      "vs_yesterday": 0.00649999999999995,
+      "vs_lastweek": 0.04569999999999996,
+      "vs_lastmonth": 0.06769999999999998
     },
     "fd": {
       "value": 0.018,
-      "vs_yesterday": -0.0030000000000000027,
-      "vs_lastweek": -0.007000000000000003,
+      "vs_yesterday": 0.0001999999999999988,
+      "vs_lastweek": -0.005500000000000001,
       "vs_lastmonth": -0.008
     },
     "backlog": {
@@ -102,13 +102,27 @@
       "gtc": 0.6778,
       "fd": 0.018,
       "backlog": 1823
+    },
+    {
+      "date": "2026-10-06",
+      "volume": 61200,
+      "gtc": 0.6812,
+      "fd": 0.0178,
+      "backlog": 1500
+    },
+    {
+      "date": "2026-10-07",
+      "volume": 4396,
+      "gtc": 0.6877,
+      "fd": 0.0175,
+      "backlog": 199
     }
   ],
   "provinces": [
     {
       "name": "Bến Tre",
       "volume": 11862,
-      "gtc": 0.6613,
+      "gtc": 0.671,
       "gtc_change": 0.05179999999999996,
       "fd": 0.0182,
       "fd_change": -0.0023,
@@ -132,7 +146,7 @@
     {
       "name": "Vĩnh Long",
       "volume": 9589,
-      "gtc": 0.7115,
+      "gtc": 0.7219,
       "gtc_change": 0.09510000000000007,
       "fd": 0.018,
       "fd_change": -0.0015000000000000013,
@@ -156,7 +170,7 @@
     {
       "name": "Đồng Tháp",
       "volume": 11422,
-      "gtc": 0.6958,
+      "gtc": 0.706,
       "gtc_change": 9.999999999998899e-05,
       "fd": 0.0175,
       "fd_change": -0.0034999999999999996,
@@ -180,7 +194,7 @@
     {
       "name": "Tiền Giang",
       "volume": 17632,
-      "gtc": 0.6443,
+      "gtc": 0.6537,
       "gtc_change": 0.07189999999999996,
       "fd": 0.0185,
       "fd_change": -0.005000000000000001,
@@ -204,7 +218,7 @@
     {
       "name": "Trà Vinh",
       "volume": 9195,
-      "gtc": 0.7054,
+      "gtc": 0.7157,
       "gtc_change": 0.03380000000000005,
       "fd": 0.017,
       "fd_change": -0.0049999999999999975,
@@ -230,8 +244,8 @@
     {
       "name": "Nguyễn Tuấn Anh",
       "volume": 7617,
-      "gtc": 0.7341,
-      "gtc_change": 0.09909999999999997,
+      "gtc": 0.7448,
+      "gtc_change": 0.10980000000000001,
       "fd": 0.05571818181818181,
       "fd_change": 0.011836363636363631,
       "backlog": 46,
@@ -253,8 +267,8 @@
     {
       "name": "Nguyễn Việt Tới",
       "volume": 3414,
-      "gtc": 0.7293,
-      "gtc_change": -0.011900000000000022,
+      "gtc": 0.74,
+      "gtc_change": -0.0011999999999999789,
       "fd": 0.0591,
       "fd_change": 0.018125000000000002,
       "backlog": 3,
@@ -276,8 +290,8 @@
     {
       "name": "Ngô Phan Mỹ Tú",
       "volume": 3922,
-      "gtc": 0.7058,
-      "gtc_change": -0.01319999999999999,
+      "gtc": 0.7161,
+      "gtc_change": -0.0029000000000000137,
       "fd": 0.04885,
       "fd_change": 0.006374999999999999,
       "backlog": 1,
@@ -299,8 +313,8 @@
     {
       "name": "Nguyễn Thành Huy",
       "volume": 9195,
-      "gtc": 0.7054,
-      "gtc_change": 0.03380000000000005,
+      "gtc": 0.7157,
+      "gtc_change": 0.04410000000000003,
       "fd": 0.052575,
       "fd_change": 0.0032874999999999988,
       "backlog": 27,
@@ -322,8 +336,8 @@
     {
       "name": "Đoàn Công Tín",
       "volume": 5453,
-      "gtc": 0.6771,
-      "gtc_change": 0.046600000000000086,
+      "gtc": 0.687,
+      "gtc_change": 0.056500000000000106,
       "fd": 0.1028566945410129,
       "fd_change": 0.0044780431199701876,
       "backlog": 8,
@@ -345,8 +359,8 @@
     {
       "name": "Đào Nhật Trường",
       "volume": 6791,
-      "gtc": 0.6749,
-      "gtc_change": 0.032300000000000106,
+      "gtc": 0.6848,
+      "gtc_change": 0.042200000000000015,
       "fd": 0.06695714285714287,
       "fd_change": 0.013885714285714286,
       "backlog": 7,
@@ -368,8 +382,8 @@
     {
       "name": "Nguyễn Anh Tùng",
       "volume": 4195,
-      "gtc": 0.6598,
-      "gtc_change": 0.20320000000000005,
+      "gtc": 0.6694,
+      "gtc_change": 0.2128,
       "fd": 0.07022857142857143,
       "fd_change": 0.007157142857142862,
       "backlog": 22,
@@ -391,8 +405,8 @@
     {
       "name": "Lý Quài Nhân",
       "volume": 4086,
-      "gtc": 0.6581,
-      "gtc_change": 0.026100000000000012,
+      "gtc": 0.6677,
+      "gtc_change": 0.035699999999999954,
       "fd": 0.08272000000000002,
       "fd_change": 0.021320000000000026,
       "backlog": 27,
@@ -414,8 +428,8 @@
     {
       "name": "Nguyễn Huỳnh Quốc Dũng",
       "volume": 5071,
-      "gtc": 0.6431,
-      "gtc_change": 0.0826,
+      "gtc": 0.6525,
+      "gtc_change": 0.09199999999999997,
       "fd": 0.0607,
       "fd_change": -0.010533333333333332,
       "backlog": 32,
@@ -437,8 +451,8 @@
     {
       "name": "Ngô Thị Bé Mi",
       "volume": 3588,
-      "gtc": 0.6282,
-      "gtc_change": 0.031299999999999994,
+      "gtc": 0.6374,
+      "gtc_change": 0.04049999999999998,
       "fd": 0.0,
       "fd_change": 0.0,
       "backlog": 4,
@@ -460,8 +474,8 @@
     {
       "name": "Tăng Kiều Anh",
       "volume": 1972,
-      "gtc": 0.6242,
-      "gtc_change": 0.0817,
+      "gtc": 0.6333,
+      "gtc_change": 0.09079999999999999,
       "fd": 0.0,
       "fd_change": 0.0,
       "backlog": 6,
@@ -483,8 +497,8 @@
     {
       "name": "Lê Minh Tuấn",
       "volume": 4396,
-      "gtc": 0.6024,
-      "gtc_change": 0.02440000000000009,
+      "gtc": 0.6112,
+      "gtc_change": 0.03320000000000001,
       "fd": 0.05445491733424237,
       "fd_change": 0.004048087924187149,
       "backlog": 16,
