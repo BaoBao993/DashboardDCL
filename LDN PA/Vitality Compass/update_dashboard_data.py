@@ -103,8 +103,11 @@ def download_with_cookies(url, cookies_path, output_path):
                 cookies_list = json.load(f)
             cookie_parts = []
             for c in cookies_list:
-                if 'name' in c and 'value' in c:
-                    cookie_parts.append(f"{c['name']}={c['value']}")
+                if isinstance(c, dict) and 'name' in c and 'value' in c:
+                    val = str(c['value'])
+                    # Only accept ASCII printable values without control chars
+                    if all(32 <= ord(ch) <= 126 for ch in val):
+                        cookie_parts.append(f"{c['name']}={val}")
             if cookie_parts:
                 headers['Cookie'] = "; ".join(cookie_parts)
                 print(f"-> Using cookies from {cookies_path} for download.")
@@ -120,6 +123,18 @@ def download_with_cookies(url, cookies_path, output_path):
         return True
     except Exception as e:
         print(f"⚠ Download failed for {url}: {e}")
+        # Try without cookies as fallback if cookies were present
+        if 'Cookie' in headers:
+            try:
+                headers_no_cookie = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+                req = urllib.request.Request(url, headers=headers_no_cookie)
+                with urllib.request.urlopen(req, timeout=90, context=ssl_ctx) as response:
+                    with open(output_path, 'wb') as f:
+                        f.write(response.read())
+                print(f"✓ Download succeeded without cookies for {url}")
+                return True
+            except Exception as e2:
+                print(f"⚠ Download without cookies also failed for {url}: {e2}")
         return False
 
 def scrape_looker_data(cookies_path):
