@@ -2,17 +2,17 @@
   "latest_date": "2026-10-07",
   "zen_score": 91,
   "forecasting": {
-    "projected_volume": 60654,
+    "projected_volume": 18624,
     "projected_shortage": 0,
-    "vol_trend": "Tăng",
-    "recommendation": "Dự báo sản lượng tuần tới đạt 60,654 đơn (Tăng). Cần bổ sung thêm 0 shipper dự phòng để giữ lưới chặng cuối luôn ổn định."
+    "vol_trend": "Giảm",
+    "recommendation": "Dự báo sản lượng tuần tới đạt 18,624 đơn (Giảm). Cần bổ sung thêm 0 shipper dự phòng để giữ lưới chặng cuối luôn ổn định."
   },
   "kpis": {
     "volume": {
-      "value": 59700,
-      "vs_yesterday": -0.024509803921568627,
-      "vs_lastweek": 0.07162089391491654,
-      "vs_lastmonth": 0.029310344827586206
+      "value": 21873,
+      "vs_yesterday": -0.6425980392156863,
+      "vs_lastweek": -0.6073774905761982,
+      "vs_lastmonth": -0.6228793103448276
     },
     "gtc": {
       "value": 0.6877,
@@ -33,9 +33,9 @@
       "vs_lastmonth": -0.897948717948718
     },
     "hr": {
-      "total_shortage_actual": 46,
-      "total_shortage_bs": 12,
-      "total_resign_week": 48,
+      "total_shortage_actual": 44,
+      "total_shortage_bs": 11,
+      "total_resign_week": 47,
       "total_ob_week": 20,
       "latest_week": 41
     },
@@ -112,7 +112,7 @@
     },
     {
       "date": "2026-10-07",
-      "volume": 59700,
+      "volume": 21873,
       "gtc": 0.6877,
       "fd": 0.0175,
       "backlog": 199
@@ -201,9 +201,9 @@
       "backlog": 50,
       "backlog_change": 17,
       "hr": {
-        "shortage_actual": 15,
-        "shortage_bs": 7,
-        "resign": 10,
+        "shortage_actual": 13,
+        "shortage_bs": 6,
+        "resign": 9,
         "ob": 4,
         "target_headcount": 229,
         "hrbp": "BaoHQ",
@@ -394,9 +394,9 @@
       },
       "status": "Cải thiện",
       "hr": {
-        "shortage_actual": 3,
-        "shortage_bs": 2,
-        "resign": 2,
+        "shortage_actual": 1,
+        "shortage_bs": 1,
+        "resign": 1,
         "ob": 1,
         "target_headcount": 51
       },
@@ -12352,19 +12352,19 @@
         "action_plan": "Phân bổ gán tuyến trước 8h sáng, chạy FB Ads tìm shipper thay thế. AM cắm chốt tại BC để hướng dẫn shipper mới."
       },
       {
-        "bc_name": "(TVI) Duyên Hải",
-        "volume": 720,
-        "vol_tts": 134,
-        "gtc": 0.493,
-        "backlog_72h": 191,
-        "am": "Nguyễn Thành Huy",
-        "dinhiben_nvpttt": 20,
+        "bc_name": "(BTR) Thạnh Phú",
+        "volume": 0,
+        "vol_tts": 0,
+        "gtc": 0.0,
+        "backlog_72h": 0,
+        "am": "Ngô Thị Bé Mi",
+        "dinhiben_nvpttt": 7,
         "dinhiben_nvxl": 1,
         "tuyen_7d": 0,
-        "nghi_7d": 2,
-        "details": "- Số thiếu 4\n- Bưu cục xảy ra chiếm dụng, nhân viên nghỉ ngang\n- Các tuyến chạy xa BC \n- Nhân viên mới vào năng suất chưa cao \n- NVXL có kinh nghiệm, sắp xếp layout, FIFO hàng hóa \n==============\nTriển khai dán banner tuyển dụng ở các khu vực lân cận \nTriển khai chính sách giới thiệu nội bộ để đẩy nhanh tuyển dụng",
+        "nghi_7d": 1,
+        "details": "- Thiếu hụt thực tế sau OB: 2 NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +0 OB. Nhân sự nghỉ việc: -1.\n- Tuyến thiếu: Phú Cường, Phường 1, (Mỹ Phước Tây: tuyến cần tuyển dư).",
         "shortage_accurate": 2,
-        "missing_routes": "Trường Long Hòa, Long Khánh, Ngũ Lạc, Long Vĩnh",
+        "missing_routes": "Phú Cường, Phường 1, (Mỹ Phước Tây: tuyến cần tuyển dư)",
         "action_plan": "Phân bổ gán tuyến trước 8h sáng, chạy FB Ads tìm shipper thay thế. AM cắm chốt tại BC để hướng dẫn shipper mới."
       }
     ],
