@@ -12,7 +12,7 @@
 - **Tồn Luân Chuyển**: 4,428 đơn
 - **Tồn đọng Lấy/Giao/Trả**: 75,740 đơn
 - **Đơn ưu tiên trễ ODR**: 4,587 đơn (Tỷ lệ trễ: 10.45%)
-- **Thiếu hụt Nhân sự**: Thiếu 50 shipper (Tuyển mới: 0 / Nghỉ việc: 40)
+- **Thiếu hụt Nhân sự**: Thiếu 52 shipper (Tuyển mới: 0 / Nghỉ việc: 42)
 
 ## 🔴 Cảnh báo Hôm nay (Alerts)
 - **(BTR) Sơn Đông** có chỉ số GTC ngày 12/10/26 thấp hơn ngày hôm N-1 (24/07/26) 0.58%. So với cùng kỳ giảm 0.01% do Sản lượng cực lớn (9,230 đơn), thiếu 3/13 shipper (hụt 23%) tại Hữu Định, Phước Thạnh, Tam Phước, Sơn Đông, Phường 8. | Cảnh báo: Thiếu 2 shipper + Hiệu suất giao (GTC) thấp (52.13%) + Tồn đọng đơn hàng backlog >5 ngày lớn (307 đơn) + Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1), nhân sự đang thiếu 2/16 định biên, tuyến thiếu (Hữu Định).
@@ -34,7 +34,7 @@ xã tân nhuận đông).
 - Trong tuần qua, HRBP đã tuyển thành công **0 nhân viên mới** (OB) hỗ trợ lấp đầy các tuyến nóng.
 
 ### Lowlights:
-- Toàn vùng đang **thiếu hụt thực tế 50 shipper (NVPTTT)**, ảnh nghiêm trọng đến tiến độ giao hàng đầu ca.
+- Toàn vùng đang **thiếu hụt thực tế 52 shipper (NVPTTT)**, ảnh nghiêm trọng đến tiến độ giao hàng đầu ca.
 - Điểm nóng nhân sự tập trung lớn nhất tại **Tiền Giang** (thiếu 17 định biên) và **Đồng Tháp** (thiếu 9 định biên).
 
 ## 🔮 Phân tích Nguyên nhân (Root Causes)
@@ -54,7 +54,7 @@ xã tân nhuận đông).
 ## 📋 Đánh giá AM (Scorecard)
 | AM | GTC | FD | Trạng thái | Đơn Aging | Thiếu shipper | HRBP |
 | --- | --- | --- | --- | --- | --- | --- |
-| Nguyễn Tuấn Anh | 72.50% | 5.57% | Mạnh | 60 | Thiếu 3/119 | DungLK |
+| Nguyễn Tuấn Anh | 72.50% | 5.57% | Mạnh | 60 | Thiếu 4/119 | DungLK |
 | Nguyễn Việt Tới | 71.80% | 5.91% | Mạnh | 3 | Thiếu 0/64 | NgọcNTM |
 | Ngô Phan Mỹ Tú | 71.20% | 4.88% | Mạnh | 1 | Thiếu 3/61 | NgọcNTM |
 | Đào Nhật Trường | 70.20% | 6.70% | Mạnh | 8 | Thiếu 8/105 | NgọcNTM |
@@ -62,7 +62,7 @@ xã tân nhuận đông).
 | Nguyễn Huỳnh Quốc Dũng | 69.30% | 6.07% | Mạnh | 34 | Thiếu 6/85 | NgọcNTM |
 | Nguyễn Thành Huy | 69.15% | 5.26% | Mạnh | 30 | Thiếu 6/141 | DungLK |
 | Đoàn Công Tín | 67.50% | 10.29% | Mạnh | 9 | Thiếu 2/80 | BaoHQ |
-| Tăng Kiều Anh | 65.40% | 0.00% | Cải thiện | 7 | Thiếu 1/29 | DungLK |
+| Tăng Kiều Anh | 65.40% | 0.00% | Cải thiện | 7 | Thiếu 2/29 | DungLK |
 | Nguyễn Anh Tùng | 65.20% | 7.02% | Cải thiện | 24 | Thiếu 2/51 | BaoHQ |
 | Lê Minh Tuấn | 62.80% | 5.45% | Cải thiện | 18 | Thiếu 7/72 | NgọcNTM |
 | Ngô Thị Bé Mi | 61.50% | 0.00% | Cải thiện | 4 | Thiếu 6/56 | BaoHQ |

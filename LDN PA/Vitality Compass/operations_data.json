@@ -33,9 +33,9 @@
       "vs_lastmonth": -0.8835897435897436
     },
     "hr": {
-      "total_shortage_actual": 50,
+      "total_shortage_actual": 52,
       "total_shortage_bs": 10,
-      "total_resign_week": 40,
+      "total_resign_week": 42,
       "total_ob_week": 0,
       "latest_week": 42
     },
@@ -140,9 +140,9 @@
       "backlog": 67,
       "backlog_change": 40,
       "hr": {
-        "shortage_actual": 4,
+        "shortage_actual": 6,
         "shortage_bs": 0,
-        "resign": 4,
+        "resign": 6,
         "ob": 0,
         "target_headcount": 148,
         "hrbp": "DungLK",
@@ -247,9 +247,9 @@
       },
       "status": "Mạnh",
       "hr": {
-        "shortage_actual": 3,
+        "shortage_actual": 4,
         "shortage_bs": 0,
-        "resign": 3,
+        "resign": 4,
         "ob": 0,
         "target_headcount": 119
       },
@@ -431,9 +431,9 @@
       },
       "status": "Cải thiện",
       "hr": {
-        "shortage_actual": 1,
+        "shortage_actual": 2,
         "shortage_bs": 0,
-        "resign": 1,
+        "resign": 2,
         "ob": 0,
         "target_headcount": 29
       },
@@ -12343,19 +12343,19 @@
         "action_plan": "Phân bổ gán tuyến trước 8h sáng, chạy FB Ads tìm shipper thay thế. AM cắm chốt tại BC để hướng dẫn shipper mới."
       },
       {
-        "bc_name": "(BTR) Thạnh Phú",
+        "bc_name": "(VLO) Phú Quới",
         "volume": 0,
         "vol_tts": 0,
         "gtc": 0.0,
         "backlog_72h": 0,
-        "am": "Ngô Thị Bé Mi",
-        "dinhiben_nvpttt": 7,
+        "am": "Nguyễn Tuấn Anh",
+        "dinhiben_nvpttt": 19,
         "dinhiben_nvxl": 1,
         "tuyen_7d": 0,
-        "nghi_7d": 1,
-        "details": "- Thiếu hụt thực tế sau OB: 2 NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +0 OB. Nhân sự nghỉ việc: -1.\n- Tuyến thiếu: Phú Cường, Phường 1, (Mỹ Phước Tây: tuyến cần tuyển dư).",
-        "shortage_accurate": 2,
-        "missing_routes": "Phú Cường, Phường 1, (Mỹ Phước Tây: tuyến cần tuyển dư)",
+        "nghi_7d": 3,
+        "details": "- Thiếu hụt thực tế sau OB: 3 NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +0 OB. Nhân sự nghỉ việc: -3.\n- Tuyến thiếu: Long Phú, Tân Phú, Phú Thịnh.",
+        "shortage_accurate": 3,
+        "missing_routes": "Long Phú, Tân Phú, Phú Thịnh",
         "action_plan": "Phân bổ gán tuyến trước 8h sáng, chạy FB Ads tìm shipper thay thế. AM cắm chốt tại BC để hướng dẫn shipper mới."
       }
     ],
