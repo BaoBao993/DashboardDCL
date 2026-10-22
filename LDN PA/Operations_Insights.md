@@ -15,11 +15,11 @@
 - **Thiếu hụt Nhân sự**: Thiếu 45 shipper (Tuyển mới: 13 / Nghỉ việc: 45)
 
 ## 🔴 Cảnh báo Hôm nay (Alerts)
-- **(BTR) Sơn Đông** có chỉ số GTC ngày 12/10/26 thấp hơn ngày hôm N-1 (24/07/26) 0.58%. So với cùng kỳ giảm 0.01% do Sản lượng cực lớn (9,230 đơn), thiếu 3/13 shipper (hụt 23%) tại Hữu Định, Phước Thạnh, Tam Phước, Sơn Đông, Phường 8. | Cảnh báo: Thiếu 2 shipper + Hiệu suất giao (GTC) thấp (52.13%) + Tồn đọng đơn hàng backlog >5 ngày lớn (307 đơn) + Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1), nhân sự đang thiếu 2/16 định biên, tuyến thiếu (Hữu Định).
-- **(BTR) Hương Mỹ** có chỉ số GTC ngày 12/10/26 thấp hơn ngày hôm N-1 (24/07/26) 2.44%. So với cùng kỳ giảm 2.11% do Thiếu 2 shipper + Rớt luân chuyển 4 đơn (Shopee: 2, TTS: 1, Khác: 1), nhân sự đang thiếu 2/11 định biên, tuyến thiếu (An Định).
-- **(DTH) Tân Nhuận Đông** có chỉ số GTC ngày 12/10/26 thấp hơn ngày hôm N-1 (24/07/26) 3.99%. So với cùng kỳ giảm 5.78% do Thiếu 2 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.27%), nhân sự đang thiếu 2/18 định biên, tuyến thiếu (Xã tân bình        
+- **(BTR) Sơn Đông** có chỉ số GTC ngày 20/10/26 thấp hơn ngày hôm N-1 (24/07/26) 0.58%. So với cùng kỳ giảm 0.01% do Sản lượng cực lớn (9,230 đơn), thiếu 3/13 shipper (hụt 23%) tại Hữu Định, Phước Thạnh, Tam Phước, Sơn Đông, Phường 8. | Cảnh báo: Thiếu 2 shipper + Hiệu suất giao (GTC) thấp (52.13%) + Tồn đọng đơn hàng backlog >5 ngày lớn (307 đơn) + Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1), nhân sự đang thiếu 2/16 định biên, tuyến thiếu (Hữu Định).
+- **(BTR) Hương Mỹ** có chỉ số GTC ngày 20/10/26 thấp hơn ngày hôm N-1 (24/07/26) 2.44%. So với cùng kỳ giảm 2.11% do Thiếu 2 shipper + Rớt luân chuyển 4 đơn (Shopee: 2, TTS: 1, Khác: 1), nhân sự đang thiếu 2/11 định biên, tuyến thiếu (An Định).
+- **(DTH) Tân Nhuận Đông** có chỉ số GTC ngày 20/10/26 thấp hơn ngày hôm N-1 (24/07/26) 3.99%. So với cùng kỳ giảm 5.78% do Thiếu 2 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.27%), nhân sự đang thiếu 2/18 định biên, tuyến thiếu (Xã tân bình        
 xã tân nhuận đông).
-- **(TGI) Trung An** có chỉ số GTC ngày 12/10/26 thấp hơn ngày hôm N-1 (24/07/26) 4.46%. So với cùng kỳ giảm 3.52% do Tỷ lệ shipper mới cao (+3 OB, ~33%), hiệu suất chưa ổn định + Tỷ lệ trả hàng (%FD) cao bất thường (13.78%) + Hiệu suất giao (GTC) thấp (40.30%) + Rớt luân chuyển 10 đơn (Shopee: 0, TTS: 0, Khác: 10), nhân sự đang thiếu 0/9 định biên, tuyến thiếu (Tuyến Trung An, Phường 10).
+- **(TGI) Trung An** có chỉ số GTC ngày 20/10/26 thấp hơn ngày hôm N-1 (24/07/26) 4.46%. So với cùng kỳ giảm 3.52% do Tỷ lệ shipper mới cao (+3 OB, ~33%), hiệu suất chưa ổn định + Tỷ lệ trả hàng (%FD) cao bất thường (13.78%) + Hiệu suất giao (GTC) thấp (40.30%) + Rớt luân chuyển 10 đơn (Shopee: 0, TTS: 0, Khác: 10), nhân sự đang thiếu 0/9 định biên, tuyến thiếu (Tuyến Trung An, Phường 10).
 
 ## 📈 Highlight / Lowlight
 ### Highlights:

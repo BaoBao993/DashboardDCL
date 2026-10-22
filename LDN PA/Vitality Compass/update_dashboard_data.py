@@ -114,27 +114,19 @@ def download_with_cookies(url, cookies_path, output_path):
         except Exception as e:
             print(f"⚠ Error loading cookies from {cookies_path}: {e}")
             
+    import urllib.error
     try:
         ssl_ctx = ssl._create_unverified_context()
         req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=90, context=ssl_ctx) as response:
+        with urllib.request.urlopen(req, timeout=10, context=ssl_ctx) as response:
             with open(output_path, 'wb') as f:
                 f.write(response.read())
         return True
+    except urllib.error.HTTPError as he:
+        print(f"⚠ Download returned HTTP {he.code} for {url} ({he.reason}). Skipping.")
+        return False
     except Exception as e:
         print(f"⚠ Download failed for {url}: {e}")
-        # Try without cookies as fallback if cookies were present
-        if 'Cookie' in headers:
-            try:
-                headers_no_cookie = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
-                req = urllib.request.Request(url, headers=headers_no_cookie)
-                with urllib.request.urlopen(req, timeout=90, context=ssl_ctx) as response:
-                    with open(output_path, 'wb') as f:
-                        f.write(response.read())
-                print(f"✓ Download succeeded without cookies for {url}")
-                return True
-            except Exception as e2:
-                print(f"⚠ Download without cookies also failed for {url}: {e2}")
         return False
 
 def scrape_looker_data(cookies_path):
