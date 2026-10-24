@@ -1,8 +1,61 @@
 {
   "date": "2026-10-23",
-  "gtc": 0.6847,
-  "volume": 70121,
-  "gan": 0.9331,
-  "fd": 0.0257,
-  "backlog": 227
+  "gtc": 0.6431,
+  "volume": 98368,
+  "gan": 0.9126,
+  "fd": 0.0207,
+  "leadtime": 17.56,
+  "yest_volume": 95893,
+  "yest_gtc": 0.6390,
+  "yest_gan": 0.9137,
+  "yest_fd": 0.0210,
+  "yest_leadtime": 16.37,
+  "backlog": 227,
+  "provinces": {
+    "Đồng Tháp": {
+      "volume": 24725,
+      "gtc": 0.6519,
+      "gan": 0.9488,
+      "fd": 0.0202,
+      "leadtime": 16.17,
+      "gtc_change": -0.0169,
+      "fd_change": 0.0001
+    },
+    "Vĩnh Long": {
+      "volume": 14997,
+      "gtc": 0.6684,
+      "gan": 0.9097,
+      "fd": 0.0152,
+      "leadtime": 16.29,
+      "gtc_change": -0.0013,
+      "fd_change": -0.0044
+    },
+    "Trà Vinh": {
+      "volume": 12913,
+      "gtc": 0.6682,
+      "gan": 0.9221,
+      "fd": 0.0249,
+      "leadtime": 18.37,
+      "gtc_change": 0.0017,
+      "fd_change": 0.0018
+    },
+    "Tiền Giang": {
+      "volume": 28041,
+      "gtc": 0.5963,
+      "gan": 0.8532,
+      "fd": 0.0225,
+      "leadtime": 19.35,
+      "gtc_change": 0.0205,
+      "fd_change": 0.0013
+    },
+    "Bến Tre": {
+      "volume": 17692,
+      "gtc": 0.6653,
+      "gan": 0.9518,
+      "fd": 0.0201,
+      "leadtime": 17.42,
+      "gtc_change": 0.0075,
+      "fd_change": -0.0015
+    }
+  }
 }

@@ -5,8 +5,8 @@
 ---
 
 ## 📈 Chỉ số Vận hành (KPIs)
-- **GTC**: 68.47% (Biến động vs Tuần trước: ↗ +0.69% vs Tuần trước)
-- **FD**: 2.57% (Biến động vs Tuần trước: ↗ +0.77% vs Tuần trước)
+- **GTC**: 64.31% (Biến động vs Tuần trước: ↘ -3.47% vs Tuần trước)
+- **FD**: 2.07% (Biến động vs Tuần trước: ↗ +0.27% vs Tuần trước)
 - **Ontime**: 91.50%
 - **Backlog**: 227 (Biến động vs Tuần trước: ↘ -87.55% vs Tuần trước)
 - **Tồn Luân Chuyển**: 4,428 đơn
@@ -15,24 +15,24 @@
 - **Thiếu hụt Nhân sự**: Thiếu 70 shipper (Tuyển mới: 9 / Nghỉ việc: 65)
 
 ## 🔴 Cảnh báo Hôm nay (Alerts)
-- **(BTR) Sơn Đông** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (24/07/26) 0.58%. So với cùng kỳ giảm 0.01% do Sản lượng cực lớn (9,230 đơn), thiếu 3/13 shipper (hụt 23%) tại Hữu Định, Phước Thạnh, Tam Phước, Sơn Đông, Phường 8. | Cảnh báo: Thiếu 2 shipper + Hiệu suất giao (GTC) thấp (52.13%) + Tồn đọng đơn hàng backlog >5 ngày lớn (307 đơn) + Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1), nhân sự đang thiếu 2/16 định biên, tuyến thiếu (Hữu Định).
-- **(TVI) Duyên Hải** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (24/07/26) 0.04%. So với cùng kỳ giảm 1.36% do Thiếu 2 shipper + Rớt luân chuyển 28 đơn (Shopee: 0, TTS: 10, Khác: 18), nhân sự đang thiếu 2/20 định biên, tuyến thiếu (Trường Long Hòa - Long Vĩnh - Ngủ Lạc - Long Thành).
-- **(BTR) Hương Mỹ** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (24/07/26) 2.44%. So với cùng kỳ giảm 2.11% do Thiếu hụt nhân sự nghiêm trọng (hụt 3/11 shipper, ~27%) + Biến động nghỉ việc đột biến trong tuần (-3 shipper) + Rớt luân chuyển 4 đơn (Shopee: 2, TTS: 1, Khác: 1), nhân sự đang thiếu 3/11 định biên, tuyến thiếu (An Định).
-- **(TGI) Chợ Gạo** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (24/07/26) 2.89%. So với cùng kỳ giảm 4.48% do Hiệu suất giao kém, tỷ lệ trả (FD 8.14%) cao. Thiếu 2/20 shipper tại Lương Hòa Lạc, Mỹ Tịnh An. | Cảnh báo: Thiếu 2 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.14%) + Hiệu suất giao (GTC) thấp (53.17%) + Rớt luân chuyển 12 đơn (Shopee: 0, TTS: 0, Khác: 12), nhân sự đang thiếu 2/20 định biên, tuyến thiếu (Xã Trung Hoà, Xã Hoà Tịnh).
-- **(DTH) Tân Nhuận Đông** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (24/07/26) 3.99%. So với cùng kỳ giảm 5.78% do Thiếu 2 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.27%), nhân sự đang thiếu 2/18 định biên, tuyến thiếu (Xã tân bình        
+- **(BTR) Sơn Đông** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (22/10/26) 0.58%. So với cùng kỳ giảm 0.01% do Sản lượng cực lớn (9,230 đơn), thiếu 3/13 shipper (hụt 23%) tại Hữu Định, Phước Thạnh, Tam Phước, Sơn Đông, Phường 8. | Cảnh báo: Thiếu 2 shipper + Hiệu suất giao (GTC) thấp (52.13%) + Tồn đọng đơn hàng backlog >5 ngày lớn (307 đơn) + Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1), nhân sự đang thiếu 2/16 định biên, tuyến thiếu (Hữu Định).
+- **(TVI) Duyên Hải** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (22/10/26) 0.04%. So với cùng kỳ giảm 1.36% do Thiếu 2 shipper + Rớt luân chuyển 28 đơn (Shopee: 0, TTS: 10, Khác: 18), nhân sự đang thiếu 2/20 định biên, tuyến thiếu (Trường Long Hòa - Long Vĩnh - Ngủ Lạc - Long Thành).
+- **(BTR) Hương Mỹ** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (22/10/26) 2.44%. So với cùng kỳ giảm 2.11% do Thiếu hụt nhân sự nghiêm trọng (hụt 3/11 shipper, ~27%) + Biến động nghỉ việc đột biến trong tuần (-3 shipper) + Rớt luân chuyển 4 đơn (Shopee: 2, TTS: 1, Khác: 1), nhân sự đang thiếu 3/11 định biên, tuyến thiếu (An Định).
+- **(TGI) Chợ Gạo** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (22/10/26) 2.89%. So với cùng kỳ giảm 4.48% do Hiệu suất giao kém, tỷ lệ trả (FD 8.14%) cao. Thiếu 2/20 shipper tại Lương Hòa Lạc, Mỹ Tịnh An. | Cảnh báo: Thiếu 2 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.14%) + Hiệu suất giao (GTC) thấp (53.17%) + Rớt luân chuyển 12 đơn (Shopee: 0, TTS: 0, Khác: 12), nhân sự đang thiếu 2/20 định biên, tuyến thiếu (Xã Trung Hoà, Xã Hoà Tịnh).
+- **(DTH) Tân Nhuận Đông** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (22/10/26) 3.99%. So với cùng kỳ giảm 5.78% do Thiếu 2 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.27%), nhân sự đang thiếu 2/18 định biên, tuyến thiếu (Xã tân bình        
 xã tân nhuận đông).
-- **(TGI) Trung An** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (24/07/26) 4.46%. So với cùng kỳ giảm 3.52% do Thiếu hụt nhân sự nghiêm trọng (hụt 3/9 shipper, ~33%) + Tỷ lệ trả hàng (%FD) cao bất thường (13.78%) + Hiệu suất giao (GTC) thấp (40.30%) + Rớt luân chuyển 10 đơn (Shopee: 0, TTS: 0, Khác: 10), nhân sự đang thiếu 3/9 định biên, tuyến thiếu (Tuyến Phước Thạnh, Trung An, Phường 10).
+- **(TGI) Trung An** có chỉ số GTC ngày 23/10/26 thấp hơn ngày hôm N-1 (22/10/26) 4.46%. So với cùng kỳ giảm 3.52% do Thiếu hụt nhân sự nghiêm trọng (hụt 3/9 shipper, ~33%) + Tỷ lệ trả hàng (%FD) cao bất thường (13.78%) + Hiệu suất giao (GTC) thấp (40.30%) + Rớt luân chuyển 10 đơn (Shopee: 0, TTS: 0, Khác: 10), nhân sự đang thiếu 3/9 định biên, tuyến thiếu (Tuyến Phước Thạnh, Trung An, Phường 10).
 
 ## 📈 Highlight / Lowlight
 ### Highlights:
-- Tỷ lệ GTC toàn vùng (68.47%) cải thiện **+0.69%** so với cùng kỳ tuần trước (58.57%).
-- Sản lượng đơn toàn vùng đạt 70,121 đơn, tăng trưởng **+17.46%** so với tuần trước.
-- Đơn tồn backlog (>5 ngày) kiểm soát tốt, giảm **-87.55%** so với tuần trước (từ 1,850 xuống 227 đơn).
+- Sản lượng đơn toàn vùng đạt 98,368 đơn, tăng trưởng **+64.77%** so với tuần trước.
+- Đơn tồn backlog (>5 ngày) kiểm soát tốt, giảm **-87.55%** so với tuần trước (từ 1,823 xuống 227 đơn).
 - **Ngô Phan Mỹ Tú** là AM có tỷ lệ GTC cao nhất toàn vùng (71.20%), đồng thời duy trì lượng đơn tồn đọng cực thấp.
-- Tỷ lệ chuyển trả (FD) toàn vùng duy trì ở mức an toàn là **2.57%** (↗ +0.77% vs Tuần trước).
+- Tỷ lệ chuyển trả (FD) toàn vùng duy trì ở mức an toàn là **2.07%** (↗ +0.27% vs Tuần trước).
 - Trong tuần qua, HRBP đã tuyển thành công **9 nhân viên mới** (OB) hỗ trợ lấp đầy các tuyến nóng.
 
 ### Lowlights:
+- Hiệu suất GTC trung bình toàn vùng (64.31%) sụt giảm **-3.47%** so với cùng kỳ tuần trước (58.57%).
 - Toàn vùng đang **thiếu hụt thực tế 70 shipper (NVPTTT)**, ảnh nghiêm trọng đến tiến độ giao hàng đầu ca.
 - Điểm nóng nhân sự tập trung lớn nhất tại **Tiền Giang** (thiếu 27 định biên) và **Đồng Tháp** (thiếu 7 định biên).
 

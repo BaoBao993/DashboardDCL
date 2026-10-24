@@ -1382,6 +1382,18 @@ def main():
     if looker_vol is not None and looker_vol > 20000:
         print(f"Overriding cur_vol: {cur_vol:,} -> {looker_vol:,}")
         cur_vol = looker_vol
+    if override_fd is not None:
+        print(f"Overriding cur_fd: {cur_fd:.2%} -> {override_fd:.2%}")
+        cur_fd = override_fd
+    if override_date:
+        try:
+            latest_gtc_date = pd.to_datetime(override_date)
+            yesterday_gtc_date = latest_gtc_date - pd.Timedelta(days=1)
+            lastweek_gtc_date = latest_gtc_date - pd.Timedelta(days=7)
+            lastmonth_gtc_date = latest_gtc_date - pd.Timedelta(days=30)
+            print(f"-> Overriding latest_gtc_date: {latest_gtc_date.strftime('%Y-%m-%d')}")
+        except Exception as e:
+            pass
 
     # Scale df_bl_ams if override_bl is provided
     if override_bl is not None and not df_bl_ams.empty:
@@ -1398,6 +1410,12 @@ def main():
             print(f"-> Scaled AM backlogs to match override {override_bl} (new sum: {df_bl_ams['Tổng'].sum()})")
 
     yest_gtc, yest_fd, yest_vol = calc_gtc_fd(yest_df)
+    if 'yest_volume' in ov_data and ov_data['yest_volume'] is not None:
+        yest_vol = int(ov_data['yest_volume'])
+    if 'yest_gtc' in ov_data and ov_data['yest_gtc'] is not None:
+        yest_gtc = float(ov_data['yest_gtc'])
+    if 'yest_fd' in ov_data and ov_data['yest_fd'] is not None:
+        yest_fd = float(ov_data['yest_fd'])
     lastweek_gtc, lastweek_fd, lastweek_vol = calc_gtc_fd(lastweek_df)
     overall_ontime = 0.915
     
@@ -1477,6 +1495,22 @@ def main():
             'latest_week': latest_week_num
         }
     }
+
+    if override_gan is not None:
+        yest_gan = float(ov_data.get('yest_gan', 0.9137))
+        kpis['gan'] = {
+            'value': override_gan,
+            'vs_yesterday': float(override_gan - yest_gan),
+            'vs_lastweek': float(override_gan - 0.9331),
+            'vs_lastmonth': 0.0131
+        }
+    if 'leadtime' in ov_data:
+        leadtime_val = float(ov_data['leadtime'])
+        yest_leadtime = float(ov_data.get('yest_leadtime', 16.37))
+        kpis['leadtime'] = {
+            'value': leadtime_val,
+            'vs_yesterday': float(leadtime_val - yest_leadtime)
+        }
     
     # Aggregate by Province
     provinces = ['Bến Tre', 'Vĩnh Long', 'Đồng Tháp', 'Tiền Giang', 'Trà Vinh']
@@ -1509,7 +1543,7 @@ def main():
         # Get Intern dynamically from interns_map
         p_intern = interns_map.get(prov.lower(), "N/A")
         
-        province_data.append({
+        p_item = {
             'name': prov,
             'volume': p_vol,
             'gtc': p_gtc,
@@ -1527,7 +1561,18 @@ def main():
                 'hrbp': p_hrbp,
                 'intern': p_intern
             }
-        })
+        }
+        if 'provinces' in ov_data and prov in ov_data['provinces']:
+            p_ov = ov_data['provinces'][prov]
+            if 'volume' in p_ov: p_item['volume'] = int(p_ov['volume'])
+            if 'gtc' in p_ov: p_item['gtc'] = float(p_ov['gtc'])
+            if 'gtc_change' in p_ov: p_item['gtc_change'] = float(p_ov['gtc_change'])
+            if 'fd' in p_ov: p_item['fd'] = float(p_ov['fd'])
+            if 'fd_change' in p_ov: p_item['fd_change'] = float(p_ov['fd_change'])
+            if 'leadtime' in p_ov: p_item['leadtime'] = float(p_ov['leadtime'])
+            if 'gan' in p_ov: p_item['gan'] = float(p_ov['gan'])
+            
+        province_data.append(p_item)
         
     # Aggregate by AM
     am_data = []
@@ -3143,6 +3188,26 @@ def main():
         p_name = p['name']
         profile = exit_hours_data.get(p_name, {'exit_hour': '08:45', 'late_inbound_rate': 0.10, 'sorting_delay_min': 30})
         p['exit_profile'] = profile
+
+    # Update or append latest_date entry to daily_trends
+    latest_date_str = latest_gtc_date.strftime('%Y-%m-%d')
+    found_trend = False
+    for tr in daily_trends:
+        if tr['date'] == latest_date_str:
+            tr['volume'] = cur_vol
+            tr['gtc'] = cur_gtc
+            tr['fd'] = cur_fd
+            tr['backlog'] = cur_bl
+            found_trend = True
+            break
+    if not found_trend:
+        daily_trends.append({
+            'date': latest_date_str,
+            'volume': cur_vol,
+            'gtc': cur_gtc,
+            'fd': cur_fd,
+            'backlog': cur_bl
+        })
 
     # 11. Export JSON Data
 
