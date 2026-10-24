@@ -28,7 +28,7 @@ xã tân nhuận đông).
 ## 📈 Highlight / Lowlight
 ### Highlights:
 - Sản lượng đơn toàn vùng đạt 98,368 đơn, tăng trưởng **+40.28%** so với tuần trước.
-- Đơn tồn backlog (>5 ngày) kiểm soát tốt, giảm **-87.55%** so với tuần trước (từ 2,128 xuống 227 đơn).
+- Đơn tồn backlog (>5 ngày) kiểm soát tốt, giảm **-87.55%** so với tuần trước (từ 210 xuống 227 đơn).
 - **Ngô Phan Mỹ Tú** là AM có tỷ lệ GTC cao nhất toàn vùng (71.20%), đồng thời duy trì lượng đơn tồn đọng cực thấp.
 - Tỷ lệ chuyển trả (FD) toàn vùng duy trì ở mức an toàn là **2.07%** (↘ -0.50% vs Tuần trước).
 - Trong tuần qua, HRBP đã tuyển thành công **9 nhân viên mới** (OB) hỗ trợ lấp đầy các tuyến nóng.
@@ -39,15 +39,18 @@ xã tân nhuận đông).
 - Điểm nóng nhân sự tập trung lớn nhất tại **Tiền Giang** (thiếu 27 định biên) và **Đồng Tháp** (thiếu 7 định biên).
 
 ## 🔮 Phân tích Nguyên nhân (Root Causes)
-- Tỷ lệ nghỉ việc cao tập trung tại các BC trọng điểm: **Phó Cơ Điều** (nghỉ 7), **Chợ Lách** (nghỉ 4), **Mỹ Thọ** (nghỉ 4), **Khóm 3 Trần Hưng Đạo** (nghỉ 4), **Tân Nhuận Đông** (nghỉ 3).
-- Áp lực quá tải đơn hàng trong các ngày sale lớn và việc di chuyển qua các tuyến cù lao/đò dọc xa xôi (như tại Chợ Lách và Tân Nhuận Đông) làm giảm thu nhập thực tế, gây nản chí cho shipper mới.
-- Quy trình lựa hàng và phân tuyến tại kho chậm trễ khiến shipper rời kho muộn (sau 9h30 sáng), phải làm việc xuyên trưa dưới trời nắng nóng và thiếu kèm cặp cho shipper mới (OB).
+- Tại **(BTR) An Hội**: Nhân sự: 7/11 (thiếu 4) + 2 nhân viên hỗ trợ; Bưu cục liên tục có nhân viên nghỉ ngang, té xe.; NVXL mới chưa quản lý được nhân sự tại BC, điều tiết giờ giấc xuất hàng.; Nhân viên 9h chưa rời khỏi kho.
+- Tại **(DTH) Lấp Vò**: Số thiếu: 4 NVPTTT; Thiếu tuyến xã Mỹ An Hưng A, xã Mỹ An Hưng B, xã Hội An Đông; Nhân sự hiện tại: 9 NVPTTT (12 tuyến chạy); Nhân viên mới năng suất trung bình: GTC 35 đơn/ngày; Bưu cục có phân chia tuyến rõ ràng, hàng cồng kềnh còn để không gọn, hàng lấy về nhiều để giữa kho không kiểm soát được; NV ra khỏi kho trễ (10h) do tự lựa hàng và gọi lâu, NVXL không phân chia hàng trước cho NVPTTT; AM ngồi trực tiếp tại kho, NVXL có kinh nghiệm sắp xếp gán và điều hành; AM tick mất hàng (hơn 75 đơn), còn hàng vật lý chuyển trả về OE
+- Tại **(TGI) Châu Thành**: Số thiếu: 5 NVPTTT + 1 NVXL; Thiếu tuyến xã Tân Hương, xã Thân Cửu Nghĩa, xã Tam Hiệp, xã Tân Hội Đông; NVXL trực tiếp điều hành sắp xếp và gán chuyến cho nhân viên; Hàng tồn: 121 đơn
+- Tại **(TVI) Duyên Hải**: Số thiếu 4; Bưu cục xảy ra chiếm dụng, nhân viên nghỉ ngang; Các tuyến chạy xa BC; Nhân viên mới vào năng suất chưa cao; NVXL có kinh nghiệm, sắp xếp layout, FIFO hàng hóa
+- Tại **(DTH) Hòa Long**: Số thiếu: 2 NVPTTT; Thiếu tuyến xã Long Hưng B; Nhân viên mới năng suất trung bình: GTC 30 đơn/ngày; NVXL trực tiếp điều hành tại kho, tuy nhiên năng suất nhân viên không cao
 
 ## 🛠️ Kiến nghị Hành động (Recommendations)
-- Yêu cầu AM (Tuấn Anh, Phương Duy, Việt Tới, Minh Tuấn, Quài Nhân) cắm chốt trực tiếp tại các bưu cục nóng để tháo gỡ khó khăn về tuyến và chia nhỏ tuyến giao phù hợp.
-- Đề xuất áp dụng phụ cấp xăng xe/đò phà đặc thù cho các tuyến cù lao (như An Bình, Bình Hòa Phước tại Chợ Lách) để giữ chân nhân sự.
-- Triển khai chương trình 'Buddy' kèm cặp shipper mới nhận việc trong 3 ngày đầu tiên và cam kết phân hàng trước 8h sáng để shipper ra kho sớm trước 9h sáng.
-- Yêu cầu HRBP (VyLNK, BìnhNLC) đẩy mạnh chạy Ads Facebook, dán banner tuyển dụng liên tục tại các bưu cục nóng và chuẩn bị nguồn cộng tác viên dự phòng.
+- Tại **(BTR) An Hội**: Tuyển thay thế NVXL ( NVXL mới đã OB ngày 19/8),; Chạy Ads FB; Đẩy mạnh tuyển dụng NVPTTT; AM cắm chốt hỗ trợ vận hành BC
+- Tại **(DTH) Lấp Vò**: NVXL trực tiếp điều hành của nhân viên; Layout có sắp xếp, hàng cồng kềnh chưa gọn; AOV đã được điều chỉnh, không có tuyến AOV thấp; Đang thực hiện chạy FB Ads để hỗ trợ tuyển dụng, áp dụng chính sách giới thiệu nội bộ; Call check NV cũ nghỉ việc không vi phạm vào làm lại
+- Tại **(TGI) Châu Thành**: Đẩy mạnh tuyển dụng do cắt hàng nặng, nhân viên nghỉ do thu nhập giảm; NVXL tìm việc làm mới, đã có NVXL mới đang được đào tạo - AM phân chia lại các tuyến chạy và điều chỉnh lại AOV
+- Tại **(TVI) Duyên Hải**: Triển khai dán banner tuyển dụng ở các khu vực lân cận; Triển khai chính sách giới thiệu nội bộ để đẩy nhanh tuyển dụng
+- Tại **(DTH) Hòa Long**: Tuyển dụng cho bưu cục; AM họp kho để thúc đẩy tinh thần nhân viên; Sắp xếp lại layout: kho mới cần sắp xếp hàng hoá đúng chỗ
 
 ## 📋 Đánh giá AM (Scorecard)
 | AM | GTC | FD | Trạng thái | Đơn Aging | Thiếu shipper | HRBP |
