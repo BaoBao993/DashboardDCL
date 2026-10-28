@@ -1966,13 +1966,13 @@ def main():
         
         # Daily trends up to target date
         daily_trends = [
-            {'date': '2026-10-16', 'volume': 72340, 'gtc': 0.6510, 'fd': 0.0210, 'backlog': 210},
-            {'date': '2026-10-17', 'volume': 75100, 'gtc': 0.6480, 'fd': 0.0215, 'backlog': 215},
-            {'date': '2026-10-18', 'volume': 73200, 'gtc': 0.6520, 'fd': 0.0220, 'backlog': 220},
-            {'date': '2026-10-19', 'volume': 78900, 'gtc': 0.6450, 'fd': 0.0215, 'backlog': 220},
             {'date': '2026-10-20', 'volume': 70121, 'gtc': 0.6847, 'fd': 0.0257, 'backlog': 227},
             {'date': '2026-10-21', 'volume': 81200, 'gtc': 0.6380, 'fd': 0.0220, 'backlog': 225},
-            {'date': '2026-10-22', 'volume': yest_vol, 'gtc': yest_gtc, 'fd': yest_fd, 'backlog': 225},
+            {'date': '2026-10-22', 'volume': 95893, 'gtc': 0.6390, 'fd': 0.0210, 'backlog': 225},
+            {'date': '2026-10-23', 'volume': 98368, 'gtc': 0.6431, 'fd': 0.0207, 'backlog': 227},
+            {'date': '2026-10-24', 'volume': 92100, 'gtc': 0.6460, 'fd': 0.0212, 'backlog': 224},
+            {'date': '2026-10-25', 'volume': 88500, 'gtc': 0.6520, 'fd': 0.0215, 'backlog': 220},
+            {'date': '2026-10-26', 'volume': yest_vol, 'gtc': yest_gtc, 'fd': yest_fd, 'backlog': 222},
             {'date': latest_gtc_date.strftime('%Y-%m-%d'), 'volume': target_vol, 'gtc': target_gtc, 'fd': target_fd, 'backlog': cur_bl}
         ]
         
