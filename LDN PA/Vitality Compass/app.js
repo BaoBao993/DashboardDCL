@@ -3016,13 +3016,15 @@ function renderHrTop5() {
     
     // Parse target date and yesterday's date for GTC comparison warning
     // We will extract matching BC object from repData.bcs to get GTC change and details
-    let bcMatch = null;
-    let cleanName = clean_bc_name(item.bc_name);
-    for (let bc of repData.bcs) {
-      let b_clean = clean_bc_name(bc.name);
-      if (b_clean === cleanName || b_clean.includes(cleanName) || cleanName.includes(b_clean)) {
-        bcMatch = bc;
-        break;
+    let bcMatch = repData.bcs.find(bc => bc.name && item.bc_name && bc.name.trim().toLowerCase() === item.bc_name.trim().toLowerCase()) || null;
+    if (!bcMatch) {
+      let cleanName = clean_bc_name(item.bc_name);
+      for (let bc of repData.bcs) {
+        let b_clean = clean_bc_name(bc.name);
+        if (b_clean === cleanName) {
+          bcMatch = bc;
+          break;
+        }
       }
     }
 
@@ -3557,48 +3559,52 @@ function renderFdTop5() {
   }
   
   const fd_causes = {
-    'Phó Cơ Điều': 'Thiếu shipper giao chặng cuối, hàng hoàn do lưu kho quá hạn.',
-    'Đường Huyện 35': 'Tuyến giao hàng Vĩnh Kim xa, shipper mới giao không kịp phải chuyển hoàn.',
-    'QL57 KP3': 'Khách hàng không liên lạc được nhiều, tỷ lệ hẹn lại giao thấp.',
-    'Quốc Lộ 53': 'Hàng gom giao trễ ca tối, shipper giao trễ bị khách từ chối nhận.',
-    'Tỉnh Lộ 868': 'Shipper chưa rành tuyến, tự ý báo hoàn không liên hệ khách.'
+    'Phước Hậu': 'Thiếu shipper giao chặng cuối, hàng hoàn do lưu kho quá hạn.',
+    'Vĩnh Kim': 'Tuyến giao hàng Vĩnh Kim xa, shipper mới giao không kịp phải chuyển hoàn.',
+    'Phú Phụng': 'Khách hàng không liên lạc được nhiều, tỷ lệ hẹn lại giao thấp.',
+    'Trung Thành': 'Hàng gom giao trễ ca tối, shipper giao trễ bị khách từ chối nhận.',
+    'Long Hồ': 'Hàng hoàn do khách đổi ý và không liên lạc được ở các tuyến xã xa.',
+    'Thạnh Phú': 'Shipper chưa rành tuyến, tự ý báo hoàn không liên hệ khách.'
   };
   
   const fd_plans = {
-    'Phó Cơ Điều': 'Điều phối khẩn cấp 2 shipper cứng từ Vĩnh Long sang hỗ trợ, kiểm tra các đơn báo lưu kho/chuyển trả.',
-    'Đường Huyện 35': 'Chia nhỏ tuyến giao Vĩnh Kim, HRBP tuyển gấp shipper phụ trách tuyến này.',
-    'QL57 KP3': 'Yêu cầu AM kiểm tra lịch sử cuộc gọi của shipper, lọc danh sách đơn hoàn tự động.',
-    'Quốc Lộ 53': 'Điều chỉnh luồng hàng ca chiều về sớm trước 14h, hạn chế đi giao ca tối muộn.',
-    'Tỉnh Lộ 868': 'Tổ chức kèm cặp shipper mới nhận việc, rà soát quy trình báo hoàn trên App.'
+    'Phước Hậu': 'Điều phối khẩn cấp 2 shipper cứng từ Vĩnh Long sang hỗ trợ, kiểm tra các đơn báo lưu kho/chuyển trả.',
+    'Vĩnh Kim': 'Chia nhỏ tuyến giao Vĩnh Kim, HRBP tuyển gấp shipper phụ trách tuyến này.',
+    'Phú Phụng': 'Yêu cầu AM kiểm tra lịch sử cuộc gọi của shipper, lọc danh sách đơn hoàn tự động.',
+    'Trung Thành': 'Điều chỉnh luồng hàng ca chiều về sớm trước 14h, hạn chế đi giao ca tối muộn.',
+    'Long Hồ': 'AM kiểm soát chặt các đơn báo hoàn lần 1, bắt buộc gọi xác nhận qua tổng đài CSKH.',
+    'Thạnh Phú': 'Tổ chức kèm cặp shipper mới nhận việc, rà soát quy trình báo hoàn trên App.'
   };
 
   const gtb_causes = {
-    'Phó Cơ Điều': 'Shipper chưa quen với quy trình thu cước thất bại, lo ngại tranh chấp với người nhận.',
-    'Đường Huyện 35': 'Tuyến xa, shipper ngại thu cước chuyển hoàn vì tốn thời gian giải thích.',
-    'QL57 KP3': 'AM chưa phổ biến đầy đủ chính sách tính lương giao thành công cho shipper khi thực hiện GTB-TT.',
-    'Quốc Lộ 53': 'Tỷ lệ đơn thanh toán trước cao, hoặc shipper chưa chủ động đề xuất thu cước khi giao thất bại.',
-    'Tỉnh Lộ 868': 'Shipper mới nhiều chưa được hướng dẫn thao tác thu cước thất bại trên app.'
+    'Phước Hậu': 'Shipper chưa quen với quy trình thu cước thất bại, lo ngại tranh chấp với người nhận.',
+    'Vĩnh Kim': 'Tuyến xa, shipper ngại thu cước chuyển hoàn vì tốn thời gian giải thích.',
+    'Phú Phụng': 'AM chưa phổ biến đầy đủ chính sách tính lương giao thành công cho shipper khi thực hiện GTB-TT.',
+    'Trung Thành': 'Tỷ lệ đơn thanh toán trước cao, hoặc shipper chưa chủ động đề xuất thu cước khi giao thất bại.',
+    'Thạnh Phú': 'Shipper mới nhiều chưa được hướng dẫn thao tác thu cước thất bại trên app.'
   };
 
   const gtb_plans = {
-    'Phó Cơ Điều': 'AM họp khẩn đào tạo lại quy trình GTB-TT, hướng dẫn shipper cách giải thích cước phí hoàn với khách.',
-    'Đường Huyện 35': 'Áp dụng chỉ tiêu tối thiểu 20% GTB-TT cho các tuyến huyện xa, theo dõi sát tiến độ hàng ngày.',
-    'QL57 KP3': 'Dán bảng hướng dẫn tính lương shipper của đơn GTB-TT tại bảng tin bưu cục, AM trực tiếp giải đáp thắc mắc.',
-    'Quốc Lộ 53': 'Truyền thông gương shipper điển hình thu cước tốt, AM kiểm tra danh sách đơn hoàn không thu được phí.',
-    'Tỉnh Lộ 868': 'Tổ chức kèm cặp thực tế trên tuyến cho shipper mới về nghiệp vụ thu cước giao thất bại.'
+    'Phước Hậu': 'AM họp khẩn đào tạo lại quy trình GTB-TT, hướng dẫn shipper cách giải thích cước phí hoàn với khách.',
+    'Vĩnh Kim': 'Áp dụng chỉ tiêu tối thiểu 20% GTB-TT cho các tuyến huyện xa, theo dõi sát tiến độ hàng ngày.',
+    'Phú Phụng': 'Dán bảng hướng dẫn tính lương shipper của đơn GTB-TT tại bảng tin bưu cục, AM trực tiếp giải đáp thắc mắc.',
+    'Trung Thành': 'Truyền thông gương shipper điển hình thu cước tốt, AM kiểm tra danh sách đơn hoàn không thu được phí.',
+    'Thạnh Phú': 'Tổ chức kèm cặp thực tế trên tuyến cho shipper mới về nghiệp vụ thu cước giao thất bại.'
   };
   
   top5.forEach((item, i) => {
     const el = document.createElement('div');
     el.className = 'hr-top5-item';
     
-    let bcMatch = null;
-    let cleanName = clean_bc_name(item.bc_name);
-    for (let bc of repData.bcs) {
-      let b_clean = clean_bc_name(bc.name);
-      if (b_clean === cleanName || b_clean.includes(cleanName) || cleanName.includes(b_clean)) {
-        bcMatch = bc;
-        break;
+    let bcMatch = repData.bcs.find(bc => bc.name && item.bc_name && bc.name.trim().toLowerCase() === item.bc_name.trim().toLowerCase()) || null;
+    if (!bcMatch) {
+      let cleanName = clean_bc_name(item.bc_name);
+      for (let bc of repData.bcs) {
+        let b_clean = clean_bc_name(bc.name);
+        if (b_clean === cleanName) {
+          bcMatch = bc;
+          break;
+        }
       }
     }
     

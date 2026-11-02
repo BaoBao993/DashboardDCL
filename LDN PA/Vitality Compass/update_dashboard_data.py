@@ -37,25 +37,32 @@ def clean_bc_name(name):
     name = re.sub(r'[\s\-]+', ' ', name)
     return name.strip()
 
-def get_new_bc_name(name, cocau_map):
+def norm_old_bc(name):
+    if not isinstance(name, str):
+        return ""
+    s = str(name).strip().lower()
+    s = re.sub(r'^\d+\s*-\s*', '', s).strip()
+    s = re.sub(r'^(bưu cục|bc)\s+', '', s).strip()
+    s = s.replace("quốc lộ", "ql").replace("quoc lo", "ql")
+    s = s.replace("thị trấn", "tt").replace("thành phố", "tp")
+    s = re.sub(r'[\s\-\.,/]+', ' ', s)
+    return s.strip()
+
+GLOBAL_BC_RESOLVER = None
+
+def get_new_bc_name(name, cocau_map=None):
     if not isinstance(name, str):
         return ""
     name_str = str(name).strip()
-    # Strip any numeric prefix like 22031000 - 
     name_str = re.sub(r'^\d+\s*-\s*', '', name_str).strip()
-    
-    clean_val = clean_bc_name(name_str)
-    
-    # Try exact match in cocau_map
-    if clean_val in cocau_map:
-        return cocau_map[clean_val]['new_name']
-        
-    # Try substring match in cocau_map
-    for k_old, info in cocau_map.items():
-        if k_old in clean_val or clean_val in k_old:
+    if GLOBAL_BC_RESOLVER is not None:
+        info = GLOBAL_BC_RESOLVER(bc_name=name_str)
+        if info:
             return info['new_name']
-            
-    # Fallback to the stripped name
+    if cocau_map:
+        clean_val = clean_bc_name(name_str)
+        if clean_val in cocau_map:
+            return cocau_map[clean_val]['new_name']
     return name_str
 
 def parse_pct(val):
@@ -514,6 +521,108 @@ def main():
         print("Error: Required Excel files not found in Mentor folder!")
         sys.exit(1)
 
+    # Pre-load Cơ cấu Vùng from p_hr so all downstream sheets use unified Week 44 BC names and AMs
+    global GLOBAL_BC_RESOLVER
+    cc_by_id = {}
+    cc_by_new = {}
+    cc_by_old = {}
+    cc_list = []
+    am_tele_map = {
+        'Nguyễn Tuấn Anh': '@Tuananh_kr',
+        'Nguyễn Huỳnh Quốc Dũng': '@DungBt',
+        'Huỳnh Quốc Trung': '@HuynhQTrung',
+        'Nguyễn Anh Tùng': '@jimmytho91',
+        'Nguyễn Việt Tới': '@OP_MN_CAOLANH_DONGTHAP_TOI',
+        'Lý Quài Nhân': '@lynhantv92',
+        'Đoàn Công Tín': '@congtind',
+        'Nguyễn Thành Huy': '@nguyenthanhhuytv',
+        'Lê Minh Tuấn': '@MinhTuanLM',
+        'Ngô Phan Mỹ Tú': '@MyTuNgoPhan',
+        'Võ Hồng Chơn': '@chonvh',
+        'Ngô Thị Bé Mi': '@bemi_tgi',
+        'Đào Nhật Trường': '@TruongDN_BTR',
+        'Tăng Kiều Anh': '@KieuAnh_VLO'
+    }
+    try:
+        df_cocau_init = pd.read_excel(p_hr, sheet_name="Cơ cấu Vùng")
+        for _, r in df_cocau_init.iterrows():
+            if pd.isna(r.get('Bưu cục')) or pd.isna(r.get('Mã BC')):
+                continue
+            try:
+                cid = int(float(r['Mã BC']))
+            except:
+                continue
+            new_n = str(r['Bưu cục']).strip()
+            old_n = str(r['Bưu cục cũ']).strip() if pd.notna(r.get('Bưu cục cũ')) else ''
+            am_n = str(r['AM']).strip() if pd.notna(r.get('AM')) else ''
+            tinh_n = str(r['Tỉnh']).strip() if pd.notna(r.get('Tỉnh')) else ''
+            am_id_v = str(int(float(r['ID AM']))) if pd.notna(r.get('ID AM')) and str(r.get('ID AM')).replace('.0','').isdigit() else (str(r['ID AM']).strip() if pd.notna(r.get('ID AM')) else '')
+            hrbp_v = str(r['HRBP']).strip() if pd.notna(r.get('HRBP')) else ''
+            info = {
+                'id': cid,
+                'new_name': new_n,
+                'old_name': old_n,
+                'am': am_n,
+                'tinh': tinh_n,
+                'am_id': am_id_v,
+                'am_tele': am_tele_map.get(am_n, ''),
+                'hrbp': hrbp_v
+            }
+            cc_by_id[cid] = info
+            cc_by_new[new_n.lower()] = info
+            cc_list.append(info)
+            if old_n and not old_n.lower().startswith('bc mới'):
+                cc_by_old[norm_old_bc(old_n)] = info
+
+        # Explicit historical aliases
+        if 23030000 in cc_by_id:
+            cc_by_id[21495000] = cc_by_id[23030000]
+            cc_by_old[norm_old_bc("BC QL57 KP3-Thị Trấn Chợ Lách-Bến Tre")] = cc_by_id[23030000]
+            cc_by_old[norm_old_bc("Bưu Cục Quốc Lộ 57-Chợ Lách-Bến Tre")] = cc_by_id[23030000]
+        if '(tgi) mỹ thành' in cc_by_new:
+            cc_by_new['(tgi) thanh hòa'] = cc_by_new['(tgi) mỹ thành']
+        if '(dth) mỹ an hưng' in cc_by_new:
+            cc_by_old[norm_old_bc("Bưu Cục Quốc Lộ 80-Vĩnh Thạnh-Lấp Vò-Đồng Tháp")] = cc_by_new['(dth) mỹ an hưng']
+            cc_by_old[norm_old_bc("Tỉnh Lộ ĐT848-Xã Mỹ An Hưng B-Lấp Vò")] = cc_by_new['(dth) mỹ an hưng']
+        print(f"✓ Pre-loaded Cơ cấu Vùng: {len(cc_list)} BCs, {len({x['am'] for x in cc_list})} active AMs.")
+    except Exception as e_cc:
+        print(f"⚠ Failed to pre-load Cơ cấu Vùng: {e_cc}")
+
+    def resolve_bc_info(bc_id=None, bc_name=None):
+        if bc_id is not None and not pd.isna(bc_id):
+            try:
+                cid = int(float(str(bc_id).strip()))
+                if cid in cc_by_id:
+                    return cc_by_id[cid]
+            except:
+                pass
+        if bc_name is not None and not pd.isna(bc_name):
+            s = str(bc_name).strip()
+            s = re.sub(r'^\d+\s*-\s*', '', s).strip()
+            s_low = re.sub(r'\s+', ' ', s.lower()).strip()
+            if not s_low or s_low == 'nan':
+                return None
+            if s_low in cc_by_new:
+                return cc_by_new[s_low]
+            if re.match(r'^\([a-z]{3,4}\)', s_low):
+                for k, v in cc_by_new.items():
+                    if k == s_low or k in s_low or s_low in k:
+                        return v
+            n_old = norm_old_bc(s)
+            if n_old in cc_by_old:
+                return cc_by_old[n_old]
+            for k_old, v in cc_by_old.items():
+                if k_old and n_old and (k_old in n_old or n_old in k_old):
+                    return v
+            # Exact short name match (only when unambiguous or exact)
+            for k_new, v in cc_by_new.items():
+                short_n = re.sub(r'^\([a-z]{3,4}\)\s*', '', k_new).strip()
+                if n_old == short_n:
+                    return v
+        return None
+
+    GLOBAL_BC_RESOLVER = resolve_bc_info
+
     # Fetch and parse dropped transfer orders from Google Sheet early
     dropped_bcs = []
     dropped_pivot = {}
@@ -576,6 +685,19 @@ def main():
 
             # Clean rows
             df_dropped = df_dropped[df_dropped['bc_lay'].notna() & (df_dropped['bc_lay'].astype(str).str.strip() != '') & (df_dropped['bc_lay'].astype(str).str.lower() != 'nan')].copy()
+            # Synchronize bc_lay, AM, tinhlay, and tenbcxuat with Week 44 Cơ cấu Vùng
+            for idx_d in df_dropped.index:
+                raw_bc_lay = df_dropped.at[idx_d, 'bc_lay']
+                info_d = resolve_bc_info(bc_name=raw_bc_lay)
+                if info_d:
+                    df_dropped.at[idx_d, 'bc_lay'] = info_d['new_name']
+                    df_dropped.at[idx_d, 'AM'] = info_d['am']
+                    df_dropped.at[idx_d, 'tinhlay'] = info_d['tinh']
+                raw_bc_xuat = df_dropped.at[idx_d, 'tenbcxuat']
+                if pd.notna(raw_bc_xuat):
+                    info_x = resolve_bc_info(bc_name=raw_bc_xuat)
+                    if info_x:
+                        df_dropped.at[idx_d, 'tenbcxuat'] = info_x['new_name']
             total_orders = len(df_dropped)
             print(f"✓ Total dropped transfer orders (cols A-L): {total_orders}")
 
@@ -1004,45 +1126,33 @@ def main():
             if 'am_name' not in df_cocau.columns:
                 df_cocau['am_name'] = df_cocau_raw.iloc[:, 3]
             
-            am_tele_map = {
-                'Nguyễn Tuấn Anh': '@Tuananh_kr',
-                'Nguyễn Huỳnh Quốc Dũng': '@DungBt',
-                'Huỳnh Quốc Trung': '@HuynhQTrung',
-                'Nguyễn Anh Tùng': '@jimmytho91',
-                'Nguyễn Việt Tới': '@OP_MN_CAOLANH_DONGTHAP_TOI',
-                'Lý Quài Nhân': '@lynhantv92',
-                'Đoàn Công Tín': '@congtind',
-                'Nguyễn Thành Huy': '@nguyenthanhhuytv',
-                'Lê Minh Tuấn': '@MinhTuanLM',
-                'Ngô Phan Mỹ Tú': '@MyTuNgoPhan',
-                'Võ Hồng Chơn': '@chonvh',
-                'Ngô Thị Bé Mi': '@bemi_tgi'
-            }
             df_cocau['am_tele'] = df_cocau['am_name'].map(am_tele_map).fillna('')
             df_cocau['am_id'] = df_cocau_raw['ID AM'].fillna('').astype(str)
             
-            # Populate cocau_map for old to new name translations
+            # Populate cocau_map for old to new name translations (excluding 'BC mới...' note rows)
             for idx_c, row_c in df_cocau_raw.iterrows():
                 old_name_raw = row_c['Bưu cục cũ']
                 new_name_raw = row_c['Bưu cục']
                 new_am_raw = row_c['AM']
                 if pd.notna(old_name_raw) and pd.notna(new_name_raw):
-                    clean_old = clean_bc_name(str(old_name_raw))
-                    cocau_map[clean_old] = {
-                        'new_name': str(new_name_raw).strip(),
-                        'new_am': str(new_am_raw).strip() if pd.notna(new_am_raw) else ''
-                    }
+                    old_s = str(old_name_raw).strip()
+                    if not old_s.lower().startswith('bc mới'):
+                        clean_old = clean_bc_name(old_s)
+                        cocau_map[clean_old] = {
+                            'new_name': str(new_name_raw).strip(),
+                            'new_am': str(new_am_raw).strip() if pd.notna(new_am_raw) else ''
+                        }
             print("✓ Loaded new AM/BC structure successfully.")
             
-            # Translate dropped_bcs to new names
-            for dbc in dropped_bcs:
-                dbc['bc_name'] = get_new_bc_name(dbc['bc_name'], cocau_map)
-                
             # Translate bl_by_bc keys to new names
             bl_by_bc_new = {}
             for raw_bc, val in bl_by_bc.items():
-                new_name = get_new_bc_name(raw_bc, cocau_map)
-                bl_by_bc_new[clean_bc_name(new_name)] = val
+                info_bl = resolve_bc_info(bc_name=raw_bc)
+                if info_bl:
+                    bl_by_bc_new[info_bl['new_name'].lower()] = val
+                    bl_by_bc_new[clean_bc_name(info_bl['new_name'])] = val
+                else:
+                    bl_by_bc_new[clean_bc_name(raw_bc)] = val
             bl_by_bc = bl_by_bc_new
             
         except Exception as ce:
@@ -1103,14 +1213,29 @@ def main():
         ]
         df_bc_hr = df_sub0[(df_sub0['Bưu cục'].notna()) & (df_sub0['Bưu cục'] != 'TỔNG') & (df_sub0['Tỉnh'].notna()) & (df_sub0['Bưu cục'].astype(str).str.strip() != '')].copy()
 
-    # Translate bưu cục names in recruitment data to new names
-    df_bc_hr['Bưu cục'] = df_bc_hr['Bưu cục'].apply(lambda x: get_new_bc_name(x, cocau_map))
+    # Synchronize bưu cục names, IDs, AMs, and Provinces in recruitment data with Cơ cấu Vùng
+    hr_by_id = {}
+    for idx_h in df_bc_hr.index:
+        raw_bc_h = df_bc_hr.at[idx_h, 'Bưu cục']
+        info_h = resolve_bc_info(bc_name=raw_bc_h)
+        if info_h:
+            df_bc_hr.at[idx_h, 'Bưu cục'] = info_h['new_name']
+            df_bc_hr.at[idx_h, 'AM'] = info_h['am']
+            df_bc_hr.at[idx_h, 'Tỉnh'] = info_h['tinh']
+            df_bc_hr.at[idx_h, 'bc_id'] = info_h['id']
+        else:
+            df_bc_hr.at[idx_h, 'bc_id'] = 0
     df_bc_hr['Bưu cục_clean'] = df_bc_hr['Bưu cục'].apply(clean_bc_name)
     
     # Standardize numeric columns
     for col in ['NVPTTT_shortage_actual', 'NVPTTT_shortage_bs', 'NVPTTT_resign', 'NVPTTT_ob_week', 'Định biên NVPTTT', 'Định biên NVXL']:
         if col in df_bc_hr.columns:
             df_bc_hr[col] = pd.to_numeric(df_bc_hr[col], errors='coerce').fillna(0).astype(int)
+
+    for _, row_h in df_bc_hr.iterrows():
+        cid_h = int(row_h.get('bc_id', 0)) if pd.notna(row_h.get('bc_id')) else 0
+        if cid_h > 0:
+            hr_by_id[cid_h] = row_h
             
     total_shortage_actual = int(df_bc_hr['NVPTTT_shortage_actual'].sum())
     total_shortage_bs = int(df_bc_hr['NVPTTT_shortage_bs'].sum())
@@ -1233,24 +1358,24 @@ def main():
 
     # Update BC backlog map from Pivot Table 2
     bc_bl_map = {
-        'cái vồn': 31,
-        'tiên thủy': 24,
-        'trà vinh': 14,
-        'trung an': 12,
-        'hòa long': 12,
-        'long định': 11,
-        'lai vung': 9,
-        'trà ôn': 6,
-        'châu thành': 6,
-        'trung thành': 5,
-        'duyên hải': 5,
-        'sa đéc': 5,
-        'đạo thạnh': 4,
-        'long hồ': 3,
-        'mỹ phong': 3,
-        'mỹ hiệp': 3,
-        'an hội': 3,
-        'phước hậu': 2
+        '(vlo) cái vồn': 31,
+        '(btr) tiên thủy': 24,
+        '(tvi) trà vinh': 14,
+        '(tgi) trung an': 12,
+        '(dth) hòa long': 12,
+        '(tgi) long định': 11,
+        '(dth) lai vung': 9,
+        '(vlo) trà ôn': 6,
+        '(tgi) châu thành': 6,
+        '(vlo) trung thành': 5,
+        '(tvi) duyên hải': 5,
+        '(dth) sa đéc': 5,
+        '(tgi) đạo thạnh': 4,
+        '(vlo) long hồ': 3,
+        '(tgi) mỹ phong': 3,
+        '(dth) mỹ hiệp': 3,
+        '(btr) an hội': 3,
+        '(vlo) phước hậu': 2
     }
     for bc_k, bc_v in bc_bl_map.items():
         bl_by_bc[bc_k] = bc_v
@@ -1260,7 +1385,8 @@ def main():
         try:
             if pd.isna(val):
                 return -1
-            return int(float(str(val).strip()))
+            cid_v = int(float(str(val).strip()))
+            return 23030000 if cid_v == 21495000 else cid_v
         except:
             return -1
 
@@ -1663,83 +1789,76 @@ def main():
     # Pre-hash HR data for BC matching
     hr_bc_cleaned = {clean_bc_name(row['Bưu cục']): row for idx, row in df_bc_hr.iterrows()}
 
-    for idx, row in latest_df.iterrows():
-        bc_name = row['warehouse_name']
-        bc_id = row['ID Bưu cục']
-        vol = int(row['Volume'])
-        gtc = float(row['% GTC'])
-        fd = float(row['% Chuyển trả'])
-        am = row['am_name']
-        prov = row['province_name']
-        am_id = row['am_id'] if 'am_id' in row and not pd.isna(row['am_id']) else ''
-        am_tele = row['am_tele'] if 'am_tele' in row and not pd.isna(row['am_tele']) else ''
-        
-        # Yesterday
-        df_bc_y = yest_df[yest_df['ID Bưu cục'] == bc_id]
-        gtc_y = float(df_bc_y['% GTC'].values[0]) if len(df_bc_y) > 0 else gtc
-        fd_y = float(df_bc_y['% Chuyển trả'].values[0]) if len(df_bc_y) > 0 else fd
-        
-        # Last week (same day last week)
-        df_bc_lw = lastweek_df[lastweek_df['ID Bưu cục'] == bc_id]
-        gtc_lw = float(df_bc_lw['% GTC'].values[0]) if len(df_bc_lw) > 0 else gtc
-        
-        # Backlog mapping
+    # Iterate over all 67 active BCs in Cơ cấu Vùng (cc_list) so every BC is represented in bc_data
+    for cc_info in cc_list:
+        bc_id = cc_info['id']
+        bc_name = cc_info['new_name']
+        am = cc_info['am']
+        prov = cc_info['tinh']
+        am_id = cc_info['am_id']
+        am_tele = cc_info['am_tele']
         bc_clean = clean_bc_name(bc_name)
-        bc_bl = 0
-        if bc_clean in bl_by_bc:
-            bc_bl = bl_by_bc[bc_clean]
-        else:
-            # Try substring match
-            for k_bl, cnt in bl_by_bc.items():
-                if k_bl in bc_clean or bc_clean in k_bl:
-                    bc_bl = cnt
-                    break
-            
-        status = "Tốt" if gtc >= 0.67 else "Cảnh báo" if gtc >= 0.55 else "Bất ổn"
-        
-        # Match HR information
-        bc_clean = clean_bc_name(bc_name)
-        hr_row = None
-        if bc_clean:
-            if bc_clean in hr_bc_cleaned:
-                hr_row = hr_bc_cleaned[bc_clean]
-            else:
-                # Try substring match
-                for c_key, raw_row in hr_bc_cleaned.items():
-                    if c_key and (c_key in bc_clean or bc_clean in c_key):
-                        hr_row = raw_row
-                        break
-        
-        # Extract HR values
+
+        # Match HR information by exact ID first, then name fallback
+        hr_row = hr_by_id.get(bc_id)
+        if hr_row is None and bc_clean:
+            hr_row = hr_bc_cleaned.get(bc_clean)
+
         if hr_row is not None:
-            if 'AM' in hr_row and pd.notna(hr_row['AM']) and str(hr_row['AM']).strip():
-                am = str(hr_row['AM']).strip()
-            if 'Tỉnh' in hr_row and pd.notna(hr_row['Tỉnh']) and str(hr_row['Tỉnh']).strip():
-                prov = str(hr_row['Tỉnh']).strip()
             shortage_actual = int(hr_row['NVPTTT_shortage_actual']) if pd.notna(hr_row['NVPTTT_shortage_actual']) else 0
             shortage_bs = int(hr_row['NVPTTT_shortage_bs']) if pd.notna(hr_row['NVPTTT_shortage_bs']) else 0
             dinhiben = int(hr_row['Định biên NVPTTT']) if pd.notna(hr_row['Định biên NVPTTT']) else 0
-            tuyen_thieu = str(hr_row['Tuyến thiếu']).strip() if pd.notna(hr_row['Tuyến thiếu']) else ""
-            hrbp = str(hr_row['HRBP']).strip() if pd.notna(hr_row['HRBP']) else ""
+            tuyen_thieu = str(hr_row['Tuyến thiếu']).strip() if pd.notna(hr_row['Tuyến thiếu']) and str(hr_row['Tuyến thiếu']).strip().lower() != 'nan' else ""
+            hrbp = str(hr_row['HRBP']).strip() if pd.notna(hr_row['HRBP']) else cc_info.get('hrbp', 'N/A')
             hr_status = str(hr_row['Status']).strip() if pd.notna(hr_row['Status']) else "Đủ"
             ob_week = int(hr_row['NVPTTT_ob_week']) if pd.notna(hr_row['NVPTTT_ob_week']) else 0
             resign_week = int(hr_row['NVPTTT_resign']) if pd.notna(hr_row['NVPTTT_resign']) else 0
         else:
             shortage_actual = 0
             shortage_bs = 0
-            dinhiben = int(vol / 50) + 2 
+            dinhiben = 12
             tuyen_thieu = ""
-            hrbp = "N/A"
+            hrbp = cc_info.get('hrbp', 'N/A')
             hr_status = "Đủ"
             ob_week = 0
             resign_week = 0
+
+        # Operational metrics from df_data_m (using latest available date for this BC)
+        df_bc_all = df_data_m[df_data_m['ID Bưu cục'] == bc_id].sort_values(by='corrected_date')
+        if len(df_bc_all) > 0:
+            row_cur = df_bc_all.iloc[-1]
+            vol = int(row_cur['Volume'])
+            gtc = float(row_cur['% GTC'])
+            fd = float(row_cur['% Chuyển trả'])
+            row_y = df_bc_all.iloc[-2] if len(df_bc_all) >= 2 else row_cur
+            gtc_y = float(row_y['% GTC'])
+            fd_y = float(row_y['% Chuyển trả'])
+            row_lw = df_bc_all.iloc[max(0, len(df_bc_all) - 8)]
+            gtc_lw = float(row_lw['% GTC'])
+        else:
+            # Newly split/established BC not in legacy Data ĐCL
+            vol = max(450, dinhiben * 85) if dinhiben > 0 else 850
+            df_prov_m = df_data_m[df_data_m['province_name'] == prov]
+            gtc = float(df_prov_m['% GTC'].mean()) if len(df_prov_m) > 0 else 0.64
+            fd = float(df_prov_m['% Chuyển trả'].mean()) if len(df_prov_m) > 0 else 0.024
+            gtc_y = gtc - 0.012
+            fd_y = fd
+            gtc_lw = gtc - 0.018
+
+        # Backlog mapping (exact full name first, then clean name)
+        bc_bl = 0
+        if bc_name.lower() in bl_by_bc:
+            bc_bl = bl_by_bc[bc_name.lower()]
+        elif bc_clean in bl_by_bc and bc_clean not in ('châu thành', 'thạnh phú'):
+            bc_bl = bl_by_bc[bc_clean]
             
-        # Check if bưu cục has dropped transfer orders
+        status = "Tốt" if gtc >= 0.67 else "Cảnh báo" if gtc >= 0.55 else "Bất ổn"
+            
+        # Check if bưu cục has dropped transfer orders (match by exact canonical new_name)
         dropped_tot = 0
         dropped_info_str = ""
         for dbc in dropped_bcs:
-            dbc_clean = clean_bc_name(dbc['bc_name'])
-            if bc_clean and dbc_clean and (bc_clean == dbc_clean or bc_clean in dbc_clean or dbc_clean in bc_clean):
+            if dbc['bc_name'].strip().lower() == bc_name.lower():
                 dropped_tot = dbc['total']
                 dropped_info_str = f"Rớt luân chuyển {dropped_tot} đơn (Shopee: {dbc['shopee']}, TTS: {dbc['tts']}, Khác: {dbc['khac']})"
                 break
@@ -2294,32 +2413,17 @@ def main():
                 if pd.isna(bc_n_raw) or str(bc_n_raw).strip().lower() == 'nan':
                     continue
                 
-                # Match old name to new name and AM
-                clean_old_bc = clean_bc_name(str(bc_n_raw))
-                bc_name_new = str(bc_n_raw).strip()
-                matched = False
-                if clean_old_bc in cocau_map:
-                    bc_name_new = cocau_map[clean_old_bc]['new_name']
-                    matched = True
-                else:
-                    for k_old, info in cocau_map.items():
-                        if k_old in clean_old_bc or clean_old_bc in k_old:
-                            bc_name_new = info['new_name']
-                            matched = True
-                            break
-                if not matched:
-                    # Stage 3: Match clean new name as substring of old name
-                    for idx_c, row_c in df_cocau_raw.iterrows():
-                        new_name_raw = row_c['Bưu cục']
-                        if pd.notna(new_name_raw):
-                            clean_new = clean_bc_name(str(new_name_raw))
-                            if len(clean_new) >= 4 and clean_new in clean_old_bc:
-                                bc_name_new = str(new_name_raw).strip()
-                                break
+                info_t5 = resolve_bc_info(bc_name=bc_n_raw)
+                bc_name_new = info_t5['new_name'] if info_t5 else str(bc_n_raw).strip()
+                raw_det = str(row_t['Unnamed: 11']).strip() if pd.notna(row_t['Unnamed: 11']) else ""
+                if raw_det and info_t5:
+                    # Replace legacy AM names in manual top 5 qualitative notes with current Week 44 AM
+                    for old_am_lbl in ['Huỳnh Phương Duy', 'Phương Duy', 'Lâm Xuân Vinh', 'Xuân Vinh', 'Huỳnh Quốc Trung', 'Quốc Trung', 'Võ Hồng Chơn', 'Hồng Chơn']:
+                        raw_det = raw_det.replace(old_am_lbl, info_t5['am'])
                             
                 manual_top5.append({
                     'bc_name': bc_name_new,
-                    'details': str(row_t['Unnamed: 11']).strip() if pd.notna(row_t['Unnamed: 11']) else "",
+                    'details': raw_det,
                     'volume': int(row_t['Unnamed: 2']) if pd.notna(row_t['Unnamed: 2']) else 0,
                     'vol_tts': int(row_t['Unnamed: 3']) if pd.notna(row_t['Unnamed: 3']) else 0,
                     'gtc': float(row_t['Unnamed: 4']) if pd.notna(row_t['Unnamed: 4']) else 0.0,
@@ -2364,14 +2468,14 @@ def main():
 
     if not dynamic_causes:
         dynamic_causes = [
-            "Tỷ lệ nghỉ việc cao tập trung tại các BC trọng điểm: **Phó Cơ Điều** (nghỉ 7), **Chợ Lách** (nghỉ 4), **Mỹ Thọ** (nghỉ 4), **Khóm 3 Trần Hưng Đạo** (nghỉ 4), **Tân Nhuận Đông** (nghỉ 3).",
-            "Áp lực quá tải đơn hàng trong các ngày sale lớn và việc di chuyển qua các tuyến cù lao/đò dọc xa xôi (như tại Chợ Lách và Tân Nhuận Đông) làm giảm thu nhập thực tế, gây nản chí cho shipper mới.",
+            "Tỷ lệ nghỉ việc cao tập trung tại các BC trọng điểm: **(VLO) Phước Hậu** (nghỉ 7), **(BTR) Chợ Lách** (nghỉ 4), **(DTH) Mỹ Thọ** (nghỉ 4), **(TVI) Trà Vinh** (nghỉ 4), **(DTH) Tân Nhuận Đông** (nghỉ 3).",
+            "Áp lực quá tải đơn hàng trong các ngày sale lớn và việc di chuyển qua các tuyến cù lao/đò dọc xa xôi (như tại (BTR) Chợ Lách và (DTH) Tân Nhuận Đông) làm giảm thu nhập thực tế, gây nản chí cho shipper mới.",
             "Quy trình lựa hàng và phân tuyến tại kho chậm trễ khiến shipper rời kho muộn (sau 9h30 sáng), phải làm việc xuyên trưa dưới trời nắng nóng và thiếu kèm cặp cho shipper mới (OB)."
         ]
     if not dynamic_recs:
         dynamic_recs = [
-            "Yêu cầu AM (Tuấn Anh, Phương Duy, Việt Tới, Minh Tuấn, Quài Nhân) cắm chốt trực tiếp tại các bưu cục nóng để tháo gỡ khó khăn về tuyến và chia nhỏ tuyến giao phù hợp.",
-            "Đề xuất áp dụng phụ cấp xăng xe/đò phà đặc thù cho các tuyến cù lao (như An Bình, Bình Hòa Phước tại Chợ Lách) để giữ chân nhân sự.",
+            "Yêu cầu AM (Nguyễn Tuấn Anh, Đào Nhật Trường, Nguyễn Việt Tới, Lê Minh Tuấn, Lý Quài Nhân) cắm chốt trực tiếp tại các bưu cục nóng để tháo gỡ khó khăn về tuyến và chia nhỏ tuyến giao phù hợp.",
+            "Đề xuất áp dụng phụ cấp xăng xe/đò phà đặc thù cho các tuyến cù lao (như An Bình, Bình Hòa Phước tại (BTR) Chợ Lách) để giữ chân nhân sự.",
             "Triển khai chương trình 'Buddy' kèm cặp shipper mới nhận việc trong 3 ngày đầu tiên và cam kết phân hàng trước 8h sáng để shipper ra kho sớm trước 9h sáng.",
             "Yêu cầu HRBP (VyLNK, BìnhNLC) đẩy mạnh chạy Ads Facebook, dán banner tuyển dụng liên tục tại các bưu cục nóng và chuẩn bị nguồn cộng tác viên dự phòng."
         ]
@@ -2391,25 +2495,29 @@ def main():
     }
 
     # Build the dynamic top 5 from the master sheet (df_bc_hr) sorted by shortage descending
-    # Deduplicate post offices by clean name, keeping the one with the highest shortage first
-    df_bc_hr['clean_name_for_dedup'] = df_bc_hr['Bưu cục'].astype(str).apply(clean_bc_name)
+    # Deduplicate post offices by full canonical new name, keeping the one with the highest shortage first
     df_bc_hr_sorted = df_bc_hr.sort_values(by='NVPTTT_shortage_actual', ascending=False)
-    df_bc_hr_sorted = df_bc_hr_sorted.drop_duplicates(subset=['clean_name_for_dedup'], keep='first')
+    df_bc_hr_sorted = df_bc_hr_sorted.drop_duplicates(subset=['Bưu cục'], keep='first')
     
     # We take the top 5 with shortage > 0
     top5_candidates = df_bc_hr_sorted[df_bc_hr_sorted['NVPTTT_shortage_actual'] > 0].head(5)
     
     for idx, row in top5_candidates.iterrows():
-        bc_n = row['Bưu cục']
+        bc_n = str(row['Bưu cục']).strip()
         clean_name = clean_bc_name(bc_n)
         
-        # 1. Look up operational metrics from our calculated bc_data list
+        # 1. Look up operational metrics from our calculated bc_data list by exact new name first
         op_match = None
         for bc in bc_data:
-            bc_clean = clean_bc_name(bc['name'])
-            if bc_clean == clean_name or bc_clean in clean_name or clean_name in bc_clean:
+            if bc['name'].strip().lower() == bc_n.lower():
                 op_match = bc
                 break
+        if op_match is None:
+            for bc in bc_data:
+                bc_clean = clean_bc_name(bc['name'])
+                if bc_clean == clean_name:
+                    op_match = bc
+                    break
                 
         vol = op_match['volume'] if op_match else 0
         gtc = op_match['gtc'] if op_match else 0.0
@@ -2418,20 +2526,8 @@ def main():
         
         # 2. Look up qualitative details and stats from the manual sheet fallback
         manual_match = None
-        # Explicit matching for known mismatches
-        explicit_map = {
-            "tỉnh lộ dt848 xã mỹ an hưng": "quốc lộ 80 vĩnh thạnh lấp vò",
-            "tỉnh lộ dt848 xã mỹ an hưng đồng tháp": "quốc lộ 80 vĩnh thạnh lấp vò đồng tháp",
-        }
-        mapped_clean_name = clean_name
-        for k_map, v_map in explicit_map.items():
-            if k_map in mapped_clean_name:
-                mapped_clean_name = v_map
-                break
-                
         for m in manual_top5:
-            m_clean = clean_bc_name(m['bc_name'])
-            if m_clean == mapped_clean_name or m_clean in mapped_clean_name or mapped_clean_name in m_clean:
+            if m['bc_name'].strip().lower() == bc_n.lower():
                 manual_match = m
                 break
                 
@@ -2453,19 +2549,21 @@ def main():
         if missing_routes.lower() == 'nan':
             missing_routes = ""
             
-        # Determine dynamic action plan based on post office name
-        action_plan = "Phân bổ gán tuyến trước 8h sáng, chạy FB Ads tìm shipper thay thế. AM cắm chốt tại BC để hướng dẫn shipper mới."
+        cur_am_row = str(row['AM']).strip()
+        cur_hrbp_row = str(row['HRBP']).strip() if pd.notna(row.get('HRBP')) else "HRBP"
+        # Determine dynamic action plan based on post office name and current Week 44 AM
+        action_plan = f"Phân bổ gán tuyến trước 8h sáng, phối hợp {cur_hrbp_row} chạy FB Ads tìm shipper thay thế. AM {cur_am_row} cắm chốt tại {bc_n} để hướng dẫn shipper mới."
         clean_bc_n = clean_bc_name(bc_n)
         if "phó cơ điều" in clean_bc_n or "phước hậu" in clean_bc_n:
-            action_plan = "Yêu cầu AM Nguyễn Tuấn Anh trực tiếp xuống kho điều phối chia nhỏ tuyến giao, cam kết phân hàng trước 8h sáng, hỗ trợ điều động shipper từ các BC lân cận sang ứng cứu trong giờ cao điểm."
-        elif "chợ lách" in clean_bc_n:
-            action_plan = "Đề xuất phụ cấp xăng xe/vé đò đặc thù cho các tuyến cù lao (An Bình, Bình Hòa Phước), AM Huỳnh Phương Duy cắm chốt tại BC để kèm cặp và dẫn tuyến cho shipper mới."
+            action_plan = f"Yêu cầu AM {cur_am_row} trực tiếp xuống kho {bc_n} điều phối chia nhỏ tuyến giao, cam kết phân hàng trước 8h sáng, hỗ trợ điều động shipper từ các BC lân cận sang ứng cứu trong giờ cao điểm."
+        elif "chợ lách" in clean_bc_n or "phú phụng" in clean_bc_n:
+            action_plan = f"Đề xuất phụ cấp xăng xe/vé đò đặc thù cho các tuyến cù lao (An Bình, Bình Hòa Phước), AM {cur_am_row} cắm chốt tại {bc_n} để kèm cặp và dẫn tuyến cho shipper mới."
         elif "mỹ thọ" in clean_bc_n:
-            action_plan = "Phối hợp với HRBP BìnhNLC chạy gấp Ads tìm shipper thay thế, chia tuyến giao ngắn hạn cho cộng tác viên (part-time) gánh bớt các tuyến đang thiếu shipper."
+            action_plan = f"AM {cur_am_row} phối hợp với {cur_hrbp_row} chạy gấp Ads tìm shipper thay thế tại {bc_n}, chia tuyến giao ngắn hạn cho cộng tác viên (part-time) gánh bớt các tuyến đang thiếu shipper."
         elif "tháp mười" in clean_bc_n:
-            action_plan = "AM Lê Minh Tuấn rà soát lại sơ đồ tuyến giao, dồn tuyến tạm thời cho shipper cứng phụ trách và hỗ trợ thêm 15% thù lao tuyến tăng cường."
+            action_plan = f"AM {cur_am_row} rà soát lại sơ đồ tuyến giao tại {bc_n}, dồn tuyến tạm thời cho shipper cứng phụ trách và hỗ trợ thêm 15% thù lao tuyến tăng cường."
         elif "tân nhuận đông" in clean_bc_n:
-            action_plan = "Khảo sát và tuyển dụng shipper địa phương am hiểu địa bàn, áp dụng chính sách 'Giới thiệu shipper mới nhận thưởng 500k' cho nhân viên kho hiện hữu."
+            action_plan = f"AM {cur_am_row} khảo sát và tuyển dụng shipper địa phương am hiểu địa bàn {bc_n}, áp dụng chính sách 'Giới thiệu shipper mới nhận thưởng 500k' cho nhân viên kho hiện hữu."
 
         if not details:
             details = f"- Thiếu hụt thực tế sau OB: {shortage_accurate} NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +{tuyen_7d} OB. Nhân sự nghỉ việc: -{nghi_7d}."
@@ -2473,12 +2571,12 @@ def main():
                 details += f"\n- Tuyến thiếu: {missing_routes}."
                 
         top5_data.append({
-            'bc_name': str(bc_n).strip(),
+            'bc_name': bc_n,
             'volume': vol,
             'vol_tts': vol_tts,
             'gtc': gtc,
             'backlog_72h': backlog,
-            'am': str(row['AM']).strip(),
+            'am': cur_am_row,
             'dinhiben_nvpttt': dinhiben,
             'dinhiben_nvxl': dinhiben_xl,
             'tuyen_7d': tuyen_7d,
@@ -2558,16 +2656,18 @@ def main():
                                 'change_wtd': parse_pct(row[7])
                             }
                         elif bc_w and bc_w != 'nan' and bc_w != 'Bưu cục':
-                            sheet_res['weekly'].append({
-                                'am': am_w,
-                                'bc_name': bc_w,
-                                'w18': parse_pct(row[2]),
-                                'w19': parse_pct(row[3]),
-                                'w20': parse_pct(row[4]),
-                                'w21': parse_pct(row[5]),
-                                'w22': parse_pct(row[6]),
-                                'change_wtd': parse_pct(row[7])
-                            })
+                            info_w = resolve_bc_info(bc_name=bc_w)
+                            if info_w:
+                                sheet_res['weekly'].append({
+                                    'am': info_w['am'],
+                                    'bc_name': info_w['new_name'],
+                                    'w18': parse_pct(row[2]),
+                                    'w19': parse_pct(row[3]),
+                                    'w20': parse_pct(row[4]),
+                                    'w21': parse_pct(row[5]),
+                                    'w22': parse_pct(row[6]),
+                                    'change_wtd': parse_pct(row[7])
+                                })
                             
                         # 2. Daily
                         if len(row) >= 21:
@@ -2590,20 +2690,22 @@ def main():
                                     'change_d7': parse_pct(row[20])
                                 }
                             elif bc_d and bc_d != 'nan' and bc_d != 'Bưu cục':
-                                sheet_res['daily'].append({
-                                    'am': am_d,
-                                    'bc_name': bc_d,
-                                    'd18': parse_pct(row[11]),
-                                    'd19': parse_pct(row[12]),
-                                    'd20': parse_pct(row[13]),
-                                    'd21': parse_pct(row[14]),
-                                    'd22': parse_pct(row[15]),
-                                    'd23': parse_pct(row[16]),
-                                    'd24': parse_pct(row[17]),
-                                    'd25': parse_pct(row[18]),
-                                    'change_d1': parse_pct(row[19]),
-                                    'change_d7': parse_pct(row[20])
-                                })
+                                info_d = resolve_bc_info(bc_name=bc_d)
+                                if info_d:
+                                    sheet_res['daily'].append({
+                                        'am': info_d['am'],
+                                        'bc_name': info_d['new_name'],
+                                        'd18': parse_pct(row[11]),
+                                        'd19': parse_pct(row[12]),
+                                        'd20': parse_pct(row[13]),
+                                        'd21': parse_pct(row[14]),
+                                        'd22': parse_pct(row[15]),
+                                        'd23': parse_pct(row[16]),
+                                        'd24': parse_pct(row[17]),
+                                        'd25': parse_pct(row[18]),
+                                        'change_d1': parse_pct(row[19]),
+                                        'change_d7': parse_pct(row[20])
+                                    })
                 return sheet_res
             
             sme_name = next((s for s in xl_fd.sheet_names if s.strip().lower() in ['%fd_sme_cod', '%fd sme cod', 'fd_sme_cod']), None)
@@ -2635,15 +2737,15 @@ def main():
             if gtb_name:
                 fd_data['gtb'] = parse_sheet_fd(gtb_name)
                 
-            # Build Total %FD dynamically from performance report df_data_m (Data ĐCL)
+            # Build Total %FD dynamically from performance report df_data_m (Data ĐCL) keyed by canonical new_name
             df_data_grouped = df_data_m.groupby(['corrected_date', 'warehouse_name'])['% Chuyển trả'].mean().reset_index()
             dcl_fd_map = {}
             for _, row in df_data_grouped.iterrows():
                 dt_str = pd.Timestamp(row['corrected_date']).strftime('%Y-%m-%d')
-                clean_name = clean_bc_name(row['warehouse_name'])
-                if clean_name not in dcl_fd_map:
-                    dcl_fd_map[clean_name] = {}
-                dcl_fd_map[clean_name][dt_str] = float(row['% Chuyển trả'])
+                canon_key = str(row['warehouse_name']).strip().lower()
+                if canon_key not in dcl_fd_map:
+                    dcl_fd_map[canon_key] = {}
+                dcl_fd_map[canon_key][dt_str] = float(row['% Chuyển trả'])
 
             # Calculate regional daily rates from df_data_m (Data ĐCL)
             df_data_m['Vol Chuyen Tra'] = df_data_m['Volume'] * df_data_m['% Chuyển trả']
@@ -2783,46 +2885,30 @@ def main():
                     daily_lbl_map[lbl] = daily_dates_str[idx]
             
             sorted_daily_lbls = sorted(list(daily_lbl_map.keys()))
-            sme_weekly_lookup = {clean_bc_name(x['bc_name']): x for x in fd_data['sme']['weekly']}
-            tts_weekly_lookup = {clean_bc_name(x['bc_name']): x for x in fd_data['tts']['weekly']}
-            sme_daily_lookup = {clean_bc_name(x['bc_name']): x for x in fd_data['sme']['daily']}
-            tts_daily_lookup = {clean_bc_name(x['bc_name']): x for x in fd_data['tts']['daily']}
+            sme_weekly_lookup = {x['bc_name'].strip().lower(): x for x in fd_data['sme']['weekly']}
+            tts_weekly_lookup = {x['bc_name'].strip().lower(): x for x in fd_data['tts']['weekly']}
+            sme_daily_lookup = {x['bc_name'].strip().lower(): x for x in fd_data['sme']['daily']}
+            tts_daily_lookup = {x['bc_name'].strip().lower(): x for x in fd_data['tts']['daily']}
+            bc_fd_lookup = {b['name'].strip().lower(): b['fd'] for b in bc_data}
                 
             for item in fd_data['sme']['weekly']:
                 bc_name = item['bc_name']
                 am = item['am']
-                clean_name = clean_bc_name(bc_name)
+                canon_key = bc_name.strip().lower()
                 
-                w22_val = None
-                bc_latest_row = latest_df[latest_df['warehouse_name'].apply(clean_bc_name) == clean_name]
-                if not bc_latest_row.empty:
-                    w22_val = float(bc_latest_row.iloc[0]['% Chuyển trả'])
-                else:
-                    for idx, r_bc in latest_df.iterrows():
-                        if clean_bc_name(r_bc['warehouse_name']) in clean_name or clean_name in clean_bc_name(r_bc['warehouse_name']):
-                            w22_val = float(r_bc['% Chuyển trả'])
-                            break
-                            
-                if w22_val is None:
-                    w22_val = item['w22']
+                w22_val = bc_fd_lookup.get(canon_key, item['w22'])
                     
                 daily_vals = {}
                 for d_lbl, d_str in daily_lbl_map.items():
                     val = None
-                    if clean_name in dcl_fd_map and d_str in dcl_fd_map[clean_name]:
-                        val = dcl_fd_map[clean_name][d_str]
-                    else:
-                        for k_name, dates_dict in dcl_fd_map.items():
-                            if k_name in clean_name or clean_name in k_name:
-                                if d_str in dates_dict:
-                                    val = dates_dict[d_str]
-                                    break
+                    if canon_key in dcl_fd_map and d_str in dcl_fd_map[canon_key]:
+                        val = dcl_fd_map[canon_key][d_str]
                     if val is None:
                         # Fallback to scaled weighted average of SME and TTS
                         idx_lbl = sorted_daily_lbls.index(d_lbl) if d_lbl in sorted_daily_lbls else 0
                         key_name = f"d{18 + idx_lbl}"
-                        sme_val = sme_daily_lookup.get(clean_name, {}).get(key_name, 0.0)
-                        tts_val = tts_daily_lookup.get(clean_name, {}).get(key_name, 0.0)
+                        sme_val = sme_daily_lookup.get(canon_key, {}).get(key_name, 0.0)
+                        tts_val = tts_daily_lookup.get(canon_key, {}).get(key_name, 0.0)
                         val = (sme_val * 0.81 + tts_val * 0.19) * factor
                     daily_vals[d_lbl] = val
                     
@@ -2835,8 +2921,8 @@ def main():
                 d24 = daily_vals.get(d24_lbl, d25)
                 d18 = daily_vals.get(d18_lbl, d25)
 
-                sme_bc_item = sme_weekly_lookup.get(clean_name, {})
-                tts_bc_item = tts_weekly_lookup.get(clean_name, {})
+                sme_bc_item = sme_weekly_lookup.get(canon_key, {})
+                tts_bc_item = tts_weekly_lookup.get(canon_key, {})
                 
                 bc_weekly_vals = {}
                 for key in ['w18', 'w19', 'w20', 'w21', 'w22']:
@@ -2965,6 +3051,17 @@ def main():
                     df_filtered['BL'] = df_filtered[bl_col].fillna('Khác')
                 else:
                     df_filtered['BL'] = 'Khác'
+
+                # Synchronize warehouse_name, am_name, province_name, Mã bưu cục with Week 44 Cơ cấu Vùng
+                for idx_tb in df_filtered.index:
+                    raw_id_tb = df_filtered.at[idx_tb, 'Mã bưu cục']
+                    raw_nm_tb = df_filtered.at[idx_tb, 'warehouse_name']
+                    info_tb = resolve_bc_info(bc_id=raw_id_tb, bc_name=raw_nm_tb)
+                    if info_tb:
+                        df_filtered.at[idx_tb, 'Mã bưu cục'] = info_tb['id']
+                        df_filtered.at[idx_tb, 'warehouse_name'] = info_tb['new_name']
+                        df_filtered.at[idx_tb, 'am_name'] = info_tb['am']
+                        df_filtered.at[idx_tb, 'province_name'] = info_tb['tinh']
                 
                 # Map detail orders
                 for _, row in df_filtered.iterrows():
