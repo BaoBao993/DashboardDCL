@@ -1,11 +1,11 @@
 {
-  "latest_date": "2026-11-01",
+  "latest_date": "2026-11-02",
   "zen_score": 87,
   "forecasting": {
-    "projected_volume": 99777,
+    "projected_volume": 98721,
     "projected_shortage": 0,
     "vol_trend": "Tăng",
-    "recommendation": "Dự báo sản lượng tuần tới đạt 99,777 đơn (Tăng). Cần bổ sung thêm 0 shipper dự phòng để giữ lưới chặng cuối luôn ổn định."
+    "recommendation": "Dự báo sản lượng tuần tới đạt 98,721 đơn (Tăng). Cần bổ sung thêm 0 shipper dự phòng để giữ lưới chặng cuối luôn ổn định."
   },
   "kpis": {
     "volume": {
@@ -52,56 +52,56 @@
   },
   "daily_trends": [
     {
-      "date": "2026-10-25",
-      "volume": 88500,
-      "gtc": 0.652,
-      "fd": 0.0215,
-      "backlog": 220
-    },
-    {
-      "date": "2026-10-26",
       "volume": 95893,
       "gtc": 0.639,
       "fd": 0.021,
-      "backlog": 222
+      "backlog": 222,
+      "date": "2026-10-26"
     },
     {
-      "date": "2026-10-27",
       "volume": 98368,
       "gtc": 0.6431,
       "fd": 0.0207,
-      "backlog": 227
+      "backlog": 227,
+      "date": "2026-10-27"
     },
     {
-      "date": "2026-10-28",
       "volume": 94200,
       "gtc": 0.648,
       "fd": 0.0211,
-      "backlog": 225
+      "backlog": 225,
+      "date": "2026-10-28"
     },
     {
-      "date": "2026-10-29",
       "volume": 96500,
       "gtc": 0.6455,
       "fd": 0.0209,
-      "backlog": 224
+      "backlog": 224,
+      "date": "2026-10-29"
     },
     {
-      "date": "2026-10-30",
       "volume": 97100,
       "gtc": 0.641,
       "fd": 0.0212,
-      "backlog": 226
+      "backlog": 226,
+      "date": "2026-10-30"
     },
     {
-      "date": "2026-10-31",
+      "volume": 95400,
+      "gtc": 0.6442,
+      "fd": 0.0208,
+      "backlog": 225,
+      "date": "2026-10-31"
+    },
+    {
       "volume": 95893,
       "gtc": 0.639,
       "fd": 0.021,
-      "backlog": 225
+      "backlog": 225,
+      "date": "2026-11-01"
     },
     {
-      "date": "2026-11-01",
+      "date": "2026-11-02",
       "volume": 98368,
       "gtc": 0.6431,
       "fd": 0.0207,

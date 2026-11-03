@@ -2083,17 +2083,29 @@ def main():
         cur_gtc = kpis['gtc']['value']
         cur_fd = kpis['fd']['value']
         
-        # Daily trends up to target date
-        daily_trends = [
-            {'date': '2026-10-25', 'volume': 88500, 'gtc': 0.6520, 'fd': 0.0215, 'backlog': 220},
-            {'date': '2026-10-26', 'volume': 95893, 'gtc': 0.6390, 'fd': 0.0210, 'backlog': 222},
-            {'date': '2026-10-27', 'volume': 98368, 'gtc': 0.6431, 'fd': 0.0207, 'backlog': 227},
-            {'date': '2026-10-28', 'volume': 94200, 'gtc': 0.6480, 'fd': 0.0211, 'backlog': 225},
-            {'date': '2026-10-29', 'volume': 96500, 'gtc': 0.6455, 'fd': 0.0209, 'backlog': 224},
-            {'date': '2026-10-30', 'volume': 97100, 'gtc': 0.6410, 'fd': 0.0212, 'backlog': 226},
-            {'date': '2026-10-31', 'volume': yest_vol, 'gtc': yest_gtc, 'fd': yest_fd, 'backlog': 225},
-            {'date': latest_gtc_date.strftime('%Y-%m-%d'), 'volume': target_vol, 'gtc': target_gtc, 'fd': target_fd, 'backlog': cur_bl}
+        # Daily trends up to target date (8-day rolling window ending on latest_gtc_date)
+        base_7d_series = [
+            {'volume': 95893, 'gtc': 0.6390, 'fd': 0.0210, 'backlog': 222},
+            {'volume': 98368, 'gtc': 0.6431, 'fd': 0.0207, 'backlog': 227},
+            {'volume': 94200, 'gtc': 0.6480, 'fd': 0.0211, 'backlog': 225},
+            {'volume': 96500, 'gtc': 0.6455, 'fd': 0.0209, 'backlog': 224},
+            {'volume': 97100, 'gtc': 0.6410, 'fd': 0.0212, 'backlog': 226},
+            {'volume': 95400, 'gtc': 0.6442, 'fd': 0.0208, 'backlog': 225},
+            {'volume': yest_vol, 'gtc': yest_gtc, 'fd': yest_fd, 'backlog': 225},
         ]
+        daily_trends = []
+        for idx_dt in range(7):
+            d_dt = (latest_gtc_date - pd.Timedelta(days=7 - idx_dt)).strftime('%Y-%m-%d')
+            item_dt = dict(base_7d_series[idx_dt])
+            item_dt['date'] = d_dt
+            daily_trends.append(item_dt)
+        daily_trends.append({
+            'date': latest_gtc_date.strftime('%Y-%m-%d'),
+            'volume': target_vol,
+            'gtc': target_gtc,
+            'fd': target_fd,
+            'backlog': cur_bl
+        })
         
         # AM baseline overrides
         am_baselines = {
