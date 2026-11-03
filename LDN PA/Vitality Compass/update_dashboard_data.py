@@ -122,14 +122,25 @@ def download_with_cookies(url, cookies_path, output_path):
             print(f"⚠ Error loading cookies from {cookies_path}: {e}")
             
     import urllib.error
+    ssl_ctx = ssl._create_unverified_context()
     try:
-        ssl_ctx = ssl._create_unverified_context()
         req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=10, context=ssl_ctx) as response:
+        with urllib.request.urlopen(req, timeout=45, context=ssl_ctx) as response:
             with open(output_path, 'wb') as f:
                 f.write(response.read())
         return True
     except urllib.error.HTTPError as he:
+        if he.code in (401, 403) and 'Cookie' in headers:
+            try:
+                headers_no_cookie = {'User-Agent': headers['User-Agent']}
+                req2 = urllib.request.Request(url, headers=headers_no_cookie)
+                with urllib.request.urlopen(req2, timeout=45, context=ssl_ctx) as response2:
+                    with open(output_path, 'wb') as f:
+                        f.write(response2.read())
+                print(f"✓ Downloaded {url} via public access (without expired cookie).")
+                return True
+            except Exception:
+                pass
         print(f"⚠ Download returned HTTP {he.code} for {url} ({he.reason}). Skipping.")
         return False
     except Exception as e:
