@@ -1107,8 +1107,50 @@ let hrTableSearchQuery = '';
 let hrChartObj = null;
 
 // ===== DROPPED TRANSFER PIVOT STATE =====
+let activeDroppedDatasetMode = 'all'; // 'all' (Hàng Tổng) or 'tts' (Hàng TTS Logic Mới)
 let activeDroppedSort = 'tts';
 let activeDroppedPivotView = 'bc'; // 'bc', 'province', 'am', 'matrix', 'shop', 'raw'
+
+function getActiveDroppedDataset() {
+  if (!repData) return { bcs: [], pivot: {}, expert_analysis: {}, raw_orders: [] };
+  if (repData.dropped_report && repData.dropped_report[activeDroppedDatasetMode]) {
+    return repData.dropped_report[activeDroppedDatasetMode];
+  }
+  return {
+    bcs: repData.dropped_bcs || [],
+    pivot: repData.dropped_pivot || {},
+    expert_analysis: repData.dropped_expert_analysis || {},
+    raw_orders: repData.dropped_raw_orders || []
+  };
+}
+
+function switchDroppedDatasetMode(mode) {
+  activeDroppedDatasetMode = mode === 'tts' ? 'tts' : 'all';
+  const btnAll = document.getElementById('btnDroppedModeAll');
+  const btnTts = document.getElementById('btnDroppedModeTts');
+  const btnTopAll = document.getElementById('btnTopDroppedAll');
+  const btnTopTts = document.getElementById('btnTopDroppedTts');
+  if (btnAll) btnAll.classList.toggle('active', activeDroppedDatasetMode === 'all');
+  if (btnTts) btnTts.classList.toggle('active', activeDroppedDatasetMode === 'tts');
+  if (btnTopAll) btnTopAll.classList.toggle('active', activeDroppedDatasetMode === 'all');
+  if (btnTopTts) btnTopTts.classList.toggle('active', activeDroppedDatasetMode === 'tts');
+
+  const selChannel = document.getElementById('dropFilterChannel');
+  if (selChannel) {
+    if (activeDroppedDatasetMode === 'tts') {
+      selChannel.value = 'TTS';
+      droppedFilterChannel = 'all';
+    } else {
+      selChannel.value = 'all';
+      droppedFilterChannel = 'all';
+    }
+  }
+
+  droppedRawCurrentPage = 1;
+  renderDroppedBcs();
+  renderDroppedPivotSection();
+}
+window.switchDroppedDatasetMode = switchDroppedDatasetMode;
 let droppedFilterProvince = 'all';
 let droppedFilterAm = 'all';
 let droppedFilterChannel = 'all';
@@ -1493,23 +1535,62 @@ function renderChecklistSidePanel() {
 }
 
 function renderDroppedBcs() {
-  if (!repData || !repData.dropped_bcs) return;
+  const ds = getActiveDroppedDataset();
+  if (!ds || !ds.bcs) return;
 
   const container = document.getElementById('droppedBcTableBody');
+  const theadEl = document.getElementById('droppedBcThead');
   if (!container) return;
 
   container.innerHTML = '';
+  const isTtsMode = activeDroppedDatasetMode === 'tts';
+
+  if (theadEl) {
+    if (isTtsMode) {
+      theadEl.innerHTML = `
+        <tr>
+          <th colspan="2" style="text-align: center; background-color: #ffffff; border-bottom: none;">Đơn LẤY rớt luân chuyển TTS (Logic Mới)</th>
+          <th colspan="4" style="text-align: center; background-color: #ffe4e6; color: #be123c; border-bottom: none;">Phân bổ Ca & Loại Hàng (TTS)</th>
+          <th rowspan="2" style="background-color: #f2f2f2; text-align: center; font-size: 11px; width: 10%;">Thao tác</th>
+        </tr>
+        <tr>
+          <th style="width: 18%; border-top: none;">AM</th>
+          <th style="width: 32%; border-top: none;">Bưu cục</th>
+          <th class="blue-header" style="width: 10%; border-top: none;">Ngoài Cut-off</th>
+          <th class="blue-header" style="width: 10%; border-top: none;">Ca Tối</th>
+          <th class="blue-header" style="width: 10%; border-top: none;">Bulky</th>
+          <th class="dark-blue-header" style="width: 10%; border-top: none;">Tổng TTS</th>
+        </tr>
+      `;
+    } else {
+      theadEl.innerHTML = `
+        <tr>
+          <th colspan="2" style="text-align: center; background-color: #ffffff; border-bottom: none;">Đơn LẤY rớt luân chuyển (Hàng Tổng ALL)</th>
+          <th colspan="4" style="text-align: center; background-color: #ffffff; border-bottom: none;">Loai_KH</th>
+          <th rowspan="2" style="background-color: #f2f2f2; text-align: center; font-size: 11px; width: 10%;">Thao tác</th>
+        </tr>
+        <tr>
+          <th style="width: 18%; border-top: none;">AM</th>
+          <th style="width: 32%; border-top: none;">Bưu cục</th>
+          <th class="blue-header" style="width: 10%; border-top: none;">Khac</th>
+          <th class="blue-header" style="width: 10%; border-top: none;">Shopee</th>
+          <th class="blue-header" style="width: 10%; border-top: none;">TTS</th>
+          <th class="dark-blue-header" style="width: 10%; border-top: none;">Grand Total</th>
+        </tr>
+      `;
+    }
+  }
 
   // Sort the dropped list based on activeDroppedSort descending (TTS is default)
-  const droppedList = [...repData.dropped_bcs];
+  const droppedList = [...ds.bcs];
   droppedList.sort((a, b) => {
-    const valA = a[activeDroppedSort] || 0;
-    const valB = b[activeDroppedSort] || 0;
+    const sortKey = isTtsMode ? 'total' : activeDroppedSort;
+    const valA = a[sortKey] || 0;
+    const valB = b[sortKey] || 0;
     if (valB !== valA) {
       return valB - valA;
     }
-    // Secondary sort by total descending
-    if (activeDroppedSort !== 'total') {
+    if (sortKey !== 'total') {
       return (b.total || 0) - (a.total || 0);
     }
     return 0;
@@ -1518,7 +1599,8 @@ function renderDroppedBcs() {
   // Update badge count
   const badge = document.getElementById('droppedBcBadge');
   if (badge) {
-    badge.textContent = droppedList.length + ' BC';
+    const sumOrders = droppedList.reduce((acc, x) => acc + (x.total || 0), 0);
+    badge.textContent = `${droppedList.length} BC (${sumOrders} đơn)`;
   }
 
   // 1. Calculate max total/value across all items to calibrate heatmap
@@ -1527,6 +1609,8 @@ function renderDroppedBcs() {
     if (item.khac > maxVal) maxVal = item.khac;
     if (item.shopee > maxVal) maxVal = item.shopee;
     if (item.tts > maxVal) maxVal = item.tts;
+    if (item.cutoff > maxVal) maxVal = item.cutoff;
+    if (item.toi > maxVal) maxVal = item.toi;
     if (item.total > maxVal) maxVal = item.total;
   });
 
@@ -1534,7 +1618,6 @@ function renderDroppedBcs() {
   function getExcelHeatmapColor(val, maxVal) {
     if (!val || val <= 0) return '';
     const ratio = val / maxVal;
-    // Interpolate between a very light pink #fdebeb (253, 235, 235) and a solid red #ea3b2f (234, 59, 47)
     const r = Math.round(253 - ratio * (253 - 234));
     const g = Math.round(235 - ratio * (235 - 59));
     const b = Math.round(235 - ratio * (235 - 47));
@@ -1542,17 +1625,22 @@ function renderDroppedBcs() {
   }
 
   // Initialize total accumulators for the grand total row
-  let totalKhac = 0;
-  let totalShopee = 0;
-  let totalTts = 0;
+  let totalCol1 = 0;
+  let totalCol2 = 0;
+  let totalCol3 = 0;
   let totalGrand = 0;
 
   // 2. Render each data row
   droppedList.forEach(item => {
-    totalKhac += item.khac || 0;
-    totalShopee += item.shopee || 0;
-    totalTts += item.tts || 0;
-    totalGrand += item.total || 0;
+    const c1 = isTtsMode ? (item.cutoff || 0) : (item.khac || 0);
+    const c2 = isTtsMode ? (item.toi || 0) : (item.shopee || 0);
+    const c3 = isTtsMode ? (item.bulky || 0) : (item.tts || 0);
+    const cTot = item.total || 0;
+
+    totalCol1 += c1;
+    totalCol2 += c2;
+    totalCol3 += c3;
+    totalGrand += cTot;
 
     const tr = document.createElement('tr');
     
@@ -1560,11 +1648,10 @@ function renderDroppedBcs() {
     const amTele = findAmTele(item.am);
     const teleDisplay = amTele ? `<div style="font-size: 8px; color: #5a6a80; margin-top: 1px;">${escapeHtml(amTele)}</div>` : '';
     
-    // Determine cell styling (heatmap backgrounds and black text)
-    const khacBg = item.khac > 0 ? `background-color: ${getExcelHeatmapColor(item.khac, maxVal)};` : '';
-    const shopeeBg = item.shopee > 0 ? `background-color: ${getExcelHeatmapColor(item.shopee, maxVal)};` : '';
-    const ttsBg = item.tts > 0 ? `background-color: ${getExcelHeatmapColor(item.tts, maxVal)};` : '';
-    const totalBg = item.total > 0 ? `background-color: ${getExcelHeatmapColor(item.total, maxVal)};` : '';
+    const bg1 = c1 > 0 ? `background-color: ${getExcelHeatmapColor(c1, maxVal)};` : '';
+    const bg2 = c2 > 0 ? `background-color: ${getExcelHeatmapColor(c2, maxVal)};` : '';
+    const bg3 = c3 > 0 ? `background-color: ${getExcelHeatmapColor(c3, maxVal)};` : '';
+    const totalBg = cTot > 0 ? `background-color: ${getExcelHeatmapColor(cTot, maxVal)};` : '';
 
     tr.innerHTML = `
       <td class="am-cell" style="vertical-align: middle;">
@@ -1574,20 +1661,20 @@ function renderDroppedBcs() {
       <td class="bc-cell" style="vertical-align: middle;">
         <strong style="color: #111827;">${escapeHtml(item.bc_name)}</strong>
       </td>
-      <td class="num-cell" style="${khacBg}">
-        ${item.khac > 0 ? item.khac : ''}
+      <td class="num-cell" style="${bg1}">
+        ${c1 > 0 ? c1 : ''}
       </td>
-      <td class="num-cell" style="${shopeeBg}">
-        ${item.shopee > 0 ? item.shopee : ''}
+      <td class="num-cell" style="${bg2}">
+        ${c2 > 0 ? c2 : ''}
       </td>
-      <td class="num-cell" style="${ttsBg}">
-        ${item.tts > 0 ? item.tts : ''}
+      <td class="num-cell" style="${bg3}">
+        ${c3 > 0 ? c3 : ''}
       </td>
       <td class="num-cell" style="${totalBg} font-weight: bold;">
-        ${item.total > 0 ? item.total : ''}
+        ${cTot > 0 ? cTot : ''}
       </td>
       <td style="text-align: center; background-color: #ffffff;">
-        <button class="btn-nhac-am" onclick="sendDroppedAlert('${escapeHtml(item.bc_name)}', '${escapeHtml(item.am)}', '${escapeHtml(amTele)}', ${item.khac}, ${item.shopee}, ${item.tts}, ${item.total})">Nhắc AM</button>
+        <button class="btn-nhac-am" onclick="sendDroppedAlert('${escapeHtml(item.bc_name)}', '${escapeHtml(item.am)}', '${escapeHtml(amTele)}', ${item.khac || 0}, ${item.shopee || 0}, ${item.tts || 0}, ${item.total || 0})">Nhắc AM</button>
       </td>
     `;
     container.appendChild(tr);
@@ -1599,9 +1686,9 @@ function renderDroppedBcs() {
   trTotal.innerHTML = `
     <td class="am-cell" style="background-color: #f2f2f2;"></td>
     <td class="bc-cell" style="font-weight: bold; color: #000000; background-color: #f2f2f2;">Grand Total</td>
-    <td class="num-cell" style="font-weight: bold; color: #000000; background-color: #f2f2f2;">${totalKhac}</td>
-    <td class="num-cell" style="font-weight: bold; color: #000000; background-color: #f2f2f2;">${totalShopee}</td>
-    <td class="num-cell" style="font-weight: bold; color: #000000; background-color: #f2f2f2;">${totalTts}</td>
+    <td class="num-cell" style="font-weight: bold; color: #000000; background-color: #f2f2f2;">${totalCol1}</td>
+    <td class="num-cell" style="font-weight: bold; color: #000000; background-color: #f2f2f2;">${totalCol2}</td>
+    <td class="num-cell" style="font-weight: bold; color: #000000; background-color: #f2f2f2;">${totalCol3}</td>
     <td class="num-cell" style="font-weight: bold; color: #000000; background-color: #f2f2f2;">${totalGrand}</td>
     <td style="background-color: #f2f2f2;"></td>
   `;
@@ -1703,13 +1790,14 @@ function switchDroppedView(view) {
 }
 
 function populateDroppedFilterOptions() {
-  if (!repData || !repData.dropped_bcs) return;
+  const ds = getActiveDroppedDataset();
+  if (!ds || !ds.bcs) return;
   
   const selProv = document.getElementById('dropFilterProvince');
   const selAm = document.getElementById('dropFilterAm');
   
   if (selProv && selProv.options.length <= 1) {
-    const provinces = [...new Set(repData.dropped_bcs.map(b => b.tinh).filter(Boolean))].sort();
+    const provinces = [...new Set((repData.dropped_bcs || ds.bcs).map(b => b.tinh).filter(Boolean))].sort();
     provinces.forEach(p => {
       const opt = document.createElement('option');
       opt.value = p;
@@ -1719,7 +1807,7 @@ function populateDroppedFilterOptions() {
   }
   
   if (selAm && selAm.options.length <= 1) {
-    const ams = [...new Set(repData.dropped_bcs.map(b => b.am).filter(Boolean))].sort();
+    const ams = [...new Set((repData.dropped_bcs || ds.bcs).map(b => b.am).filter(Boolean))].sort();
     ams.forEach(a => {
       const opt = document.createElement('option');
       opt.value = a;
@@ -1730,8 +1818,9 @@ function populateDroppedFilterOptions() {
 }
 
 function getFilteredDroppedRawList() {
-  if (!repData || !repData.dropped_raw_orders) return [];
-  return repData.dropped_raw_orders.filter(item => {
+  const ds = getActiveDroppedDataset();
+  if (!ds || !ds.raw_orders) return [];
+  return ds.raw_orders.filter(item => {
     if (droppedFilterProvince !== 'all' && item.tinhlay !== droppedFilterProvince) return false;
     if (droppedFilterAm !== 'all' && item.am !== droppedFilterAm) return false;
     if (droppedFilterChannel !== 'all' && item.channel !== droppedFilterChannel) return false;
@@ -1804,23 +1893,51 @@ function renderDroppedPivotSection() {
   if (!repData) return;
   populateDroppedFilterOptions();
 
+  const ds = getActiveDroppedDataset();
+  const isTtsMode = activeDroppedDatasetMode === 'tts';
+  const allTotal = repData.dropped_report?.all?.pivot?.total_orders || repData.dropped_pivot?.total_orders || 712;
+  const ttsLogicTotal = repData.dropped_report?.tts?.pivot?.total_orders || repData.dropped_pivot?.tts_logic_moi_total || 228;
+
+  // Update header badges & buttons
+  const totalBadge = document.getElementById('droppedTotalBadge');
+  if (totalBadge) totalBadge.textContent = `Hàng Tổng: ${allTotal} Đơn`;
+  const ttsLogicBadge = document.getElementById('droppedTtsLogicBadge');
+  if (ttsLogicBadge) ttsLogicBadge.textContent = `Hàng TTS (Logic Mới): ${ttsLogicTotal} Đơn`;
+
+  const btnModeAll = document.getElementById('btnDroppedModeAll');
+  if (btnModeAll) btnModeAll.textContent = `📦 Hàng Tổng (ALL - ${allTotal} đơn)`;
+  const btnModeTts = document.getElementById('btnDroppedModeTts');
+  if (btnModeTts) btnModeTts.textContent = `🔴 Hàng TTS (Logic Mới - ${ttsLogicTotal} đơn)`;
+
+  const activeIndicator = document.getElementById('droppedActiveModeIndicator');
+  if (activeIndicator) {
+    activeIndicator.innerHTML = isTtsMode
+      ? `Đang xem: <strong style="color: var(--accent-rose);">Sheet Đơn LẤY rớt luân chuyển TTS - Logic Mới (${ttsLogicTotal} đơn)</strong>`
+      : `Đang xem: <strong style="color: var(--accent-blue);">Sheet Đơn LẤY rớt luân chuyển ALL - Toàn Khách Hàng (${allTotal} đơn)</strong>`;
+  }
+
   // 1. Render KPI Ribbon
-  const pivot = repData.dropped_pivot || {};
-  const total = pivot.total_orders || (repData.dropped_bcs ? repData.dropped_bcs.reduce((acc, x) => acc + (x.total || 0), 0) : 0);
+  const pivot = ds.pivot || {};
+  const total = pivot.total_orders || (ds.bcs ? ds.bcs.reduce((acc, x) => acc + (x.total || 0), 0) : 0);
   const ch = pivot.by_channel || {};
   const sh = pivot.by_shift || {};
 
-  const totalBadge = document.getElementById('droppedTotalBadge');
-  if (totalBadge) totalBadge.textContent = `${total} Đơn`;
-
   const kpiTotal = document.getElementById('dpKpiTotal');
-  if (kpiTotal) kpiTotal.textContent = total;
+  if (kpiTotal) {
+    kpiTotal.innerHTML = isTtsMode
+      ? `${total} <span style="font-size: 12px; font-weight: 500; color: var(--text-muted);">/ ${allTotal} Tổng</span>`
+      : `${total}`;
+  }
 
   const kpiTts = document.getElementById('dpKpiTts');
   if (kpiTts) {
     const ttsVal = ch.tts || 0;
     const ttsPct = ch.tts_pct || (total > 0 ? (ttsVal / total * 100).toFixed(1) : 0);
-    kpiTts.innerHTML = `${ttsVal} <span style="font-size: 13px; font-weight: 500;">(${ttsPct}%)</span>`;
+    if (!isTtsMode && ttsLogicTotal && ttsLogicTotal !== ttsVal) {
+      kpiTts.innerHTML = `${ttsVal} <span style="font-size: 12px; font-weight: 600;">(Logic mới: ${ttsLogicTotal})</span>`;
+    } else {
+      kpiTts.innerHTML = `${ttsVal} <span style="font-size: 13px; font-weight: 500;">(${ttsPct}%)</span>`;
+    }
   }
 
   const kpiShopee = document.getElementById('dpKpiShopee');
@@ -1854,7 +1971,7 @@ function renderDroppedPivotSection() {
   // 2. Render Expert Diagnosis Cards
   const diagContainer = document.getElementById('expertDiagnosisCards');
   const sopContainer = document.getElementById('sopActionMatrixBody');
-  const exp = repData.dropped_expert_analysis;
+  const exp = ds.expert_analysis || repData.dropped_expert_analysis;
 
   if (diagContainer && exp && exp.expert_diagnosis) {
     diagContainer.innerHTML = '';
@@ -1919,7 +2036,8 @@ function renderDroppedPivotTable() {
   thead.innerHTML = '';
   tbody.innerHTML = '';
 
-  const totalAll = repData.dropped_pivot?.total_orders || 712;
+  const ds = getActiveDroppedDataset();
+  const totalAll = ds.pivot?.total_orders || 712;
 
   // Manage pagination visibility
   const paginationEl = document.getElementById('droppedRawPagination');
@@ -1949,7 +2067,7 @@ function renderDroppedPivotTable() {
       </tr>
     `;
 
-    let list = (repData.dropped_bcs || []).filter(item => {
+    let list = (ds.bcs || []).filter(item => {
       if (droppedFilterProvince !== 'all' && item.tinh !== droppedFilterProvince) return false;
       if (droppedFilterAm !== 'all' && item.am !== droppedFilterAm) return false;
       if (droppedFilterChannel === 'TTS' && (!item.tts || item.tts <= 0)) return false;
@@ -2049,7 +2167,7 @@ function renderDroppedPivotTable() {
       </tr>
     `;
 
-    const provList = repData.dropped_pivot?.by_province || [];
+    const provList = ds.pivot?.by_province || [];
     let sumKhac = 0, sumShopee = 0, sumTts = 0, sumBulky = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
 
     provList.forEach((r, idx) => {
@@ -2118,7 +2236,7 @@ function renderDroppedPivotTable() {
       </tr>
     `;
 
-    const amList = repData.dropped_pivot?.by_am || [];
+    const amList = ds.pivot?.by_am || [];
     let sumKhac = 0, sumShopee = 0, sumTts = 0, sumBulky = 0, sumCutoff = 0, sumToi = 0, sumTotal = 0;
 
     amList.forEach((r, idx) => {
@@ -2183,7 +2301,7 @@ function renderDroppedPivotTable() {
       </tr>
     `;
 
-    const matrixData = repData.dropped_pivot?.matrix_channel_shift || [
+    const matrixData = ds.pivot?.matrix_channel_shift || [
       { channel: 'TTS', cutoff: 155, toi: 70, total: 225, pct: 31.6 },
       { channel: 'Shopee', cutoff: 12, toi: 39, total: 51, pct: 7.16 },
       { channel: 'Khac', cutoff: 269, toi: 167, total: 436, pct: 61.24 }
@@ -2257,7 +2375,7 @@ function renderDroppedPivotTable() {
       </tr>
     `;
 
-    const shopList = (repData.dropped_pivot?.top_shops || []).filter(item => {
+    const shopList = (ds.pivot?.top_shops || []).filter(item => {
       if (droppedSearchQuery) {
         const q = droppedSearchQuery;
         const sMatch = item.shop_name && item.shop_name.toLowerCase().includes(q);

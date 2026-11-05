@@ -187,9 +187,15 @@
       <!-- Top Bưu Cục Rớt Luân Chuyển -->
       <div class="card" style="margin-top:20px">
         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;">
-          <div class="card-title">📦 Top Bưu Cục Rớt Luân Chuyển</div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <div class="card-title">📦 Top Bưu Cục Rớt Luân Chuyển</div>
+            <div class="dim-toggles" style="gap: 4px;">
+              <button class="dim-btn active" id="btnTopDroppedAll" onclick="switchDroppedDatasetMode('all')" style="padding: 3px 8px; font-size: 10.5px;">📦 Hàng Tổng (ALL)</button>
+              <button class="dim-btn" id="btnTopDroppedTts" onclick="switchDroppedDatasetMode('tts')" style="padding: 3px 8px; font-size: 10.5px;">🔴 Hàng TTS (Logic Mới)</button>
+            </div>
+          </div>
           <div style="display: flex; align-items: center; gap: 8px;">
-            <label style="font-size: 11px; color: var(--text-muted);">Sắp xếp theo:</label>
+            <label style="font-size: 11px; color: var(--text-muted);">Sắp xếp:</label>
             <select id="droppedBcSortSelect" onchange="changeDroppedSort(this.value)" style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border); padding: 4px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; outline: none;">
               <option value="tts" selected>TiktokShop (TTS)</option>
               <option value="shopee">Shopee</option>
@@ -201,7 +207,7 @@
         </div>
         <div class="scrollable" style="max-height: 420px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow-y: auto;">
           <table class="excel-table" style="width: 100%;">
-            <thead>
+            <thead id="droppedBcThead">
               <tr>
                 <th colspan="2" style="text-align: center; background-color: #ffffff; border-bottom: none;">Đơn LẤY rớt luân chuyển</th>
                 <th colspan="4" style="text-align: center; background-color: #ffffff; border-bottom: none;">Loai_KH</th>
@@ -323,15 +329,20 @@
       <!-- Header -->
       <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
         <div>
-          <div class="card-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+          <div class="card-title" style="font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
             <span>⚡ BẢNG PIVOT & PHÂN TÍCH CHUYÊN GIA: ĐƠN LẤY RỚT LUÂN CHUYỂN</span>
-            <span class="card-badge" style="background: rgba(244,63,94,0.15); color: var(--accent-rose); font-weight: 700;" id="droppedTotalBadge">712 Đơn</span>
+            <span class="card-badge" style="background: rgba(59,130,246,0.15); color: var(--accent-blue); font-weight: 700;" id="droppedTotalBadge">Hàng Tổng: 712 Đơn</span>
+            <span class="card-badge" style="background: rgba(244,63,94,0.15); color: var(--accent-rose); font-weight: 700;" id="droppedTtsLogicBadge">Hàng TTS (Logic Mới): 228 Đơn</span>
           </div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-            Nguồn: Sheet <strong>Đơn LẤY rớt luân chuyển ALL</strong> (Cột A đến L) • Tự động đối soát & Pivot đa chiều theo AM, Bưu Cục, Tỉnh, Ca & Kênh
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;" id="droppedSheetSourceSubtitle">
+            Nguồn: Sheet <strong>Đơn LẤY rớt luân chuyển ALL</strong> & <strong>Đơn LẤY rớt luân chuyển TTS (Logic mới)</strong> (Cột A đến L) • Đồng bộ Cơ cấu Vùng Tuần 44/45
           </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <div class="dim-toggles" style="background: rgba(15,23,42,0.6); padding: 3px; border-radius: 6px; border: 1px solid var(--border);">
+            <button class="dim-btn active" id="btnDroppedModeAll" onclick="switchDroppedDatasetMode('all')" style="font-weight: 600;">📦 Hàng Tổng (ALL - 712 đơn)</button>
+            <button class="dim-btn" id="btnDroppedModeTts" onclick="switchDroppedDatasetMode('tts')" style="font-weight: 600;">🔴 Hàng TTS (Logic Mới - 228 đơn)</button>
+          </div>
           <button class="btn btn-sm" onclick="toggleExpertAnalysis()" id="btnToggleExpert" style="background: rgba(167,139,250,0.15); border-color: var(--accent-purple); color: var(--accent-purple); font-weight: 600;">
             🧠 Chẩn Đoán Chuyên Gia & SOP
           </button>
@@ -339,6 +350,16 @@
             📥 Xuất Excel (CSV)
           </button>
         </div>
+      </div>
+
+      <!-- Cutoff Rules Banner for Logic Mới -->
+      <div id="droppedCutoffBanner" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; background: rgba(244,63,94,0.07); border: 1px solid rgba(244,63,94,0.25); border-radius: var(--radius-sm); padding: 8px 14px; margin-bottom: 14px; font-size: 11.5px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+          <span style="font-weight: 700; color: var(--accent-rose);">⏱️ Quy tắc Mốc Giờ Xuất Kiện TTS (Logic Mới):</span>
+          <span style="background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; color: var(--text-primary);"><strong>Đồng Tháp • Trà Vinh • Vĩnh Long:</strong> Xuất kiện sau <strong style="color: var(--accent-amber);">21:30</strong> ➔ Tính là trễ</span>
+          <span style="background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; color: var(--text-primary);"><strong>Tiền Giang • Bến Tre:</strong> Xuất kiện sau <strong style="color: var(--accent-teal);">22:00</strong> ➔ Tính là trễ</span>
+        </div>
+        <span style="font-size: 11px; color: var(--text-muted);" id="droppedActiveModeIndicator">Đang xem: <strong>Hàng Tổng (Toàn Khách Hàng)</strong></span>
       </div>
 
       <!-- Quick KPI Ribbon -->

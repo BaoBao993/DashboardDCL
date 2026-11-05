@@ -634,26 +634,371 @@ def main():
 
     GLOBAL_BC_RESOLVER = resolve_bc_info
 
-    # Fetch and parse dropped transfer orders from Google Sheet early
+    # Fetch and parse dropped transfer orders from Google Sheet early (both Hàng Tổng ALL and Hàng TTS Logic Mới)
     dropped_bcs = []
     dropped_pivot = {}
     dropped_expert_analysis = {}
     dropped_raw_orders = []
+    dropped_report = {}
+
+    def build_dropped_dataset(df_raw_sheet, mode='all', sheet_title=''):
+        res_bcs = []
+        res_pivot = {}
+        res_expert = {}
+        res_raw = []
+        if df_raw_sheet is None or df_raw_sheet.empty:
+            return {
+                'mode': mode,
+                'sheet_name': sheet_title,
+                'bcs': res_bcs,
+                'pivot': res_pivot,
+                'expert_analysis': res_expert,
+                'raw_orders': res_raw
+            }
+
+        df_d = df_raw_sheet.iloc[:, :12].copy()
+        std_cols = ['vunglay', 'tinhlay', 'bc_lay', 'shift', 'loai_khach_hang', 'loai_hang', 'order_code', 'from_name', 'tenbcxuat', 'gio_ltc', 'gio_dk', 'AM']
+        if len(df_d.columns) == 12:
+            df_d.columns = std_cols
+
+        df_d = df_d[df_d['bc_lay'].notna() & (df_d['bc_lay'].astype(str).str.strip() != '') & (df_d['bc_lay'].astype(str).str.lower() != 'nan')].copy()
+        for idx_d in df_d.index:
+            raw_bc_lay = df_d.at[idx_d, 'bc_lay']
+            info_d = resolve_bc_info(bc_name=raw_bc_lay)
+            if info_d:
+                df_d.at[idx_d, 'bc_lay'] = info_d['new_name']
+                df_d.at[idx_d, 'AM'] = info_d['am']
+                df_d.at[idx_d, 'tinhlay'] = info_d['tinh']
+            raw_bc_xuat = df_d.at[idx_d, 'tenbcxuat']
+            if pd.notna(raw_bc_xuat):
+                info_x = resolve_bc_info(bc_name=raw_bc_xuat)
+                if info_x:
+                    df_d.at[idx_d, 'tenbcxuat'] = info_x['new_name']
+
+        total_orders = len(df_d)
+        piv_bc = df_d.groupby(['AM', 'bc_lay', 'tinhlay']).agg(
+            total=('order_code', 'count'),
+            tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
+            shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
+            khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
+            cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
+            toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
+            bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
+        ).reset_index().sort_values(by='total', ascending=False)
+
+        for _, row in piv_bc.iterrows():
+            res_bcs.append({
+                'am': str(row['AM']).strip(),
+                'bc_name': str(row['bc_lay']).strip(),
+                'tinh': str(row['tinhlay']).strip(),
+                'khac': int(row['khac']),
+                'shopee': int(row['shopee']),
+                'tts': int(row['tts']),
+                'total': int(row['total']),
+                'cutoff': int(row['cutoff']),
+                'toi': int(row['toi']),
+                'bulky': int(row['bulky']),
+                'pct': round(float(row['total']) / total_orders * 100, 2) if total_orders > 0 else 0
+            })
+
+        piv_prov = df_d.groupby('tinhlay').agg(
+            bcs=('bc_lay', 'nunique'),
+            total=('order_code', 'count'),
+            tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
+            shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
+            khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
+            cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
+            toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
+            bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
+        ).reset_index().sort_values(by='total', ascending=False)
+
+        piv_prov_list = []
+        for _, r in piv_prov.iterrows():
+            piv_prov_list.append({
+                'tinh': str(r['tinhlay']).strip(),
+                'bcs': int(r['bcs']),
+                'total': int(r['total']),
+                'tts': int(r['tts']),
+                'shopee': int(r['shopee']),
+                'khac': int(r['khac']),
+                'cutoff': int(r['cutoff']),
+                'toi': int(r['toi']),
+                'bulky': int(r['bulky']),
+                'pct': round(float(r['total']) / total_orders * 100, 2) if total_orders > 0 else 0
+            })
+
+        piv_am = df_d.groupby('AM').agg(
+            bcs=('bc_lay', 'nunique'),
+            total=('order_code', 'count'),
+            tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
+            shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
+            khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
+            cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
+            toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
+            bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
+        ).reset_index().sort_values(by='total', ascending=False)
+
+        piv_am_list = []
+        for _, r in piv_am.iterrows():
+            top_bcs_am = df_d[df_d['AM'] == r['AM']]['bc_lay'].value_counts().head(2).to_dict()
+            top_bcs_str = ", ".join([f"{k} ({v})" for k, v in top_bcs_am.items()])
+            piv_am_list.append({
+                'am': str(r['AM']).strip(),
+                'bcs': int(r['bcs']),
+                'total': int(r['total']),
+                'tts': int(r['tts']),
+                'shopee': int(r['shopee']),
+                'khac': int(r['khac']),
+                'cutoff': int(r['cutoff']),
+                'toi': int(r['toi']),
+                'bulky': int(r['bulky']),
+                'top_bcs': top_bcs_str,
+                'pct': round(float(r['total']) / total_orders * 100, 2) if total_orders > 0 else 0
+            })
+
+        piv_shops = df_d.groupby(['from_name', 'bc_lay', 'AM']).agg(
+            total=('order_code', 'count'),
+            tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
+            shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
+            khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
+            cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
+            toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
+            bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
+        ).reset_index().sort_values(by='total', ascending=False).head(30)
+
+        top_shops_list = []
+        for _, r in piv_shops.iterrows():
+            top_shops_list.append({
+                'shop_name': str(r['from_name']).strip(),
+                'bc_lay': str(r['bc_lay']).strip(),
+                'am': str(r['AM']).strip(),
+                'total': int(r['total']),
+                'tts': int(r['tts']),
+                'shopee': int(r['shopee']),
+                'khac': int(r['khac']),
+                'cutoff': int(r['cutoff']),
+                'toi': int(r['toi']),
+                'bulky': int(r['bulky'])
+            })
+
+        matrix_channel_shift = []
+        for ch in ['TTS', 'Shopee', 'Khac']:
+            sub_df = df_d[df_d['loai_khach_hang'] == ch]
+            c_cutoff = int((sub_df['shift'] == 'Ngoài giờ cutoff').sum())
+            c_toi = int((sub_df['shift'] == 'Tối').sum())
+            c_total = len(sub_df)
+            c_pct = round(c_total / total_orders * 100, 2) if total_orders > 0 else 0
+            matrix_channel_shift.append({
+                'channel': ch,
+                'cutoff': c_cutoff,
+                'toi': c_toi,
+                'total': c_total,
+                'pct': c_pct
+            })
+
+        ch_counts = df_d['loai_khach_hang'].astype(str).str.strip().value_counts().to_dict()
+        shift_counts = df_d['shift'].astype(str).str.strip().value_counts().to_dict()
+        bulky_count = int((df_d['loai_hang'] == 'Bulky').sum())
+
+        res_pivot = {
+            'total_orders': total_orders,
+            'total_bcs': int(df_d['bc_lay'].nunique()),
+            'total_shops': int(df_d['from_name'].nunique()),
+            'total_bulky': bulky_count,
+            'by_channel': {
+                'tts': int(ch_counts.get('TTS', 0)),
+                'shopee': int(ch_counts.get('Shopee', 0)),
+                'khac': int(ch_counts.get('Khac', 0)),
+                'tts_pct': round(float(ch_counts.get('TTS', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
+                'shopee_pct': round(float(ch_counts.get('Shopee', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
+                'khac_pct': round(float(ch_counts.get('Khac', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
+            },
+            'by_shift': {
+                'cutoff': int(shift_counts.get('Ngoài giờ cutoff', 0)),
+                'toi': int(shift_counts.get('Tối', 0)),
+                'cutoff_pct': round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
+                'toi_pct': round(float(shift_counts.get('Tối', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
+            },
+            'matrix_channel_shift': matrix_channel_shift,
+            'by_province': piv_prov_list,
+            'by_am': piv_am_list,
+            'top_shops': top_shops_list
+        }
+
+        top_prov_row = piv_prov_list[0] if piv_prov_list else {'tinh': 'N/A', 'total': 0, 'pct': 0}
+        top_am_row = piv_am_list[0] if piv_am_list else {'am': 'N/A', 'total': 0, 'pct': 0, 'top_bcs': 'N/A'}
+        top_shop_1 = top_shops_list[0] if top_shops_list else {'shop_name': 'N/A', 'total': 0, 'bc_lay': 'N/A'}
+        top_shop_2 = top_shops_list[1] if len(top_shops_list) > 1 else {'shop_name': 'N/A', 'total': 0, 'bc_lay': 'N/A'}
+
+        if mode == 'tts':
+            diag_cards = [
+                {
+                    'title': '🚨 CHUYÊN ĐỀ ĐƠN RỚT TIKTOK SHOP (LOGIC MỚI)',
+                    'badge': f'{total_orders} Đơn TTS Rớt',
+                    'desc': f"Theo Logic Mới (Mốc giờ xuất kiện: Đồng Tháp/Trà Vinh/Vĩnh Long sau 21:30; Tiền Giang/Bến Tre sau 22:00 tính là trễ), toàn vùng ghi nhận {total_orders} đơn TTS rớt luân chuyển tại {res_pivot['total_bcs']} bưu cục ({res_pivot['total_shops']} shop). Cần xử lý ưu tiên số 1 để bảo vệ SLA sàn TikTok Shop."
+                },
+                {
+                    'title': f"📍 TÂM CHẤN TTS: {top_prov_row['tinh'].upper()} - AM {top_am_row['am'].upper()}",
+                    'badge': f"Chiếm {top_am_row['pct']}% TTS Vùng",
+                    'desc': f"{top_prov_row['tinh']} dẫn đầu với {top_prov_row['total']} đơn TTS ({top_prov_row['pct']}%). Cụm bưu cục của AM {top_am_row['am']} ({top_am_row['top_bcs']}) chiếm {top_am_row['total']} đơn TTS ({top_am_row['pct']}% toàn vùng)."
+                },
+                {
+                    'title': '⏰ PHÂN TÍCH KHUNG GIỜ CUT-OFF XUẤT KIỆN TTS',
+                    'badge': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1) if total_orders > 0 else 0}% Ngoài Cut-off",
+                    'desc': f"Có {int(shift_counts.get('Ngoài giờ cutoff', 0))} đơn TTS rơi vào Ngoài giờ Cut-off và {int(shift_counts.get('Tối', 0))} đơn TTS ca Tối (quá mốc 21:30 tại ĐTH/TVI/VLO hoặc 22:00 tại TGI/BTR)."
+                },
+                {
+                    'title': '🏪 TOP SHOP TIKTOK BỊ ẢNH HƯỞNG SLA',
+                    'badge': 'Ưu Tiên Vét Hàng',
+                    'desc': f"Shop TTS rớt nặng nhất là {top_shop_1['shop_name']} ({top_shop_1['bc_lay']}) với {top_shop_1['total']} đơn, kế tiếp là {top_shop_2['shop_name']} ({top_shop_2['total']} đơn). Có {bulky_count} đơn TTS cồng kềnh (Bulky)."
+                }
+            ]
+        else:
+            diag_cards = [
+                {
+                    'title': '🚨 BÁO ĐỘNG ĐỎ SLA SÀN TIKTOK SHOP (TTS)',
+                    'badge': 'Rủi ro SLA Cực Cao',
+                    'desc': f"Ghi nhận {int(ch_counts.get('TTS', 0))} đơn TikTok Shop trong sheet ALL ({round(float(ch_counts.get('TTS', 0)) / total_orders * 100, 1) if total_orders > 0 else 0}% tổng đơn rớt toàn vùng) và 228 đơn theo Logic Mới. Trực tiếp kéo tăng tỷ lệ Late Dispatch Rate (LDR), nguy cơ bị sàn phạt điểm SLA."
+                },
+                {
+                    'title': f"📍 TÂM CHẤN VÙNG: CỤM {top_prov_row['tinh'].upper()} - AM {top_am_row['am'].upper()}",
+                    'badge': f"Chiếm {top_am_row['pct']}% Vùng",
+                    'desc': f"{top_prov_row['tinh']} chiếm {top_prov_row['pct']}% ({top_prov_row['total']} đơn rớt). Điểm nóng tập trung cao độ ở cụm bưu cục do AM {top_am_row['am']} phụ trách: {top_am_row['top_bcs']}, chiếm tới {top_am_row['pct']}% toàn bộ lượng đơn rớt luân chuyển của cả Vùng ĐCL."
+                },
+                {
+                    'title': '⏰ NGUYÊN NHÂN CỐT LÕI: NGHẼN GIỜ CUT-OFF XE TẢI',
+                    'badge': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1) if total_orders > 0 else 0}% Ngoài Cut-off",
+                    'desc': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1) if total_orders > 0 else 0}% đơn rớt ({int(shift_counts.get('Ngoài giờ cutoff', 0))} đơn) rơi vào khung Ngoài giờ Cut-off do bưu cục tiếp nhận hàng hoặc quét nhập hệ thống sau khi chuyến xe tải trung chuyển chiều xuất bến. Đồng thời ca Tối rớt {int(shift_counts.get('Tối', 0))} đơn."
+                },
+                {
+                    'title': '🏪 KHÁCH HÀNG TRỌNG ĐIỂM BỊ ẢNH HƯỞNG NẶNG',
+                    'badge': 'Rủi ro Hủy Đơn',
+                    'desc': f"Top 1 Shop {top_shop_1['shop_name']} (tại {top_shop_1['bc_lay']}) rớt tới {top_shop_1['total']} đơn. Kế tiếp là Shop {top_shop_2['shop_name']} ({top_shop_2['total']} đơn). Đã phát hiện {bulky_count} đơn hàng cồng kềnh (Bulky) vượt tải xe trung chuyển cần điều phối xe tải riêng."
+                }
+            ]
+
+        res_expert = {
+            'summary': {
+                'total_orders': total_orders,
+                'primary_province': top_prov_row['tinh'],
+                'primary_province_orders': top_prov_row['total'],
+                'primary_province_pct': f"{top_prov_row['pct']}%",
+                'primary_am': top_am_row['am'],
+                'primary_am_orders': top_am_row['total'],
+                'primary_am_pct': f"{top_am_row['pct']}%",
+                'tts_risk_orders': int(ch_counts.get('TTS', 0)),
+                'tts_risk_pct': f"{round(float(ch_counts.get('TTS', 0)) / total_orders * 100, 1) if total_orders > 0 else 0}%",
+                'cutoff_orders': int(shift_counts.get('Ngoài giờ cutoff', 0)),
+                'cutoff_pct': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1) if total_orders > 0 else 0}%",
+                'bulky_orders': bulky_count
+            },
+            'expert_diagnosis': diag_cards,
+            'sop_action_matrix': [
+                {
+                    'stt': 1,
+                    'role': f"AM {top_am_row['am']} & QL Bưu Cục Trọng Điểm",
+                    'priority': 'CẤP BÁCH (P1)',
+                    'action': f"Khẩn cấp bố trí 01 xe tải trung chuyển tăng cường ca vét gom sạch toàn bộ đơn rớt ({'TTS ' if mode == 'tts' else ''}tại cụm {top_am_row['top_bcs']}) về kho Hub trung tâm trước mốc giờ xuất kiện (21:30 ĐTH/TVI/VLO; 22:00 TGI/BTR).",
+                    'target': f"Giải tỏa 100% tồn rớt tại cụm của AM {top_am_row['am']} đúng mốc giờ Cut-off."
+                },
+                {
+                    'stt': 2,
+                    'role': 'Bộ phận Quản lý Vận Tải (Linehaul / Transport)',
+                    'priority': 'CẤP BÁCH (P1)',
+                    'action': f"Tăng tải trọng hoặc bổ sung tần suất xe trung chuyển tuyến {top_prov_row['tinh']} ca chiều muộn để không bỏ sót các chuyến lấy hàng về muộn.",
+                    'target': f"Đảm bảo xe kết nối đủ tải trọng cho toàn bộ bưu cục {top_prov_row['tinh']}."
+                },
+                {
+                    'stt': 3,
+                    'role': 'Bộ phận CSKH & Quản lý Tài Khoản (Sales/KAM)',
+                    'priority': 'ƯU TIÊN CAO (P2)',
+                    'action': f"Làm việc trực tiếp với chủ shop {top_shop_1['shop_name']}: đàm phán đẩy giờ đóng bao xong trước 16h30 để shipper lấy trước 17h30, tránh dồn hàng sau 18h.",
+                    'target': '100% đơn của Shop lớn được gom trước giờ cut-off chính thức.'
+                },
+                {
+                    'stt': 4,
+                    'role': 'AM Phụ Trách & Bưu Cục Nhóm 2',
+                    'priority': 'ƯU TIÊN CAO (P2)',
+                    'action': 'Rà soát quy trình đóng bao chia chọn ca tối; đảm bảo 100% kiện TTS xuất khỏi bưu cục trước 21:30 (ĐTH, TVI, VLO) và 22:00 (TGI, BTR).',
+                    'target': 'Không để phát sinh đơn trễ giờ xuất kiện.'
+                }
+            ]
+        }
+
+        for _, r in df_d.iterrows():
+            res_raw.append({
+                'vunglay': str(r['vunglay']).strip(),
+                'tinhlay': str(r['tinhlay']).strip(),
+                'bc_lay': str(r['bc_lay']).strip(),
+                'shift': str(r['shift']).strip(),
+                'channel': str(r['loai_khach_hang']).strip(),
+                'loai_hang': str(r['loai_hang']).strip(),
+                'order_code': str(r['order_code']).strip(),
+                'from_name': str(r['from_name']).strip(),
+                'tenbcxuat': str(r['tenbcxuat']).strip() if pd.notna(r['tenbcxuat']) else '--',
+                'gio_ltc': str(r['gio_ltc']).strip() if pd.notna(r['gio_ltc']) else '--',
+                'gio_dk': str(r['gio_dk']).strip() if pd.notna(r['gio_dk']) else '--',
+                'am': str(r['AM']).strip()
+            })
+
+        return {
+            'mode': mode,
+            'sheet_name': sheet_title,
+            'bcs': res_bcs,
+            'pivot': res_pivot,
+            'expert_analysis': res_expert,
+            'raw_orders': res_raw
+        }
+
     try:
-        df_dropped_raw = pd.DataFrame()
+        df_dropped_all_raw = pd.DataFrame()
+        df_dropped_tts_raw = pd.DataFrame()
+        sheet_all_name = "Đơn LẤY rớt luân chuyển ALL"
+        sheet_tts_name = "Đơn LẤY rớt luân chuyển TTS (Logic mới)"
+
+        def load_dropped_workbook(xlsx_path):
+            nonlocal df_dropped_all_raw, df_dropped_tts_raw, sheet_all_name, sheet_tts_name
+            xl_cand = pd.ExcelFile(xlsx_path)
+            s_all = None
+            s_tts = None
+            for s in xl_cand.sheet_names:
+                s_low = s.strip().lower()
+                if 'all' in s_low and ('rớt' in s_low or 'rot' in s_low or 'lấy' in s_low or 'lay' in s_low):
+                    s_all = s
+                elif 'tts' in s_low and ('rớt' in s_low or 'rot' in s_low or 'lấy' in s_low or 'lay' in s_low):
+                    s_tts = s
+            if not s_all:
+                for s in xl_cand.sheet_names:
+                    if 'all' in s.lower():
+                        s_all = s
+                        break
+            if not s_all and xl_cand.sheet_names:
+                s_all = xl_cand.sheet_names[0]
+            if not s_tts:
+                for s in xl_cand.sheet_names:
+                    if 'tts' in s.lower():
+                        s_tts = s
+                        break
+            if s_all:
+                sheet_all_name = s_all
+                df_dropped_all_raw = pd.read_excel(xl_cand, sheet_name=s_all)
+            if s_tts:
+                sheet_tts_name = s_tts
+                df_dropped_tts_raw = pd.read_excel(xl_cand, sheet_name=s_tts)
+
         if "--skip-downloads" not in sys.argv:
             gsheet_url = "https://docs.google.com/spreadsheets/d/1kYBjz-xrD8IsEo-PVC3a1Qi8etVGN9j-xWdZyrPo36M/export?format=xlsx"
             temp_xlsx_path = r"Mentor\DCL - Đơn LẤY rớt luân chuyển_temp.xlsx"
             download_success = download_with_cookies(gsheet_url, cookies_path, temp_xlsx_path)
             if download_success and os.path.exists(temp_xlsx_path) and os.path.getsize(temp_xlsx_path) > 1000:
                 try:
-                    df_dropped_raw = pd.read_excel(temp_xlsx_path, sheet_name=0)
-                    print(f"✓ Downloaded live dropped transfer sheet: {len(df_dropped_raw)} rows")
+                    load_dropped_workbook(temp_xlsx_path)
+                    print(f"✓ Downloaded live dropped transfer workbook: ALL={len(df_dropped_all_raw)} rows, TTS={len(df_dropped_tts_raw)} rows")
                 except Exception as de:
                     print(f"⚠ Could not read downloaded temp xlsx: {de}")
 
         # Fallback to local files in Mentor or workspace or Downloads
-        if df_dropped_raw.empty:
+        if df_dropped_all_raw.empty:
             local_dropped_candidates = [
                 r"C:\Users\Administrator\Desktop\AI 2026\Mentor\DCL - Đơn LẤY rớt luân chuyển.xlsx",
                 r"C:\Users\Administrator\Downloads\DCL - Đơn LẤY rớt luân chuyển.xlsx",
@@ -664,302 +1009,49 @@ def main():
                 if os.path.exists(cand) and os.path.getsize(cand) > 100:
                     try:
                         if cand.endswith('.xlsx'):
-                            xl_cand = pd.ExcelFile(cand)
-                            target_s = None
-                            for s in xl_cand.sheet_names:
-                                s_low = s.strip().lower()
-                                if 'all' in s_low and ('rớt' in s_low or 'rot' in s_low or 'lấy' in s_low or 'lay' in s_low):
-                                    target_s = s
-                                    break
-                            if not target_s:
-                                for s in xl_cand.sheet_names:
-                                    if 'all' in s.lower():
-                                        target_s = s
-                                        break
-                            if not target_s:
-                                target_s = xl_cand.sheet_names[0]
-                            df_dropped_raw = pd.read_excel(xl_cand, sheet_name=target_s)
+                            load_dropped_workbook(cand)
                         else:
-                            df_dropped_raw = pd.read_csv(cand)
-                        print(f"✓ Loaded dropped transfer orders from local fallback: {os.path.basename(cand)} (Sheet: {target_s if cand.endswith('.xlsx') else 'csv'}, Rows: {len(df_dropped_raw)})")
+                            df_dropped_all_raw = pd.read_csv(cand)
+                        print(f"✓ Loaded dropped transfer orders from local fallback: {os.path.basename(cand)} (ALL: {len(df_dropped_all_raw)} rows, TTS: {len(df_dropped_tts_raw)} rows)")
                         break
                     except Exception as le:
                         print(f"⚠ Failed reading local fallback {cand}: {le}")
 
-        if not df_dropped_raw.empty:
-            # Slice columns A-L (first 12 columns)
-            df_dropped = df_dropped_raw.iloc[:, :12].copy()
-            # Standardize column headers
-            std_cols = ['vunglay', 'tinhlay', 'bc_lay', 'shift', 'loai_khach_hang', 'loai_hang', 'order_code', 'from_name', 'tenbcxuat', 'gio_ltc', 'gio_dk', 'AM']
-            if len(df_dropped.columns) == 12:
-                df_dropped.columns = std_cols
+        if not df_dropped_all_raw.empty:
+            dataset_all = build_dropped_dataset(df_dropped_all_raw, mode='all', sheet_title=sheet_all_name)
+            if df_dropped_tts_raw.empty:
+                df_dropped_tts_raw = df_dropped_all_raw[df_dropped_all_raw.iloc[:, 4].astype(str).str.strip() == 'TTS'].copy()
+            dataset_tts = build_dropped_dataset(df_dropped_tts_raw, mode='tts', sheet_title=sheet_tts_name)
 
-            # Clean rows
-            df_dropped = df_dropped[df_dropped['bc_lay'].notna() & (df_dropped['bc_lay'].astype(str).str.strip() != '') & (df_dropped['bc_lay'].astype(str).str.lower() != 'nan')].copy()
-            # Synchronize bc_lay, AM, tinhlay, and tenbcxuat with Week 44 Cơ cấu Vùng
-            for idx_d in df_dropped.index:
-                raw_bc_lay = df_dropped.at[idx_d, 'bc_lay']
-                info_d = resolve_bc_info(bc_name=raw_bc_lay)
-                if info_d:
-                    df_dropped.at[idx_d, 'bc_lay'] = info_d['new_name']
-                    df_dropped.at[idx_d, 'AM'] = info_d['am']
-                    df_dropped.at[idx_d, 'tinhlay'] = info_d['tinh']
-                raw_bc_xuat = df_dropped.at[idx_d, 'tenbcxuat']
-                if pd.notna(raw_bc_xuat):
-                    info_x = resolve_bc_info(bc_name=raw_bc_xuat)
-                    if info_x:
-                        df_dropped.at[idx_d, 'tenbcxuat'] = info_x['new_name']
-            total_orders = len(df_dropped)
-            print(f"✓ Total dropped transfer orders (cols A-L): {total_orders}")
+            # Map TTS Logic Mới counts onto dataset_all BCs for cross-reference
+            tts_logic_by_bc = {b['bc_name']: b['total'] for b in dataset_tts['bcs']}
+            for b in dataset_all['bcs']:
+                b['tts_logic_moi'] = tts_logic_by_bc.get(b['bc_name'], b['tts'])
+            for b in dataset_tts['bcs']:
+                b['tts_logic_moi'] = b['total']
 
-            # 1. Pivot by AM, Bưu cục, Tỉnh
-            piv_bc = df_dropped.groupby(['AM', 'bc_lay', 'tinhlay']).agg(
-                total=('order_code', 'count'),
-                tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
-                shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
-                khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
-                cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
-                toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
-                bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
-            ).reset_index().sort_values(by='total', ascending=False)
+            cutoff_rules = [
+                {'tinh': 'Đồng Tháp', 'cutoff_time': '21:30', 'note': 'Xuất kiện sau 21:30 -> tính là trễ'},
+                {'tinh': 'Trà Vinh', 'cutoff_time': '21:30', 'note': 'Xuất kiện sau 21:30 -> tính là trễ'},
+                {'tinh': 'Vĩnh Long', 'cutoff_time': '21:30', 'note': 'Xuất kiện sau 21:30 -> tính là trễ'},
+                {'tinh': 'Tiền Giang', 'cutoff_time': '22:00', 'note': 'Xuất kiện sau 22:00 -> tính là trễ'},
+                {'tinh': 'Bến Tre', 'cutoff_time': '22:00', 'note': 'Xuất kiện sau 22:00 -> tính là trễ'}
+            ]
+            dataset_tts['cutoff_rules'] = cutoff_rules
+            dataset_all['cutoff_rules'] = cutoff_rules
 
-            for _, row in piv_bc.iterrows():
-                dropped_bcs.append({
-                    'am': str(row['AM']).strip(),
-                    'bc_name': str(row['bc_lay']).strip(),
-                    'tinh': str(row['tinhlay']).strip(),
-                    'khac': int(row['khac']),
-                    'shopee': int(row['shopee']),
-                    'tts': int(row['tts']),
-                    'total': int(row['total']),
-                    'cutoff': int(row['cutoff']),
-                    'toi': int(row['toi']),
-                    'bulky': int(row['bulky']),
-                    'pct': round(float(row['total']) / total_orders * 100, 2) if total_orders > 0 else 0
-                })
+            dropped_bcs = dataset_all['bcs']
+            dropped_pivot = dataset_all['pivot']
+            dropped_pivot['tts_logic_moi_total'] = dataset_tts['pivot'].get('total_orders', 0)
+            dropped_expert_analysis = dataset_all['expert_analysis']
+            dropped_raw_orders = dataset_all['raw_orders']
 
-            # 2. Pivot by Province
-            piv_prov = df_dropped.groupby('tinhlay').agg(
-                bcs=('bc_lay', 'nunique'),
-                total=('order_code', 'count'),
-                tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
-                shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
-                khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
-                cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
-                toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
-                bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
-            ).reset_index().sort_values(by='total', ascending=False)
-
-            piv_prov_list = []
-            for _, r in piv_prov.iterrows():
-                piv_prov_list.append({
-                    'tinh': str(r['tinhlay']).strip(),
-                    'bcs': int(r['bcs']),
-                    'total': int(r['total']),
-                    'tts': int(r['tts']),
-                    'shopee': int(r['shopee']),
-                    'khac': int(r['khac']),
-                    'cutoff': int(r['cutoff']),
-                    'toi': int(r['toi']),
-                    'bulky': int(r['bulky']),
-                    'pct': round(float(r['total']) / total_orders * 100, 2) if total_orders > 0 else 0
-                })
-
-            # 3. Pivot by AM
-            piv_am = df_dropped.groupby('AM').agg(
-                bcs=('bc_lay', 'nunique'),
-                total=('order_code', 'count'),
-                tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
-                shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
-                khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
-                cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
-                toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
-                bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
-            ).reset_index().sort_values(by='total', ascending=False)
-
-            piv_am_list = []
-            for _, r in piv_am.iterrows():
-                top_bcs_am = df_dropped[df_dropped['AM'] == r['AM']]['bc_lay'].value_counts().head(2).to_dict()
-                top_bcs_str = ", ".join([f"{k} ({v})" for k, v in top_bcs_am.items()])
-                piv_am_list.append({
-                    'am': str(r['AM']).strip(),
-                    'bcs': int(r['bcs']),
-                    'total': int(r['total']),
-                    'tts': int(r['tts']),
-                    'shopee': int(r['shopee']),
-                    'khac': int(r['khac']),
-                    'cutoff': int(r['cutoff']),
-                    'toi': int(r['toi']),
-                    'bulky': int(r['bulky']),
-                    'top_bcs': top_bcs_str,
-                    'pct': round(float(r['total']) / total_orders * 100, 2) if total_orders > 0 else 0
-                })
-
-            # 4. Top Shops
-            piv_shops = df_dropped.groupby(['from_name', 'bc_lay', 'AM']).agg(
-                total=('order_code', 'count'),
-                tts=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'TTS').sum()),
-                shopee=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Shopee').sum()),
-                khac=('loai_khach_hang', lambda x: (x.astype(str).str.strip() == 'Khac').sum()),
-                cutoff=('shift', lambda x: (x.astype(str).str.strip() == 'Ngoài giờ cutoff').sum()),
-                toi=('shift', lambda x: (x.astype(str).str.strip() == 'Tối').sum()),
-                bulky=('loai_hang', lambda x: (x.astype(str).str.strip() == 'Bulky').sum())
-            ).reset_index().sort_values(by='total', ascending=False).head(30)
-
-            top_shops_list = []
-            for _, r in piv_shops.iterrows():
-                top_shops_list.append({
-                    'shop_name': str(r['from_name']).strip(),
-                    'bc_lay': str(r['bc_lay']).strip(),
-                    'am': str(r['AM']).strip(),
-                    'total': int(r['total']),
-                    'tts': int(r['tts']),
-                    'shopee': int(r['shopee']),
-                    'khac': int(r['khac']),
-                    'cutoff': int(r['cutoff']),
-                    'toi': int(r['toi']),
-                    'bulky': int(r['bulky'])
-                })
-
-            # 5. 2D Matrix: Channel x Shift
-            matrix_channel_shift = []
-            for ch in ['TTS', 'Shopee', 'Khac']:
-                sub_df = df_dropped[df_dropped['loai_khach_hang'] == ch]
-                c_cutoff = int((sub_df['shift'] == 'Ngoài giờ cutoff').sum())
-                c_toi = int((sub_df['shift'] == 'Tối').sum())
-                c_total = len(sub_df)
-                c_pct = round(c_total / total_orders * 100, 2) if total_orders > 0 else 0
-                matrix_channel_shift.append({
-                    'channel': ch,
-                    'cutoff': c_cutoff,
-                    'toi': c_toi,
-                    'total': c_total,
-                    'pct': c_pct
-                })
-
-            # Channel & Shift counts
-            ch_counts = df_dropped['loai_khach_hang'].astype(str).str.strip().value_counts().to_dict()
-            shift_counts = df_dropped['shift'].astype(str).str.strip().value_counts().to_dict()
-            bulky_count = int((df_dropped['loai_hang'] == 'Bulky').sum())
-
-            dropped_pivot = {
-                'total_orders': total_orders,
-                'total_bcs': int(df_dropped['bc_lay'].nunique()),
-                'total_shops': int(df_dropped['from_name'].nunique()),
-                'total_bulky': bulky_count,
-                'by_channel': {
-                    'tts': int(ch_counts.get('TTS', 0)),
-                    'shopee': int(ch_counts.get('Shopee', 0)),
-                    'khac': int(ch_counts.get('Khac', 0)),
-                    'tts_pct': round(float(ch_counts.get('TTS', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
-                    'shopee_pct': round(float(ch_counts.get('Shopee', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
-                    'khac_pct': round(float(ch_counts.get('Khac', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
-                },
-                'by_shift': {
-                    'cutoff': int(shift_counts.get('Ngoài giờ cutoff', 0)),
-                    'toi': int(shift_counts.get('Tối', 0)),
-                    'cutoff_pct': round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
-                    'toi_pct': round(float(shift_counts.get('Tối', 0)) / total_orders * 100, 2) if total_orders > 0 else 0,
-                },
-                'matrix_channel_shift': matrix_channel_shift,
-                'by_province': piv_prov_list,
-                'by_am': piv_am_list,
-                'top_shops': top_shops_list
+            dropped_report = {
+                'all': dataset_all,
+                'tts': dataset_tts,
+                'cutoff_rules': cutoff_rules
             }
-
-            # Top province and top AM for dynamic expert diagnostic
-            top_prov_row = piv_prov_list[0] if piv_prov_list else {'tinh': 'N/A', 'total': 0, 'pct': 0}
-            top_am_row = piv_am_list[0] if piv_am_list else {'am': 'N/A', 'total': 0, 'pct': 0, 'top_bcs': 'N/A'}
-            top_shop_1 = top_shops_list[0] if top_shops_list else {'shop_name': 'N/A', 'total': 0, 'bc_lay': 'N/A'}
-            top_shop_2 = top_shops_list[1] if len(top_shops_list) > 1 else {'shop_name': 'N/A', 'total': 0, 'bc_lay': 'N/A'}
-
-            dropped_expert_analysis = {
-                'summary': {
-                    'total_orders': total_orders,
-                    'primary_province': top_prov_row['tinh'],
-                    'primary_province_orders': top_prov_row['total'],
-                    'primary_province_pct': f"{top_prov_row['pct']}%",
-                    'primary_am': top_am_row['am'],
-                    'primary_am_orders': top_am_row['total'],
-                    'primary_am_pct': f"{top_am_row['pct']}%",
-                    'tts_risk_orders': int(ch_counts.get('TTS', 0)),
-                    'tts_risk_pct': f"{round(float(ch_counts.get('TTS', 0)) / total_orders * 100, 1)}%",
-                    'cutoff_orders': int(shift_counts.get('Ngoài giờ cutoff', 0)),
-                    'cutoff_pct': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1)}%",
-                    'bulky_orders': bulky_count
-                },
-                'expert_diagnosis': [
-                    {
-                        'title': '🚨 BÁO ĐỘNG ĐỎ SLA SÀN TIKTOK SHOP (TTS)',
-                        'badge': 'Rủi ro SLA Cực Cao',
-                        'desc': f"Ghi nhận {int(ch_counts.get('TTS', 0))} đơn TikTok Shop ({round(float(ch_counts.get('TTS', 0)) / total_orders * 100, 1)}% tổng đơn rớt toàn vùng). Đây là rủi ro nghiêm trọng nhất đối với chỉ số SLA vận hành, trực tiếp kéo tăng tỷ lệ Late Dispatch Rate (LDR), có nguy cơ bị sàn TikTok Shop phạt điểm sao cửa hàng và hủy đơn tự động."
-                    },
-                    {
-                        'title': f"📍 TÂM CHẤN VÙNG: CỤM {top_prov_row['tinh'].upper()} - AM {top_am_row['am'].upper()}",
-                        'badge': f"Chiếm {top_am_row['pct']}% Vùng",
-                        'desc': f"{top_prov_row['tinh']} chiếm {top_prov_row['pct']}% ({top_prov_row['total']} đơn rớt). Điểm nóng tập trung cao độ ở cụm bưu cục do AM {top_am_row['am']} phụ trách: {top_am_row['top_bcs']}, chiếm tới {top_am_row['pct']}% toàn bộ lượng đơn rớt luân chuyển của cả Vùng ĐCL."
-                    },
-                    {
-                        'title': '⏰ NGUYÊN NHÂN CỐT LÕI: NGHẼN GIỜ CUT-OFF XE TẢI',
-                        'badge': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1)}% Ngoài Cut-off",
-                        'desc': f"{round(float(shift_counts.get('Ngoài giờ cutoff', 0)) / total_orders * 100, 1)}% đơn rớt ({int(shift_counts.get('Ngoài giờ cutoff', 0))} đơn) rơi vào khung Ngoài giờ Cut-off do bưu cục tiếp nhận hàng hoặc quét nhập hệ thống sau khi chuyến xe tải trung chuyển chiều xuất bến. Đồng thời ca Tối rớt {int(shift_counts.get('Tối', 0))} đơn."
-                    },
-                    {
-                        'title': '🏪 KHÁCH HÀNG TRỌNG ĐIỂM BỊ ẢNH HƯỞNG NẶNG',
-                        'badge': 'Rủi ro Hủy Đơn',
-                        'desc': f"Top 1 Shop {top_shop_1['shop_name']} (tại {top_shop_1['bc_lay']}) rớt tới {top_shop_1['total']} đơn. Kế tiếp là Shop {top_shop_2['shop_name']} ({top_shop_2['total']} đơn). Đã phát hiện {bulky_count} đơn hàng cồng kềnh (Bulky) vượt tải xe trung chuyển cần điều phối xe tải riêng."
-                    }
-                ],
-                'sop_action_matrix': [
-                    {
-                        'stt': 1,
-                        'role': f"AM {top_am_row['am']} & QL Bưu Cục Trọng Điểm",
-                        'priority': 'CẤP BÁCH (P1)',
-                        'action': f"Khẩn cấp bố trí 01 xe tải trung chuyển tăng cường ca vét (19h30 - 20h30) gom sạch toàn bộ đơn rớt tại cụm {top_am_row['top_bcs']} về kho Hub trung tâm ngay trong đêm.",
-                        'target': f"Giải tỏa 100% tồn rớt tại cụm của AM {top_am_row['am']} trước 22h00."
-                    },
-                    {
-                        'stt': 2,
-                        'role': 'Bộ phận Quản lý Vận Tải (Linehaul / Transport)',
-                        'priority': 'CẤP BÁCH (P1)',
-                        'action': f"Tăng tải trọng hoặc bổ sung tần suất xe trung chuyển tuyến {top_prov_row['tinh']} ca chiều muộn (17h30 - 18h30) để không bỏ sót các chuyến lấy hàng về muộn.",
-                        'target': f"Đảm bảo xe kết nối đủ tải trọng cho toàn bộ bưu cục {top_prov_row['tinh']}."
-                    },
-                    {
-                        'stt': 3,
-                        'role': 'Bộ phận CSKH & Quản lý Tài Khoản (Sales/KAM)',
-                        'priority': 'ƯU TIÊN CAO (P2)',
-                        'action': f"Làm việc trực tiếp với chủ shop {top_shop_1['shop_name']}: đàm phán đẩy giờ đóng bao xong trước 16h30 để shipper lấy trước 17h30, tránh dồn hàng sau 18h.",
-                        'target': '100% đơn của Shop lớn được gom trước giờ cut-off chính thức.'
-                    },
-                    {
-                        'stt': 4,
-                        'role': 'AM Phụ Trách & Bưu Cục Nhóm 2',
-                        'priority': 'ƯU TIÊN CAO (P2)',
-                        'action': 'Rà soát quy trình đóng bao chia chọn ca chiều; tăng cường nhân sự xử lý để kịp giờ xe xuất bến.',
-                        'target': 'Không để phát sinh đơn rớt luân chuyển ca chiều.'
-                    }
-                ]
-            }
-
-            # FULL Raw orders export with all 12 columns (A to L)
-            for _, r in df_dropped.iterrows():
-                dropped_raw_orders.append({
-                    'vunglay': str(r['vunglay']).strip(),
-                    'tinhlay': str(r['tinhlay']).strip(),
-                    'bc_lay': str(r['bc_lay']).strip(),
-                    'shift': str(r['shift']).strip(),
-                    'channel': str(r['loai_khach_hang']).strip(),
-                    'loai_hang': str(r['loai_hang']).strip(),
-                    'order_code': str(r['order_code']).strip(),
-                    'from_name': str(r['from_name']).strip(),
-                    'tenbcxuat': str(r['tenbcxuat']).strip() if pd.notna(r['tenbcxuat']) else '--',
-                    'gio_ltc': str(r['gio_ltc']).strip() if pd.notna(r['gio_ltc']) else '--',
-                    'gio_dk': str(r['gio_dk']).strip() if pd.notna(r['gio_dk']) else '--',
-                    'am': str(r['AM']).strip()
-                })
-
-            print(f"✓ Generated Dropped Transfer Pivot: {len(dropped_bcs)} BCs, {len(piv_prov_list)} provinces, {len(piv_am_list)} AMs, {len(top_shops_list)} top shops, {len(dropped_raw_orders)} full raw orders (Cols A-L).")
+            print(f"✓ Generated Dropped Transfer Datasets: Hàng Tổng ALL={len(dropped_raw_orders)} orders ({len(dropped_bcs)} BCs), Hàng TTS Logic Mới={len(dataset_tts['raw_orders'])} orders ({len(dataset_tts['bcs'])} BCs).")
         else:
             print("⚠ Dropped transfer dataframe is empty (sheet unavailable or unauthorized).")
     except Exception as e:
@@ -1871,7 +1963,9 @@ def main():
         for dbc in dropped_bcs:
             if dbc['bc_name'].strip().lower() == bc_name.lower():
                 dropped_tot = dbc['total']
-                dropped_info_str = f"Rớt luân chuyển {dropped_tot} đơn (Shopee: {dbc['shopee']}, TTS: {dbc['tts']}, Khác: {dbc['khac']})"
+                tts_lm = dbc.get('tts_logic_moi', dbc['tts'])
+                tts_txt = f"{dbc['tts']} [Logic mới: {tts_lm}]" if tts_lm != dbc['tts'] else f"{dbc['tts']}"
+                dropped_info_str = f"Rớt luân chuyển Hàng Tổng {dropped_tot} đơn (TTS: {tts_txt}, Shopee: {dbc['shopee']}, Khác: {dbc['khac']})"
                 break
 
         # Determine cause dynamically
@@ -3360,6 +3454,7 @@ def main():
         'dropped_pivot': dropped_pivot,
         'dropped_expert_analysis': dropped_expert_analysis,
         'dropped_raw_orders': dropped_raw_orders,
+        'dropped_report': dropped_report,
         'recruitment': {
             'top_5': top5_data,
             'latest_week': latest_week_num
