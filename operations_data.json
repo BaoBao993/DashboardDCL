@@ -1,5 +1,5 @@
 {
-  "latest_date": "2026-11-02",
+  "latest_date": "2026-11-04",
   "zen_score": 87,
   "forecasting": {
     "projected_volume": 98721,
@@ -33,10 +33,10 @@
       "vs_lastmonth": -0.8835897435897436
     },
     "hr": {
-      "total_shortage_actual": 175,
-      "total_shortage_bs": 136,
-      "total_resign_week": 41,
-      "total_ob_week": 3,
+      "total_shortage_actual": 174,
+      "total_shortage_bs": 145,
+      "total_resign_week": 47,
+      "total_ob_week": 18,
       "latest_week": 45
     },
     "gan": {
@@ -56,52 +56,52 @@
       "gtc": 0.639,
       "fd": 0.021,
       "backlog": 222,
-      "date": "2026-10-26"
+      "date": "2026-10-28"
     },
     {
       "volume": 98368,
       "gtc": 0.6431,
       "fd": 0.0207,
       "backlog": 227,
-      "date": "2026-10-27"
+      "date": "2026-10-29"
     },
     {
       "volume": 94200,
       "gtc": 0.648,
       "fd": 0.0211,
       "backlog": 225,
-      "date": "2026-10-28"
+      "date": "2026-10-30"
     },
     {
       "volume": 96500,
       "gtc": 0.6455,
       "fd": 0.0209,
       "backlog": 224,
-      "date": "2026-10-29"
+      "date": "2026-10-31"
     },
     {
       "volume": 97100,
       "gtc": 0.641,
       "fd": 0.0212,
       "backlog": 226,
-      "date": "2026-10-30"
+      "date": "2026-11-01"
     },
     {
       "volume": 95400,
       "gtc": 0.6442,
       "fd": 0.0208,
       "backlog": 225,
-      "date": "2026-10-31"
+      "date": "2026-11-02"
     },
     {
       "volume": 95893,
       "gtc": 0.639,
       "fd": 0.021,
       "backlog": 225,
-      "date": "2026-11-01"
+      "date": "2026-11-03"
     },
     {
-      "date": "2026-11-02",
+      "date": "2026-11-04",
       "volume": 98368,
       "gtc": 0.6431,
       "fd": 0.0207,
@@ -119,10 +119,10 @@
       "backlog": 42,
       "backlog_change": 22,
       "hr": {
-        "shortage_actual": 41,
+        "shortage_actual": 40,
         "shortage_bs": 38,
         "resign": 3,
-        "ob": 0,
+        "ob": 1,
         "target_headcount": 200,
         "hrbp": "BảoHQ",
         "intern": "Mai Quý"
@@ -145,10 +145,10 @@
       "backlog": 67,
       "backlog_change": 40,
       "hr": {
-        "shortage_actual": 23,
-        "shortage_bs": 15,
-        "resign": 8,
-        "ob": 0,
+        "shortage_actual": 19,
+        "shortage_bs": 17,
+        "resign": 6,
+        "ob": 4,
         "target_headcount": 154,
         "hrbp": "DungLK",
         "intern": "Tuấn Hưng"
@@ -171,10 +171,10 @@
       "backlog": 51,
       "backlog_change": 17,
       "hr": {
-        "shortage_actual": 31,
+        "shortage_actual": 26,
         "shortage_bs": 22,
-        "resign": 10,
-        "ob": 2,
+        "resign": 12,
+        "ob": 8,
         "target_headcount": 247,
         "hrbp": "NgọcNTM",
         "intern": "Phương Uyên"
@@ -197,10 +197,10 @@
       "backlog": 55,
       "backlog_change": 18,
       "hr": {
-        "shortage_actual": 55,
-        "shortage_bs": 37,
-        "resign": 18,
-        "ob": 0,
+        "shortage_actual": 61,
+        "shortage_bs": 41,
+        "resign": 24,
+        "ob": 4,
         "target_headcount": 260,
         "hrbp": "DungLK",
         "intern": "Tuấn Hưng"
@@ -223,8 +223,8 @@
       "backlog": 30,
       "backlog_change": 6,
       "hr": {
-        "shortage_actual": 25,
-        "shortage_bs": 24,
+        "shortage_actual": 28,
+        "shortage_bs": 27,
         "resign": 2,
         "ob": 1,
         "target_headcount": 143,
@@ -257,9 +257,9 @@
       "status": "Mạnh",
       "hr": {
         "shortage_actual": 18,
-        "shortage_bs": 14,
-        "resign": 4,
-        "ob": 0,
+        "shortage_bs": 15,
+        "resign": 5,
+        "ob": 2,
         "target_headcount": 123
       },
       "gan": 0.961
@@ -302,10 +302,10 @@
       },
       "status": "Mạnh",
       "hr": {
-        "shortage_actual": 13,
+        "shortage_actual": 9,
         "shortage_bs": 11,
         "resign": 2,
-        "ob": 0,
+        "ob": 4,
         "target_headcount": 69
       },
       "gan": 0.955
@@ -325,10 +325,10 @@
       },
       "status": "Mạnh",
       "hr": {
-        "shortage_actual": 21,
+        "shortage_actual": 20,
         "shortage_bs": 21,
         "resign": 0,
-        "ob": 0,
+        "ob": 1,
         "target_headcount": 116
       },
       "gan": 0.961
@@ -350,8 +350,8 @@
       "hr": {
         "shortage_actual": 10,
         "shortage_bs": 4,
-        "resign": 7,
-        "ob": 2,
+        "resign": 9,
+        "ob": 3,
         "target_headcount": 80
       },
       "gan": 0.948
@@ -394,8 +394,8 @@
       },
       "status": "Mạnh",
       "hr": {
-        "shortage_actual": 25,
-        "shortage_bs": 24,
+        "shortage_actual": 28,
+        "shortage_bs": 27,
         "resign": 2,
         "ob": 1,
         "target_headcount": 143
@@ -419,8 +419,8 @@
       "hr": {
         "shortage_actual": 21,
         "shortage_bs": 20,
-        "resign": 1,
-        "ob": 0,
+        "resign": 2,
+        "ob": 1,
         "target_headcount": 99
       },
       "gan": 0.925
@@ -440,10 +440,10 @@
       },
       "status": "Cải thiện",
       "hr": {
-        "shortage_actual": 5,
-        "shortage_bs": 1,
-        "resign": 4,
-        "ob": 0,
+        "shortage_actual": 1,
+        "shortage_bs": 2,
+        "resign": 1,
+        "ob": 2,
         "target_headcount": 31
       },
       "gan": 0.912
@@ -486,10 +486,10 @@
       },
       "status": "Cải thiện",
       "hr": {
-        "shortage_actual": 4,
-        "shortage_bs": 3,
-        "resign": 1,
-        "ob": 0,
+        "shortage_actual": 11,
+        "shortage_bs": 7,
+        "resign": 6,
+        "ob": 2,
         "target_headcount": 78
       },
       "gan": 0.887
@@ -509,10 +509,10 @@
       },
       "status": "Cải thiện",
       "hr": {
-        "shortage_actual": 22,
+        "shortage_actual": 20,
         "shortage_bs": 6,
         "resign": 16,
-        "ob": 0,
+        "ob": 2,
         "target_headcount": 57
       },
       "gan": 0.862
@@ -534,20 +534,20 @@
       "fd_change": 0.011836363636363631,
       "backlog": 3,
       "status": "Cảnh báo",
-      "cause": "Rớt luân chuyển 3 đơn (Shopee: 1, TTS: 0, Khác: 2)",
-      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 3/12 shipper, ~25%) + Rớt luân chuyển 3 đơn (Shopee: 1, TTS: 0, Khác: 2)",
+      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 0,
-        "shortage_bs": 0,
+        "shortage_actual": 3,
+        "shortage_bs": 3,
         "target_headcount": 12,
         "tuyen_thieu": "",
         "hrbp": "DungLK",
-        "status": "Đủ",
+        "status": "Thiếu",
         "ob_week": 0,
         "resign_week": 0
       }
@@ -633,18 +633,18 @@
       "fd_change": 0.0032874999999999988,
       "backlog": 5,
       "status": "Cảnh báo",
-      "cause": "Thiếu 3 shipper + Rớt luân chuyển 7 đơn (Shopee: 6, TTS: 0, Khác: 1)",
-      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 5/21 shipper, ~24%) + Rớt luân chuyển 7 đơn (Shopee: 6, TTS: 0, Khác: 1)",
+      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 3,
-        "shortage_bs": 4,
+        "shortage_actual": 5,
+        "shortage_bs": 6,
         "target_headcount": 21,
-        "tuyen_thieu": "Trường Long Hòa, Long Vĩnh, Long Thành",
+        "tuyen_thieu": "Trường Long Hòa, Long Vĩnh, Long Thành, Ngũ Lạc\n(Đặc thù: Khu biển, hình xương cá, đồng tôm)",
         "hrbp": "BảoHQ",
         "status": "Thiếu",
         "ob_week": 1,
@@ -699,7 +699,7 @@
       "fd_change": -0.0013999999999999985,
       "backlog": 5,
       "status": "Bất ổn",
-      "cause": "Hiệu suất giao kém, tỷ lệ trả (FD 8.14%) cao. Thiếu 2/20 shipper tại Lương Hòa Lạc, Mỹ Tịnh An. | Cảnh báo: Thiếu 3 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.14%) + Hiệu suất giao (GTC) thấp (53.17%) + Rớt luân chuyển 12 đơn (Shopee: 0, TTS: 0, Khác: 12)",
+      "cause": "Hiệu suất giao kém, tỷ lệ trả (FD 8.14%) cao. Thiếu 2/20 shipper tại Lương Hòa Lạc, Mỹ Tịnh An. | Cảnh báo: Thiếu 2 shipper + Tỷ lệ trả hàng (%FD) cao bất thường (8.14%) + Hiệu suất giao (GTC) thấp (53.17%) + Rớt luân chuyển 12 đơn (Shopee: 0, TTS: 0, Khác: 12)",
       "recommendation": "AM họp bưu cục chấn chỉnh thái độ giao hàng và kiểm soát tỷ lệ trả hàng. Hướng xử lý: Đẩy nhanh tuyển dụng bổ sung shipper. AM trực tiếp rà soát lý do trả hàng chặng cuối và thái độ phục vụ. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "09:20",
@@ -707,13 +707,13 @@
         "sorting_delay": true
       },
       "hr": {
-        "shortage_actual": 3,
+        "shortage_actual": 2,
         "shortage_bs": 3,
         "target_headcount": 27,
         "tuyen_thieu": "Lương Hòa Lạc, Trung Hòa, Tân Bình Thạnh, Thanh Bình",
         "hrbp": "DungLK",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 0
       }
     },
@@ -798,7 +798,7 @@
       "fd_change": 0.015350000000000003,
       "backlog": 4,
       "status": "Bất ổn",
-      "cause": "Quá tải sản lượng (4,049 đơn), tỷ lệ trả (FD 13.78%) cao bất thường. Thiếu 1/21 shipper tại Phước Thạnh, Phường 10, Trung An, Phường 5. | Cảnh báo: Thiếu hụt nhân sự nghiêm trọng (hụt 5/16 shipper, ~31%) + Tỷ lệ trả hàng (%FD) cao bất thường (13.78%) + Hiệu suất giao (GTC) thấp (40.30%) + Rớt luân chuyển 10 đơn (Shopee: 0, TTS: 0, Khác: 10)",
+      "cause": "Quá tải sản lượng (4,049 đơn), tỷ lệ trả (FD 13.78%) cao bất thường. Thiếu 1/21 shipper tại Phước Thạnh, Phường 10, Trung An, Phường 5. | Cảnh báo: Thiếu hụt nhân sự nghiêm trọng (hụt 6/16 shipper, ~38%) + Tỷ lệ trả hàng (%FD) cao bất thường (13.78%) + Hiệu suất giao (GTC) thấp (40.30%) + Rớt luân chuyển 10 đơn (Shopee: 0, TTS: 0, Khác: 10)",
       "recommendation": "AM trực tiếp cắm chốt kho rà soát lý do trả hàng (FD 13.78%). Bổ sung 1 NVXL hỗ trợ gán đơn đầu ca. Hướng xử lý: AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. AM trực tiếp rà soát lý do trả hàng chặng cuối và thái độ phục vụ. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "09:35",
@@ -806,14 +806,14 @@
         "sorting_delay": true
       },
       "hr": {
-        "shortage_actual": 5,
+        "shortage_actual": 6,
         "shortage_bs": 4,
         "target_headcount": 16,
         "tuyen_thieu": "",
         "hrbp": "DungLK",
         "status": "Thiếu",
         "ob_week": 0,
-        "resign_week": 1
+        "resign_week": 2
       }
     },
     {
@@ -909,7 +909,7 @@
         "shortage_actual": 0,
         "shortage_bs": 0,
         "target_headcount": 9,
-        "tuyen_thieu": "",
+        "tuyen_thieu": "Tuyến Mỹ Trung, Thiện Trung",
         "hrbp": "NgọcNTM",
         "status": "Đủ",
         "ob_week": 0,
@@ -976,7 +976,7 @@
         "shortage_actual": 4,
         "shortage_bs": 4,
         "target_headcount": 18,
-        "tuyen_thieu": "An Định",
+        "tuyen_thieu": "",
         "hrbp": "BảoHQ",
         "status": "Thiếu",
         "ob_week": 0,
@@ -1131,22 +1131,22 @@
       "fd_change": 0.004173337380000003,
       "backlog": 5,
       "status": "Cảnh báo",
-      "cause": "Thiếu 3/20 shipper tại các tuyến xã Tân Quới Trung, Quới Thiện, Tân An Luông, Trung Hiệp. | Cảnh báo: Thiếu hụt nhân sự nghiêm trọng (hụt 4/20 shipper, ~20%) + Biến động nghỉ việc đột biến trong tuần (-4 shipper) + Hiệu suất giao (GTC) thấp (32.17%) + Rớt luân chuyển 13 đơn (Shopee: 6, TTS: 0, Khác: 7)",
-      "recommendation": "AM cắm chốt kho chỉ đạo chia chọn đầu ca để shipper ra ca sớm, phân chia giao chéo tại các tuyến trống. Hướng xử lý: AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát lý do shipper nghỉ việc đột ngột để ổn định nhân sự. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu 3/20 shipper tại các tuyến xã Tân Quới Trung, Quới Thiện, Tân An Luông, Trung Hiệp. | Cảnh báo: Hiệu suất giao (GTC) thấp (32.17%) + Rớt luân chuyển 13 đơn (Shopee: 6, TTS: 0, Khác: 7)",
+      "recommendation": "AM cắm chốt kho chỉ đạo chia chọn đầu ca để shipper ra ca sớm, phân chia giao chéo tại các tuyến trống. Hướng xử lý: Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "09:15",
         "late_inbound": true,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 4,
-        "shortage_bs": 0,
+        "shortage_actual": 0,
+        "shortage_bs": 1,
         "target_headcount": 20,
-        "tuyen_thieu": "Tuyến cồn: Thanh Bình, Quới Thiện",
+        "tuyen_thieu": "Thị Trấn Vũng Liêm, Trung Hiệp",
         "hrbp": "DungLK",
         "status": "Thiếu",
-        "ob_week": 0,
-        "resign_week": 4
+        "ob_week": 2,
+        "resign_week": 1
       }
     },
     {
@@ -1164,7 +1164,7 @@
       "fd_change": 0.013331914290000003,
       "backlog": 163,
       "status": "Cảnh báo",
-      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 11/20 shipper, ~55%) + Biến động nghỉ việc đột biến trong tuần (-6 shipper) + Tồn đọng đơn hàng backlog >5 ngày lớn (163 đơn)",
+      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 10/20 shipper, ~50%) + Biến động nghỉ việc đột biến trong tuần (-6 shipper) + Tồn đọng đơn hàng backlog >5 ngày lớn (163 đơn)",
       "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát lý do shipper nghỉ việc đột ngột để ổn định nhân sự. Giải phóng hàng tồn đọng backlog lâu ngày (163 đơn).",
       "exit_profile": {
         "exit_hour": "08:45",
@@ -1172,13 +1172,13 @@
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 11,
+        "shortage_actual": 10,
         "shortage_bs": 5,
         "target_headcount": 20,
         "tuyen_thieu": "XÃ Phú Nhuận ( đã nghỉ ngang )\n- XÃ LONG KHÁNH\n- XÃ CẨM SƠN\n- PHƯỜNG 5\n_ TÂN PHÚ ( Đã viết đơn )\n- NHỊ QUÝ ( Đã viết đơn )\n- BÌNH PHÚ \n- PHÚ AN \n- PHƯỜNG 2 \n( Bưu cục đang thiếu 6 tuyến , có 5 nhân viên việc đơn xin nghỉ t12)",
         "hrbp": "NgọcNTM",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 6
       }
     },
@@ -1197,21 +1197,21 @@
       "fd_change": 0.0039465447699999975,
       "backlog": 5,
       "status": "Tốt",
-      "cause": "Thiếu 3 shipper + Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1)",
-      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1)",
+      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 3,
+        "shortage_actual": 0,
         "shortage_bs": 2,
         "target_headcount": 22,
         "tuyen_thieu": "TT. Thường Thới Tiền \n+ Thường Phước 1\n+Thường Lạc",
         "hrbp": "NgọcNTM",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 3,
         "resign_week": 1
       }
     },
@@ -1330,22 +1330,22 @@
       "fd_change": 0.009725736090000001,
       "backlog": 7,
       "status": "Bất ổn",
-      "cause": "Hiệu suất giao (GTC) thấp (51.11%) + Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1)",
-      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 4/13 shipper, ~31%) + Biến động nghỉ việc đột biến trong tuần (-4 shipper) + Hiệu suất giao (GTC) thấp (51.11%) + Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1)",
+      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát lý do shipper nghỉ việc đột ngột để ổn định nhân sự. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "09:20",
         "late_inbound": false,
         "sorting_delay": true
       },
       "hr": {
-        "shortage_actual": 0,
+        "shortage_actual": 4,
         "shortage_bs": 0,
         "target_headcount": 13,
-        "tuyen_thieu": "",
+        "tuyen_thieu": "Mỹ Long, Tam Bình, Long Tiên",
         "hrbp": "NgọcNTM",
-        "status": "Đủ",
+        "status": "Thiếu",
         "ob_week": 0,
-        "resign_week": 0
+        "resign_week": 4
       }
     },
     {
@@ -1396,21 +1396,21 @@
       "fd_change": 0.006158875920000001,
       "backlog": 4,
       "status": "Cảnh báo",
-      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 3/15 shipper, ~20%) + Rớt luân chuyển 8 đơn (Shopee: 0, TTS: 3, Khác: 5)",
-      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu 2 shipper + Rớt luân chuyển 8 đơn (Shopee: 0, TTS: 3, Khác: 5)",
+      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 3,
+        "shortage_actual": 2,
         "shortage_bs": 3,
         "target_headcount": 15,
         "tuyen_thieu": "",
         "hrbp": "BảoHQ",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 0
       }
     },
@@ -1430,21 +1430,21 @@
       "backlog": 5,
       "status": "Cảnh báo",
       "cause": "Rớt luân chuyển 229 đơn (Shopee: 6, TTS: 19, Khác: 204)",
-      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 0,
+        "shortage_actual": 1,
         "shortage_bs": 0,
         "target_headcount": 19,
-        "tuyen_thieu": "",
+        "tuyen_thieu": "Tân Khánh đông + Tân Phú Đông",
         "hrbp": "NgọcNTM",
-        "status": "Đủ",
+        "status": "Thiếu",
         "ob_week": 1,
-        "resign_week": 0
+        "resign_week": 2
       }
     },
     {
@@ -1462,7 +1462,7 @@
       "fd_change": 0.0,
       "backlog": 0,
       "status": "Tốt",
-      "cause": "Không rõ nguyên nhân, rủi ro sập luồng hàng cao!",
+      "cause": "Thiếu 2 shipper",
       "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper.",
       "exit_profile": {
         "exit_hour": "08:45",
@@ -1470,10 +1470,10 @@
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 1,
-        "shortage_bs": 0,
+        "shortage_actual": 2,
+        "shortage_bs": 1,
         "target_headcount": 15,
-        "tuyen_thieu": "Long Đức",
+        "tuyen_thieu": "Long Đức, Hoà Thuận",
         "hrbp": "BảoHQ",
         "status": "Thiếu",
         "ob_week": 0,
@@ -1629,20 +1629,20 @@
       "fd_change": 0.000651412819999999,
       "backlog": 1,
       "status": "Tốt",
-      "cause": "Rớt luân chuyển 9 đơn (Shopee: 0, TTS: 8, Khác: 1)",
-      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu 2 shipper + Rớt luân chuyển 9 đơn (Shopee: 0, TTS: 8, Khác: 1)",
+      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 0,
-        "shortage_bs": 0,
+        "shortage_actual": 2,
+        "shortage_bs": 2,
         "target_headcount": 11,
         "tuyen_thieu": "",
         "hrbp": "DungLK",
-        "status": "Đủ",
+        "status": "Thiếu",
         "ob_week": 0,
         "resign_week": 0
       }
@@ -1696,20 +1696,20 @@
       "backlog": 1,
       "status": "Cảnh báo",
       "cause": "Không rõ nguyên nhân, rủi ro sập luồng hàng cao!",
-      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper.",
+      "recommendation": "Đề nghị AM kiểm tra và điều phối nhân sự xử lý gấp.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 1,
+        "shortage_actual": 0,
         "shortage_bs": 1,
         "target_headcount": 13,
         "tuyen_thieu": "Xã Tân Quới",
         "hrbp": "DungLK",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 0
       }
     },
@@ -1761,7 +1761,7 @@
       "fd_change": 0.00481419747,
       "backlog": 0,
       "status": "Tốt",
-      "cause": "Thiếu 3 shipper + Biến động nghỉ việc đột biến trong tuần (-3 shipper) + Rớt luân chuyển 2 đơn (Shopee: 1, TTS: 0, Khác: 1)",
+      "cause": "Thiếu 2 shipper + Biến động nghỉ việc đột biến trong tuần (-3 shipper) + Rớt luân chuyển 2 đơn (Shopee: 1, TTS: 0, Khác: 1)",
       "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát lý do shipper nghỉ việc đột ngột để ổn định nhân sự. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
@@ -1769,13 +1769,13 @@
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 3,
+        "shortage_actual": 2,
         "shortage_bs": 0,
         "target_headcount": 18,
         "tuyen_thieu": "Xã Mỹ Đức Tây, Hậu Thành",
         "hrbp": "NgọcNTM",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 3
       }
     },
@@ -1926,20 +1926,20 @@
       "fd_change": -0.003842544320000002,
       "backlog": 31,
       "status": "Cảnh báo",
-      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 4/16 shipper, ~25%) + Tồn đọng đơn hàng backlog >5 ngày lớn (31 đơn) + Rớt luân chuyển 4 đơn (Shopee: 1, TTS: 1, Khác: 2)",
-      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Giải phóng hàng tồn đọng backlog lâu ngày (31 đơn). Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Tồn đọng đơn hàng backlog >5 ngày lớn (31 đơn) + Rớt luân chuyển 4 đơn (Shopee: 1, TTS: 1, Khác: 2)",
+      "recommendation": "Giải phóng hàng tồn đọng backlog lâu ngày (31 đơn). Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 4,
-        "shortage_bs": 4,
+        "shortage_actual": 0,
+        "shortage_bs": 0,
         "target_headcount": 16,
         "tuyen_thieu": "",
         "hrbp": "DungLK",
-        "status": "Thiếu",
+        "status": "Đủ",
         "ob_week": 0,
         "resign_week": 0
       }
@@ -1960,21 +1960,21 @@
       "backlog": 6,
       "status": "Tốt",
       "cause": "Rớt luân chuyển 1 đơn (Shopee: 0, TTS: 0, Khác: 1)",
-      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 0,
+        "shortage_actual": 1,
         "shortage_bs": 0,
         "target_headcount": 10,
         "tuyen_thieu": "Xã Trà Ôn ( thị Trấn Trà Ôn cũ )",
         "hrbp": "DungLK",
-        "status": "Đủ",
+        "status": "Thiếu",
         "ob_week": 0,
-        "resign_week": 0
+        "resign_week": 1
       }
     },
     {
@@ -2258,21 +2258,21 @@
       "fd_change": 0.02103993993,
       "backlog": 2,
       "status": "Tốt",
-      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 3/13 shipper, ~23%) + Rớt luân chuyển 2 đơn (Shopee: 0, TTS: 0, Khác: 2)",
-      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu 2 shipper + Rớt luân chuyển 2 đơn (Shopee: 0, TTS: 0, Khác: 2)",
+      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 3,
+        "shortage_actual": 2,
         "shortage_bs": 2,
         "target_headcount": 13,
         "tuyen_thieu": "Tân Hộ Cơ",
         "hrbp": "NgọcNTM",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 1
       }
     },
@@ -2302,7 +2302,7 @@
         "shortage_actual": 3,
         "shortage_bs": 2,
         "target_headcount": 16,
-        "tuyen_thieu": "Tân Thiềng",
+        "tuyen_thieu": "",
         "hrbp": "BảoHQ",
         "status": "Thiếu",
         "ob_week": 0,
@@ -2358,21 +2358,21 @@
       "fd_change": 0.0031278012200000004,
       "backlog": 10,
       "status": "Cảnh báo",
-      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 4/17 shipper, ~24%) + Biến động nghỉ việc đột biến trong tuần (-4 shipper) + Rớt luân chuyển 5 đơn (Shopee: 0, TTS: 0, Khác: 5)",
-      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát lý do shipper nghỉ việc đột ngột để ổn định nhân sự. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu 3 shipper + Biến động nghỉ việc đột biến trong tuần (-4 shipper) + Rớt luân chuyển 5 đơn (Shopee: 0, TTS: 0, Khác: 5)",
+      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát lý do shipper nghỉ việc đột ngột để ổn định nhân sự. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 4,
+        "shortage_actual": 3,
         "shortage_bs": 0,
         "target_headcount": 17,
         "tuyen_thieu": "Long Phú, Tân Phú, Phú Quới, Phú Thịnh",
         "hrbp": "DungLK",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 4
       }
     },
@@ -2457,20 +2457,20 @@
       "fd_change": 0.0066723336800000015,
       "backlog": 1,
       "status": "Tốt",
-      "cause": "Rớt luân chuyển 3 đơn (Shopee: 2, TTS: 0, Khác: 1)",
-      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu 2 shipper + Rớt luân chuyển 3 đơn (Shopee: 2, TTS: 0, Khác: 1)",
+      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 0,
-        "shortage_bs": 0,
+        "shortage_actual": 2,
+        "shortage_bs": 2,
         "target_headcount": 14,
         "tuyen_thieu": "",
         "hrbp": "NgọcNTM",
-        "status": "Đủ",
+        "status": "Thiếu",
         "ob_week": 0,
         "resign_week": 0
       }
@@ -2524,20 +2524,20 @@
       "backlog": 1,
       "status": "Tốt",
       "cause": "Rớt luân chuyển 12 đơn (Shopee: 0, TTS: 0, Khác: 12)",
-      "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 1,
+        "shortage_actual": 0,
         "shortage_bs": 0,
         "target_headcount": 9,
         "tuyen_thieu": "Vĩnh Thạnh  ( A, B)",
         "hrbp": "NgọcNTM",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 1
       }
     },
@@ -2556,7 +2556,7 @@
       "fd_change": 0.020264847510000003,
       "backlog": 26,
       "status": "Cảnh báo",
-      "cause": "Thiếu 2 shipper + Rớt luân chuyển 7 đơn (Shopee: 1, TTS: 5, Khác: 1)",
+      "cause": "Rớt luân chuyển 7 đơn (Shopee: 1, TTS: 5, Khác: 1)",
       "recommendation": "Đẩy nhanh tuyển dụng bổ sung shipper. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
@@ -2564,13 +2564,13 @@
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 2,
+        "shortage_actual": 1,
         "shortage_bs": 1,
         "target_headcount": 12,
         "tuyen_thieu": "Long hưng B",
         "hrbp": "NgọcNTM",
         "status": "Thiếu",
-        "ob_week": 0,
+        "ob_week": 1,
         "resign_week": 1
       }
     },
@@ -2600,7 +2600,7 @@
         "shortage_actual": 3,
         "shortage_bs": 3,
         "target_headcount": 14,
-        "tuyen_thieu": "Tân Thanh Tây, Nhuận Phú Tân (Kho tự sắp xếp)",
+        "tuyen_thieu": "(Kho tự sắp xếp)",
         "hrbp": "BảoHQ",
         "status": "Thiếu",
         "ob_week": 0,
@@ -2623,22 +2623,22 @@
       "fd_change": 0.0,
       "backlog": 12,
       "status": "Bất ổn",
-      "cause": "Rớt luân chuyển 3 đơn (Shopee: 0, TTS: 3, Khác: 0)",
-      "recommendation": "Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
+      "cause": "Thiếu hụt nhân sự nghiêm trọng (hụt 2/8 shipper, ~25%) + Rớt luân chuyển 3 đơn (Shopee: 0, TTS: 3, Khác: 0)",
+      "recommendation": "AM phối hợp với HRBP tuyển gấp và điều động shipper từ kho lân cận sang giải toả hàng. Rà soát nguyên nhân rớt luân chuyển giao/lấy và phối hợp với vận chuyển ứng cứu.",
       "exit_profile": {
         "exit_hour": "08:45",
         "late_inbound": false,
         "sorting_delay": false
       },
       "hr": {
-        "shortage_actual": 0,
-        "shortage_bs": 0,
+        "shortage_actual": 2,
+        "shortage_bs": 2,
         "target_headcount": 8,
-        "tuyen_thieu": "",
+        "tuyen_thieu": "Tuyến Phước Thạnh, Phường Trung An (Ấp Đông, Ấp Chợ), Phường 10",
         "hrbp": "NgọcNTM",
-        "status": "Đủ",
-        "ob_week": 0,
-        "resign_week": 0
+        "status": "Thiếu",
+        "ob_week": 1,
+        "resign_week": 1
       },
       "% Gán": 0.6411
     },
@@ -14153,28 +14153,28 @@
         "am": "Ngô Thị Bé Mi",
         "dinhiben_nvpttt": 20,
         "dinhiben_nvxl": 2,
-        "tuyen_7d": 0,
+        "tuyen_7d": 1,
         "nghi_7d": 6,
-        "details": "- Thiếu hụt thực tế sau OB: 11 NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +0 OB. Nhân sự nghỉ việc: -6.\n- Tuyến thiếu: XÃ Phú Nhuận ( đã nghỉ ngang )\n- XÃ LONG KHÁNH\n- XÃ CẨM SƠN\n- PHƯỜNG 5\n_ TÂN PHÚ ( Đã viết đơn )\n- NHỊ QUÝ ( Đã viết đơn )\n- BÌNH PHÚ \n- PHÚ AN \n- PHƯỜNG 2 \n( Bưu cục đang thiếu 6 tuyến , có 5 nhân viên việc đơn xin nghỉ t12).",
-        "shortage_accurate": 11,
+        "details": "- Thiếu hụt thực tế sau OB: 10 NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +1 OB. Nhân sự nghỉ việc: -6.\n- Tuyến thiếu: XÃ Phú Nhuận ( đã nghỉ ngang )\n- XÃ LONG KHÁNH\n- XÃ CẨM SƠN\n- PHƯỜNG 5\n_ TÂN PHÚ ( Đã viết đơn )\n- NHỊ QUÝ ( Đã viết đơn )\n- BÌNH PHÚ \n- PHÚ AN \n- PHƯỜNG 2 \n( Bưu cục đang thiếu 6 tuyến , có 5 nhân viên việc đơn xin nghỉ t12).",
+        "shortage_accurate": 10,
         "missing_routes": "XÃ Phú Nhuận ( đã nghỉ ngang )\n- XÃ LONG KHÁNH\n- XÃ CẨM SƠN\n- PHƯỜNG 5\n_ TÂN PHÚ ( Đã viết đơn )\n- NHỊ QUÝ ( Đã viết đơn )\n- BÌNH PHÚ \n- PHÚ AN \n- PHƯỜNG 2 \n( Bưu cục đang thiếu 6 tuyến , có 5 nhân viên việc đơn xin nghỉ t12)",
         "action_plan": "Phân bổ gán tuyến trước 8h sáng, phối hợp NgọcNTM chạy FB Ads tìm shipper thay thế. AM Ngô Thị Bé Mi cắm chốt tại (TGI) Mỹ Thành để hướng dẫn shipper mới."
       },
       {
-        "bc_name": "(BTR) Sơn Đông",
-        "volume": 9230,
-        "vol_tts": 1384,
-        "gtc": 0.5213,
-        "backlog_72h": 307,
-        "am": "Nguyễn Huỳnh Quốc Dũng",
-        "dinhiben_nvpttt": 17,
+        "bc_name": "(TGI) Đạo Thạnh",
+        "volume": 4049,
+        "vol_tts": 607,
+        "gtc": 0.403,
+        "backlog_72h": 4,
+        "am": "Đoàn Công Tín",
+        "dinhiben_nvpttt": 16,
         "dinhiben_nvxl": 2,
         "tuyen_7d": 0,
-        "nghi_7d": 1,
-        "details": "- Thiếu hụt thực tế sau OB: 5 NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +0 OB. Nhân sự nghỉ việc: -1.\n- Tuyến thiếu: Phú Tân, Sơn Đông.",
-        "shortage_accurate": 5,
-        "missing_routes": "Phú Tân, Sơn Đông",
-        "action_plan": "Phân bổ gán tuyến trước 8h sáng, phối hợp BảoHQ chạy FB Ads tìm shipper thay thế. AM Nguyễn Huỳnh Quốc Dũng cắm chốt tại (BTR) Sơn Đông để hướng dẫn shipper mới."
+        "nghi_7d": 2,
+        "details": "- Thiếu hụt thực tế sau OB: 6 NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +0 OB. Nhân sự nghỉ việc: -2.",
+        "shortage_accurate": 6,
+        "missing_routes": "",
+        "action_plan": "Phân bổ gán tuyến trước 8h sáng, phối hợp DungLK chạy FB Ads tìm shipper thay thế. AM Đoàn Công Tín cắm chốt tại (TGI) Đạo Thạnh để hướng dẫn shipper mới."
       },
       {
         "bc_name": "(DTH) Tân Nhuận Đông",
@@ -14193,20 +14193,20 @@
         "action_plan": "AM Lý Quài Nhân khảo sát và tuyển dụng shipper địa phương am hiểu địa bàn (DTH) Tân Nhuận Đông, áp dụng chính sách 'Giới thiệu shipper mới nhận thưởng 500k' cho nhân viên kho hiện hữu."
       },
       {
-        "bc_name": "(TGI) Mỹ Phong",
-        "volume": 1695,
-        "vol_tts": 254,
-        "gtc": 0.4401,
-        "backlog_72h": 3,
-        "am": "Nguyễn Anh Tùng",
-        "dinhiben_nvpttt": 19,
+        "bc_name": "(TGI) Đồng Sơn",
+        "volume": 1876,
+        "vol_tts": 281,
+        "gtc": 0.5574,
+        "backlog_72h": 5,
+        "am": "Đoàn Công Tín",
+        "dinhiben_nvpttt": 18,
         "dinhiben_nvxl": 2,
         "tuyen_7d": 0,
         "nghi_7d": 0,
         "details": "- Thiếu hụt thực tế sau OB: 5 NVPTTT.\n- Nhân sự mới nhận việc trong tuần: +0 OB. Nhân sự nghỉ việc: -0.",
         "shortage_accurate": 5,
         "missing_routes": "",
-        "action_plan": "Phân bổ gán tuyến trước 8h sáng, phối hợp DungLK chạy FB Ads tìm shipper thay thế. AM Nguyễn Anh Tùng cắm chốt tại (TGI) Mỹ Phong để hướng dẫn shipper mới."
+        "action_plan": "Phân bổ gán tuyến trước 8h sáng, phối hợp DungLK chạy FB Ads tìm shipper thay thế. AM Đoàn Công Tín cắm chốt tại (TGI) Đồng Sơn để hướng dẫn shipper mới."
       },
       {
         "bc_name": "(TVI) Trà Vinh",
