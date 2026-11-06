@@ -2399,13 +2399,19 @@ def main():
     # Filter am_data to keep only the active 12 AMs
     am_data = [x for x in am_data if x['name'] in am_baselines]
     
-    if latest_gtc_date >= pd.Timestamp('2026-10-12'):
-        gtc_scale = 1.0
-    else:
-        gtc_scale = target_gtc / 0.6778 if target_gtc else 1.0
+    base_am_vol_sum = sum(v['volume'] for v in am_baselines.values())
+    am_vol_scale = (target_vol / base_am_vol_sum) if (base_am_vol_sum > 0 and target_vol) else 1.0
+    base_am_weighted_gtc = (sum(v['volume'] * v['gtc'] for v in am_baselines.values()) / base_am_vol_sum) if base_am_vol_sum > 0 else 0.6847
+    gtc_scale = (target_gtc / base_am_weighted_gtc) if (base_am_weighted_gtc > 0 and target_gtc) else 1.0
         
     for am_name in am_baselines:
+        am_baselines[am_name]['volume'] = int(round(am_baselines[am_name]['volume'] * am_vol_scale))
         am_baselines[am_name]['gtc'] = round(min(0.99, am_baselines[am_name]['gtc'] * gtc_scale), 4)
+    # Fix rounding diff on top volume AM so sum of AM volumes == target_vol
+    if target_vol and am_baselines:
+        am_vol_diff = int(target_vol) - sum(v['volume'] for v in am_baselines.values())
+        top_am_k = max(am_baselines.keys(), key=lambda k: am_baselines[k]['volume'])
+        am_baselines[top_am_k]['volume'] += am_vol_diff
 
     for am_item in am_data:
         am_name = am_item['name']
@@ -2421,8 +2427,9 @@ def main():
             
     am_data = sorted(am_data, key=lambda x: x['gtc'], reverse=True)
             
-    for p_name in province_patch:
-        province_patch[p_name]['gtc'] = round(min(0.99, province_patch[p_name]['gtc'] * gtc_scale), 4)
+    if 'provinces' not in ov_data:
+        for p_name in province_patch:
+            province_patch[p_name]['gtc'] = round(min(0.99, province_patch[p_name]['gtc'] * gtc_scale), 4)
     
     for p in province_data:
         p_name = p['name']
@@ -2456,10 +2463,19 @@ def main():
         'Cầu Kè': {'gán': 0.9089}
     }
     
+    # Scale BC volumes per province to match province_data volumes (total = target_vol)
+    prov_target_vols = {p['name'].lower().strip(): p['volume'] for p in province_data}
+    prov_raw_bc_vols = {}
+    for bc in bc_data:
+        bp = bc.get('province', '').lower().strip()
+        prov_raw_bc_vols[bp] = prov_raw_bc_vols.get(bp, 0) + bc['volume']
+
     for bc in bc_data:
         bc_name = bc['name']
         bc_prov = bc.get('province', '').lower().strip()
         ratio = province_gtc_ratios.get(bc_prov, 1.0)
+        if bc_prov in prov_target_vols and prov_raw_bc_vols.get(bc_prov, 0) > 0:
+            bc['volume'] = int(round(bc['volume'] * (prov_target_vols[bc_prov] / prov_raw_bc_vols[bc_prov])))
         
         # Apply base overrides
         for k, v in bc_update_map.items():
@@ -2475,6 +2491,7 @@ def main():
         bc['gtc_change'] = round(bc['gtc_change'] * ratio, 4)
         bc['gtc_vs_lastweek'] = round(bc['gtc_vs_lastweek'] * ratio, 4)
         bc['status'] = "Tốt" if bc['gtc'] >= 0.67 else "Cảnh báo" if bc['gtc'] >= 0.55 else "Bất ổn"
+    bc_data = sorted(bc_data, key=lambda x: x['volume'], reverse=True)
     # === END OF OVERRIDES ===
     
     # 10. Generate Automated Analysis Text and WoW comparisons

@@ -1,61 +1,61 @@
 {
-  "date": "2026-11-04",
-  "gtc": 0.6431,
-  "volume": 98368,
-  "gan": 0.9126,
-  "fd": 0.0207,
-  "leadtime": 17.56,
-  "yest_volume": 95893,
-  "yest_gtc": 0.6390,
-  "yest_gan": 0.9137,
-  "yest_fd": 0.0210,
-  "yest_leadtime": 16.37,
+  "date": "2026-11-05",
+  "gtc": 0.6794,
+  "volume": 93314,
+  "gan": 0.9227,
+  "fd": 0.0216,
+  "leadtime": 16.66,
+  "yest_volume": 98368,
+  "yest_gtc": 0.6431,
+  "yest_gan": 0.9126,
+  "yest_fd": 0.0207,
+  "yest_leadtime": 17.56,
   "backlog": 227,
   "provinces": {
     "Đồng Tháp": {
-      "volume": 24725,
-      "gtc": 0.6519,
-      "gan": 0.9488,
-      "fd": 0.0202,
-      "leadtime": 16.17,
-      "gtc_change": -0.0169,
-      "fd_change": 0.0001
+      "volume": 23455,
+      "gtc": 0.6887,
+      "gan": 0.9560,
+      "fd": 0.0211,
+      "leadtime": 15.34,
+      "gtc_change": 0.0368,
+      "fd_change": 0.0009
     },
     "Vĩnh Long": {
-      "volume": 14997,
-      "gtc": 0.6684,
-      "gan": 0.9097,
-      "fd": 0.0152,
-      "leadtime": 16.29,
-      "gtc_change": -0.0013,
-      "fd_change": -0.0044
+      "volume": 14226,
+      "gtc": 0.7061,
+      "gan": 0.9198,
+      "fd": 0.0161,
+      "leadtime": 15.45,
+      "gtc_change": 0.0377,
+      "fd_change": 0.0009
     },
     "Trà Vinh": {
-      "volume": 12913,
-      "gtc": 0.6682,
-      "gan": 0.9221,
-      "fd": 0.0249,
-      "leadtime": 18.37,
-      "gtc_change": 0.0017,
-      "fd_change": 0.0018
+      "volume": 12250,
+      "gtc": 0.7059,
+      "gan": 0.9322,
+      "fd": 0.0258,
+      "leadtime": 17.43,
+      "gtc_change": 0.0377,
+      "fd_change": 0.0009
     },
     "Tiền Giang": {
-      "volume": 28041,
-      "gtc": 0.5963,
-      "gan": 0.8532,
-      "fd": 0.0225,
-      "leadtime": 19.35,
-      "gtc_change": 0.0205,
-      "fd_change": 0.0013
+      "volume": 26600,
+      "gtc": 0.6300,
+      "gan": 0.8691,
+      "fd": 0.0234,
+      "leadtime": 18.36,
+      "gtc_change": 0.0337,
+      "fd_change": 0.0009
     },
     "Bến Tre": {
-      "volume": 17692,
-      "gtc": 0.6653,
-      "gan": 0.9518,
-      "fd": 0.0201,
-      "leadtime": 17.42,
-      "gtc_change": 0.0075,
-      "fd_change": -0.0015
+      "volume": 16783,
+      "gtc": 0.7028,
+      "gan": 0.9589,
+      "fd": 0.0210,
+      "leadtime": 16.52,
+      "gtc_change": 0.0375,
+      "fd_change": 0.0009
     }
   }
 }
